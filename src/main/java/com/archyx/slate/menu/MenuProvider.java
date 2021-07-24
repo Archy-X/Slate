@@ -4,10 +4,12 @@ import org.bukkit.entity.Player;
 
 public interface MenuProvider {
 
-    String replacePlaceholder(String placeholder, Player player);
+    void onOpen(Player player, ActiveMenu menu);
 
-    int getPages(Player player);
+    String onPlaceholderReplace(String placeholder, Player player);
 
-    void onOpen(Player player, MenuInventory menu);
+    default int getPages(Player player) {
+        return 1;
+    }
 
 }

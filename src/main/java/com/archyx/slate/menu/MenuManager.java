@@ -113,7 +113,7 @@ public class MenuManager {
         // Replace title placeholders
         if (menu.getProvider() != null) {
             for (String placeholder : StringUtils.substringsBetween(title, "{", "}")) {
-                title = TextUtil.replace(title, "{" + placeholder + "}", menu.getProvider().replacePlaceholder(placeholder, player));
+                title = TextUtil.replace(title, "{" + placeholder + "}", menu.getProvider().onPlaceholderReplace(placeholder, player));
             }
         }
         // Build inventory and open

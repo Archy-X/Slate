@@ -4,6 +4,9 @@ import com.archyx.slate.Slate;
 import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.SingleItem;
 import com.archyx.slate.item.TemplateItem;
+import com.archyx.slate.item.active.ActiveItem;
+import com.archyx.slate.item.active.ActiveSingleItem;
+import com.archyx.slate.item.active.ActiveTemplateItem;
 import com.archyx.slate.item.provider.SingleItemProvider;
 import com.archyx.slate.item.provider.TemplateItemProvider;
 import com.archyx.slate.util.TextUtil;
@@ -15,51 +18,70 @@ import org.apache.commons.lang.StringUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class MenuInventory implements InventoryProvider {
 
     private final Slate slate;
     private final ConfigurableMenu menu;
-    private Map<String, Consumer<ItemClickData>> itemListeners;
-    private Map<String, BiConsumer<ItemClickData, ?>> templateListeners;
+    private final ActiveMenu activeMenu;
+    private final Map<String, ActiveItem> activeItems;
 
     public MenuInventory(Slate slate, ConfigurableMenu menu) {
         this.slate = slate;
         this.menu = menu;
-        this.itemListeners = new HashMap<>();
-        this.templateListeners = new HashMap<>();
+        this.activeItems = new HashMap<>();
+        this.activeMenu = new ActiveMenu(this);
     }
 
-    public void addItemClickListener(String itemName, Consumer<ItemClickData> listener) {
-        itemListeners.put(itemName, listener);
+    public ConfigurableMenu getMenu() {
+        return menu;
     }
 
-    public <C> void addTemplateClickListener(String templateName, C context, BiConsumer<ItemClickData, C> listener) {
-        templateListeners.put(templateName, listener);
+    public ActiveMenu getActiveMenu() {
+        return activeMenu;
+    }
+
+    @Nullable
+    public ActiveItem getActiveItem(String itemName) {
+        return activeItems.get(itemName);
     }
 
     @Override
     public void init(Player player, InventoryContents contents) {
+        // Add active items
+        for (MenuItem menuItem : menu.getItems().values()) {
+            ActiveItem activeItem;
+            if (menuItem instanceof SingleItem) {
+                activeItem = new ActiveSingleItem((SingleItem) menuItem);
+            } else if (menuItem instanceof TemplateItem) {
+                TemplateItem<?> templateItem = (TemplateItem<?>) menuItem;
+                activeItem = new ActiveTemplateItem<>(templateItem);
+            } else {
+                continue;
+            }
+            activeItems.put(menuItem.getName(), activeItem);
+        }
         // Allow provider to add listeners and custom behavior
         MenuProvider provider = menu.getProvider();
         if (provider != null) {
-            provider.onOpen(player, this);
+            provider.onOpen(player, activeMenu);
         }
         // Place items
-        for (MenuItem menuItem : menu.getItems().values()) {
-            if (menuItem instanceof SingleItem) { // Create single item
-                addSingleItem((SingleItem) menuItem, contents, player);
-            } else if (menuItem instanceof TemplateItem) { // Create template item
-                addTemplateItem((TemplateItem<?>) menuItem, contents, player);
+        for (ActiveItem activeItem : activeItems.values()) {
+            if (activeItem instanceof ActiveSingleItem) { // Create single item
+                addSingleItem((ActiveSingleItem) activeItem, contents, player);
+            } else if (activeItem instanceof ActiveTemplateItem) { // Create template item
+                addTemplateItem((ActiveTemplateItem<?>) activeItem, contents, player);
             }
         }
     }
 
-    private void addSingleItem(SingleItem item, InventoryContents contents, Player player) {
+    private void addSingleItem(ActiveSingleItem activeItem, InventoryContents contents, Player player) {
+        SingleItem item = activeItem.getItem();
         SingleItemProvider provider = item.getProvider();
 
         ItemStack itemStack = item.getBaseItem();
@@ -93,7 +115,7 @@ public class MenuInventory implements InventoryProvider {
         }
 
         // Add item to inventory
-        Consumer<ItemClickData> listener = itemListeners.get(item.getName());
+        Consumer<ItemClickData> listener = activeItem.getClickListener();
         if (listener != null) { // If listener is defined
             contents.set(item.getPosition(), ClickableItem.from(itemStack, listener));
         } else {
@@ -101,27 +123,28 @@ public class MenuInventory implements InventoryProvider {
         }
     }
 
-    private <C> void addTemplateItem(TemplateItem<C> templateItem, InventoryContents contents, Player player) {
-        TemplateItemProvider<C> provider = templateItem.getProvider();
+    private <C> void addTemplateItem(ActiveTemplateItem<C> activeItem, InventoryContents contents, Player player) {
+        TemplateItem<C> item = activeItem.getItem();
+        TemplateItemProvider<C> provider = item.getProvider();
 
         Set<C> contexts;
         if (provider != null) {
             contexts = provider.getDefinedContexts();
         } else {
-            contexts = templateItem.getBaseItems().keySet();
+            contexts = item.getBaseItems().keySet();
         }
 
         for (C context : contexts) {
-            ItemStack itemStack = templateItem.getBaseItems().get(context);
+            ItemStack itemStack = item.getBaseItems().get(context);
             if (itemStack == null) {
-                itemStack = templateItem.getDefaultBaseItem();
+                itemStack = item.getDefaultBaseItem();
                 if (itemStack == null) {
                     continue;
                 }
             }
             ItemMeta meta = itemStack.getItemMeta();
             if (meta != null) {
-                String displayName = templateItem.getDisplayName();
+                String displayName = item.getDisplayName();
                 if (displayName != null) {
                     // Replace display name placeholders
                     if (provider != null) {
@@ -131,7 +154,7 @@ public class MenuInventory implements InventoryProvider {
                     }
                     meta.setDisplayName(displayName);
                 }
-                List<String> lore = templateItem.getLore();
+                List<String> lore = item.getLore();
                 if (lore != null && lore.size() > 0) {
                     // Replace lore placeholders
                     if (provider != null) {
@@ -148,11 +171,11 @@ public class MenuInventory implements InventoryProvider {
                 itemStack.setItemMeta(meta);
             }
             // Add item to inventory
-            BiConsumer<ItemClickData, ?> listener = templateListeners.get(templateItem.getName());
+            Consumer<ItemClickData> listener = activeItem.bindContext(context);
             if (listener != null) { // If listener is defined
-                // contents.set(item.getPosition(), ClickableItem.from(itemStack, listener));
+                contents.set(item.getPosition(context), ClickableItem.from(itemStack, listener));
             } else {
-                // contents.set(item.getPosition(), ClickableItem.empty(itemStack));
+                contents.set(item.getPosition(context), ClickableItem.empty(itemStack));
             }
         }
     }
