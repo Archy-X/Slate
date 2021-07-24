@@ -40,6 +40,7 @@ public class TemplateItemParser<C> extends MenuItemParser {
         Map<C, ItemStack> baseItems = new HashMap<>();
         Map<C, SlotPos> positions = new HashMap<>();
         for (String key : section.getKeys(false)) {
+            if (isKeyWord(key)) continue; // Skip for key words used for default item parsing
             C context = contextProvider.parse(key);
             ConfigurationSection contextSection = section.getConfigurationSection(key);
             if (context != null && contextSection != null) { // Context parse found a match

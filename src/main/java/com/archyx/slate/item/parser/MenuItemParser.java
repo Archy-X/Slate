@@ -29,6 +29,9 @@ import java.util.*;
 public abstract class MenuItemParser extends MapParser {
 
     protected final Slate slate;
+    private final String[] KEY_WORDS = new String[] {
+        "material", "display_name", "lore", "enchantments", "potion_data", "custom_effects", "glow", "nbt", "item_flags"
+    };
 
     public MenuItemParser(Slate slate) {
         this.slate = slate;
@@ -209,6 +212,19 @@ public abstract class MenuItemParser extends MapParser {
             int column = slot % 9;
             return SlotPos.of(row, column);
         }
+    }
+
+    protected String[] getKeyWords() {
+        return KEY_WORDS;
+    }
+
+    protected boolean isKeyWord(String word) {
+        for (String keyWord : getKeyWords()) {
+            if (keyWord.equals(word)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
