@@ -8,7 +8,7 @@ public interface TemplateItemProvider<C> {
 
     Class<C> getContext();
 
-    String replacePlaceholder(String placeholder, Player player, C context);
+    String onPlaceholderReplace(String placeholder, Player player, C context);
 
     Set<C> getDefinedContexts();
 

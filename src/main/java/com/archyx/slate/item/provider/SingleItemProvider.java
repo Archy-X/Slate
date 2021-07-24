@@ -4,6 +4,6 @@ import org.bukkit.entity.Player;
 
 public interface SingleItemProvider {
 
-    String replacePlaceholder(String placeholder, Player player);
+    String onPlaceholderReplace(String placeholder, Player player);
 
 }

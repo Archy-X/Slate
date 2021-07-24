@@ -97,7 +97,7 @@ public class MenuInventory implements InventoryProvider {
                 // Replace display name placeholders
                 if (provider != null) {
                     for (String placeholder : StringUtils.substringsBetween(displayName, "{", "}")) {
-                        displayName = TextUtil.replace(placeholder, "{" + placeholder + "}", provider.replacePlaceholder(placeholder, player));
+                        displayName = TextUtil.replace(placeholder, "{" + placeholder + "}", provider.onPlaceholderReplace(placeholder, player));
                     }
                 }
                 meta.setDisplayName(displayName);
@@ -109,7 +109,7 @@ public class MenuInventory implements InventoryProvider {
                     List<String> replacedLore = new ArrayList<>();
                     for (String line : lore) {
                         for (String placeholder : StringUtils.substringsBetween(line, "{", "}")) {
-                            replacedLore.add(TextUtil.replace(placeholder, "{" + placeholder + "}", provider.replacePlaceholder(placeholder, player)));
+                            replacedLore.add(TextUtil.replace(placeholder, "{" + placeholder + "}", provider.onPlaceholderReplace(placeholder, player)));
                         }
                     }
                     lore = replacedLore;
@@ -151,7 +151,7 @@ public class MenuInventory implements InventoryProvider {
                     // Replace display name placeholders
                     if (provider != null) {
                         for (String placeholder : StringUtils.substringsBetween(displayName, "{", "}")) {
-                            displayName = TextUtil.replace(placeholder, "{" + placeholder + "}", provider.replacePlaceholder(placeholder, player, context));
+                            displayName = TextUtil.replace(placeholder, "{" + placeholder + "}", provider.onPlaceholderReplace(placeholder, player, context));
                         }
                     }
                     meta.setDisplayName(displayName);
@@ -163,7 +163,7 @@ public class MenuInventory implements InventoryProvider {
                         List<String> replacedLore = new ArrayList<>();
                         for (String line : lore) {
                             for (String placeholder : StringUtils.substringsBetween(line, "{", "}")) {
-                                replacedLore.add(TextUtil.replace(placeholder, "{" + placeholder + "}", provider.replacePlaceholder(placeholder, player, context)));
+                                replacedLore.add(TextUtil.replace(placeholder, "{" + placeholder + "}", provider.onPlaceholderReplace(placeholder, player, context)));
                             }
                         }
                         lore = replacedLore;
