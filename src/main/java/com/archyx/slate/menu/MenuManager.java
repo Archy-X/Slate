@@ -51,18 +51,41 @@ public class MenuManager {
         return templateItemProviders.get(menuName);
     }
 
-    public void registerProvider(String name, SingleItemProvider provider) {
+    /**
+     * Registers an item provider for a single item. Providers are used to define unique behavior for items.
+     *
+     * @param name The name of the single item
+     * @param provider The provider instance
+     */
+    public void registerItemProvider(String name, SingleItemProvider provider) {
         singleItemProviders.put(name, provider);
     }
 
-    public void registerProvider(String name, TemplateItemProvider<?> provider) {
+    /**
+     * Registers an item provider for a template item. Providers are used to define unique behavior for items.
+     *
+     * @param name The name of the template item
+     * @param provider The provider instance
+     */
+    public void registerItemProvider(String name, TemplateItemProvider<?> provider) {
         templateItemProviders.put(name, provider);
     }
 
-    public void registerProvider(String name, MenuProvider provider) {
+    /**
+     * Registers a menu provider for a menu. Providers are used to define unique behavior for menus.
+     *
+     * @param name The name of the menu
+     * @param provider The provider instance
+     */
+    public void registerMenuProvider(String name, MenuProvider provider) {
         menuProviders.put(name, provider);
     }
 
+    /**
+     * Attempts to load a menu from a file
+     *
+     * @param file The file to load from, must be in Yaml syntax
+     */
     public void loadMenu(File file) {
         FileConfiguration config = YamlConfiguration.loadConfiguration(file);
         String name = config.getString("name");
@@ -106,6 +129,12 @@ public class MenuManager {
         menus.put(name, menu);
     }
 
+    /**
+     * Opens a loaded menu for a player, will fail silently if the menu does not exist.
+     *
+     * @param player The player to display the menu to
+     * @param name The name of the menu
+     */
     public void openMenu(Player player, String name) {
         ConfigurableMenu menu = menus.get(name);
         if (menu == null) return;
