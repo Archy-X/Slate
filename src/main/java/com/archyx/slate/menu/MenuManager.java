@@ -9,7 +9,6 @@ import com.archyx.slate.item.provider.TemplateItemProvider;
 import com.archyx.slate.util.TextUtil;
 import fr.minuskube.inv.SmartInventory;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -88,8 +87,11 @@ public class MenuManager {
      */
     public void loadMenu(File file) {
         FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-        String name = config.getString("name");
-        Validate.notNull(name, "Menu must have value name");
+        String name = file.getName();
+        int pos = name.lastIndexOf(".");
+        if (pos > 0) {
+            name = name.substring(0, pos);
+        }
 
         String title = config.getString("title", name);
         int size = config.getInt("size", 6);
