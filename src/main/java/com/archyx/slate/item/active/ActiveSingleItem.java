@@ -24,6 +24,13 @@ public class ActiveSingleItem extends ActiveItem {
         return clickListener;
     }
 
+    /**
+     * Adds a listener to be executed when the item is clicked.
+     * The specified consumer can use ItemClickData to get information from the click, such as the event or player.
+     * {@link ItemClickData#getEvent()} can be checked and then cast to InventoryClickEvent.
+     *
+     * @param clickListener The click listener Consumer
+     */
     public void setClickListener(Consumer<ItemClickData> clickListener) {
         this.clickListener = clickListener;
     }

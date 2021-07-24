@@ -1,6 +1,8 @@
 package com.archyx.slate.menu;
 
 import com.archyx.slate.Slate;
+import com.archyx.slate.action.Action;
+import com.archyx.slate.action.click.ClickAction;
 import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.SingleItem;
 import com.archyx.slate.item.TemplateItem;
@@ -14,8 +16,11 @@ import fr.minuskube.inv.ClickableItem;
 import fr.minuskube.inv.ItemClickData;
 import fr.minuskube.inv.content.InventoryContents;
 import fr.minuskube.inv.content.InventoryProvider;
+import fr.minuskube.inv.content.SlotPos;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
@@ -116,11 +121,8 @@ public class MenuInventory implements InventoryProvider {
 
         // Add item to inventory
         Consumer<ItemClickData> listener = activeItem.getClickListener();
-        if (listener != null) { // If listener is defined
-            contents.set(item.getPosition(), ClickableItem.from(itemStack, listener));
-        } else {
-            contents.set(item.getPosition(), ClickableItem.empty(itemStack));
-        }
+        SlotPos pos = item.getPosition();
+        addItemToInventory(item, itemStack, pos, contents, listener, player);
     }
 
     private <C> void addTemplateItem(ActiveTemplateItem<C> activeItem, InventoryContents contents, Player player) {
@@ -172,12 +174,68 @@ public class MenuInventory implements InventoryProvider {
             }
             // Add item to inventory
             Consumer<ItemClickData> listener = activeItem.bindContext(context);
-            if (listener != null) { // If listener is defined
-                contents.set(item.getPosition(context), ClickableItem.from(itemStack, listener));
-            } else {
-                contents.set(item.getPosition(context), ClickableItem.empty(itemStack));
+            SlotPos pos = item.getPosition(context);
+            addItemToInventory(item, itemStack, pos, contents, listener, player);
+        }
+    }
+
+    /**
+     * Adds the menu item itself to the inventory menu and registers click listeners, both listeners and actions
+     */
+    private void addItemToInventory(MenuItem menuItem, ItemStack itemStack, SlotPos pos, InventoryContents contents, Consumer<ItemClickData> listener, Player player) {
+        if (listener != null) { // If listener is defined
+            contents.set(pos, ClickableItem.from(itemStack, c -> {
+                listener.accept(c);
+                executeActions(menuItem, player, contents, c);
+            }));
+        } else {
+            contents.set(pos, ClickableItem.from(itemStack, clickData -> executeActions(menuItem, player, contents, clickData)));
+        }
+    }
+
+    /**
+     * Executes the configured click actions of an item
+     */
+    private void executeActions(MenuItem menuItem, Player player, InventoryContents contents, ItemClickData clickData) {
+        // Convert click data event to InventoryClickEvent
+        if (!(clickData.getEvent() instanceof InventoryClickEvent)) {
+            return;
+        }
+        InventoryClickEvent event = (InventoryClickEvent) clickData.getEvent();
+
+        Set<ClickAction> clickActions = getClickActions(event.getClick());
+        Map<ClickAction, List<Action>> actions = menuItem.getActions();
+        for (Map.Entry<ClickAction, List<Action>> entry : actions.entrySet()) {
+            ClickAction clickAction = entry.getKey();
+            if (clickActions.contains(clickAction)) { // Make sure click matches
+                for (Action action : entry.getValue()) { // Execute each action
+                    action.execute(player, this, contents);
+                }
             }
         }
+    }
+
+    private Set<ClickAction> getClickActions(ClickType clickType) {
+        Set<ClickAction> clickActions = new HashSet<>();
+        clickActions.add(ClickAction.ANY);
+        switch (clickType) {
+            case LEFT:
+            case SHIFT_LEFT:
+                clickActions.add(ClickAction.LEFT);
+                break;
+            case RIGHT:
+            case SHIFT_RIGHT:
+                clickActions.add(ClickAction.RIGHT);
+                break;
+            case MIDDLE:
+                clickActions.add(ClickAction.MIDDLE);
+                break;
+            case DROP:
+            case CONTROL_DROP:
+                clickActions.add(ClickAction.DROP);
+                break;
+        }
+        return clickActions;
     }
 
 }

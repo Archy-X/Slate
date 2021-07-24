@@ -13,6 +13,13 @@ public class ActiveMenu {
         this.menuInventory = menuInventory;
     }
 
+    /**
+     * Gets an active single item in the menu used to add behavior to
+     *
+     * @param itemName The item name, must be a single item, not a template
+     * @return The active single item
+     * @throws IllegalArgumentException If an item with the specified name does not exist in the menu
+     */
     public ActiveSingleItem getItem(String itemName) {
         ActiveItem item = menuInventory.getActiveItem(itemName);
         if (item instanceof ActiveSingleItem) {
@@ -21,6 +28,13 @@ public class ActiveMenu {
         throw new IllegalArgumentException("Item with name " + itemName + " not found in menu " + menuInventory.getMenu().getName());
     }
 
+    /**
+     * Gets an active template item in the menu used to add behavior to
+     *
+     * @param itemName The item name, must be a template, not a single item
+     * @return The active template item
+     * @throws IllegalArgumentException If an item with the specified name does not exist in the menu
+     */
     @SuppressWarnings("unchecked")
     public <C> ActiveTemplateItem<C> getItem(String itemName, Class<C> contextClass) {
         ActiveItem item = menuInventory.getActiveItem(itemName);

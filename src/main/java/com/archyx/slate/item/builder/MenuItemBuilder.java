@@ -1,9 +1,13 @@
 package com.archyx.slate.item.builder;
 
 import com.archyx.slate.Slate;
+import com.archyx.slate.action.Action;
+import com.archyx.slate.action.click.ClickAction;
 import com.archyx.slate.item.MenuItem;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class MenuItemBuilder {
 
@@ -11,9 +15,11 @@ public abstract class MenuItemBuilder {
     protected String name;
     protected String displayName;
     protected List<String> lore;
+    protected Map<ClickAction, List<Action>> actions;
 
     public MenuItemBuilder(Slate slate) {
         this.slate = slate;
+        this.actions = new LinkedHashMap<>();
     }
 
     public abstract MenuItem build();
@@ -30,6 +36,11 @@ public abstract class MenuItemBuilder {
 
     public MenuItemBuilder lore(List<String> lore) {
         this.lore = lore;
+        return this;
+    }
+
+    public MenuItemBuilder actions(Map<ClickAction, List<Action>> actions) {
+        this.actions = actions;
         return this;
     }
 

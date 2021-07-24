@@ -78,7 +78,7 @@ public class MenuManager {
             for (String itemName : itemsSection.getKeys(false)) {
                 ConfigurationSection itemSection = itemsSection.getConfigurationSection(itemName);
                 if (itemSection != null) {
-                    MenuItem item = new SingleItemParser(slate).parse(itemSection);
+                    MenuItem item = new SingleItemParser(slate).parse(itemSection, name);
                     items.put(itemName, item);
                 }
             }
@@ -91,7 +91,7 @@ public class MenuManager {
                 if (templateSection != null) {
                     TemplateItemProvider<?> provider = slate.getMenuManager().getTemplateItemProvider(name);
                     if (provider != null) {
-                        MenuItem item = new TemplateItemParser<>(slate, provider).parse(templateSection);
+                        MenuItem item = new TemplateItemParser<>(slate, provider).parse(templateSection, name);
                         items.put(templateName, item);
                     } else {
                         throw new IllegalArgumentException("Could not find registered template item provider for menu " + name);

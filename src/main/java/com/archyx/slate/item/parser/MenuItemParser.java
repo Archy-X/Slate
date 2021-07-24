@@ -1,7 +1,10 @@
 package com.archyx.slate.item.parser;
 
 import com.archyx.slate.Slate;
+import com.archyx.slate.action.Action;
+import com.archyx.slate.action.click.ClickAction;
 import com.archyx.slate.item.MenuItem;
+import com.archyx.slate.item.builder.MenuItemBuilder;
 import com.archyx.slate.util.MapParser;
 import com.archyx.slate.util.TextUtil;
 import com.cryptomorin.xseries.XEnchantment;
@@ -37,7 +40,7 @@ public abstract class MenuItemParser extends MapParser {
         this.slate = slate;
     }
 
-    public abstract MenuItem parse(ConfigurationSection section);
+    public abstract MenuItem parse(ConfigurationSection section, String menuName);
 
     @SuppressWarnings("deprecation")
     protected ItemStack parseBaseItem(ConfigurationSection section) {
@@ -225,6 +228,21 @@ public abstract class MenuItemParser extends MapParser {
             }
         }
         return false;
+    }
+
+    /**
+     * Parses actions of each type and adds it to a given item
+     */
+    protected void parseActions(MenuItemBuilder builder, Map<?, ?> map, String menuName, String itemName) {
+        Map<ClickAction, List<Action>> actions = new LinkedHashMap<>();
+        for (ClickAction clickAction : ClickAction.values()) {
+            String id = clickAction.getId();
+            if (map.containsKey(id)) {
+                List<Action> clickActions = slate.getActionManager().parseActions(getMapList(map, id), menuName, itemName);
+                actions.put(clickAction, clickActions);
+            }
+        }
+        builder.actions(actions);
     }
 
 }

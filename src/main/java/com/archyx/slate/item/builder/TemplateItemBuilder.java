@@ -42,6 +42,6 @@ public class TemplateItemBuilder<C> extends MenuItemBuilder {
 
     @Override
     public MenuItem build() {
-        return new TemplateItem<>(slate, name, baseItems, defaultBaseItem, displayName, lore, positions, provider);
+        return new TemplateItem<>(slate, name, baseItems, defaultBaseItem, displayName, lore, actions, positions, provider);
     }
 }

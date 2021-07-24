@@ -25,6 +25,14 @@ public class ActiveTemplateItem<C> extends ActiveItem {
         return clickListener;
     }
 
+    /**
+     * Adds a listener to be executed when the item is clicked.
+     * The specified consumer can use ItemClickData to get information from the click, such as the event or player.
+     * {@link ItemClickData#getEvent()} can be checked and then cast to InventoryClickEvent.
+     * The listener can also use the context C to define differing behavior
+     *
+     * @param clickListener The click listener BiConsumer
+     */
     public void setClickListener(BiConsumer<ItemClickData, C> clickListener) {
         this.clickListener = clickListener;
     }

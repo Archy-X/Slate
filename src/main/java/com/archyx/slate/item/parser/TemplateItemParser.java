@@ -24,7 +24,7 @@ public class TemplateItemParser<C> extends MenuItemParser {
 
     @Override
     @SuppressWarnings("unchecked")
-    public MenuItem parse(ConfigurationSection section) {
+    public MenuItem parse(ConfigurationSection section, String menuName) {
         TemplateItemBuilder<C> builder = new TemplateItemBuilder<>(slate);
 
         String name = section.getName();
@@ -61,6 +61,8 @@ public class TemplateItemParser<C> extends MenuItemParser {
 
         builder.displayName(parseDisplayName(section));
         builder.lore(parseLore(section));
+
+        parseActions(builder, section.getValues(false), menuName, name);
 
         return null;
     }

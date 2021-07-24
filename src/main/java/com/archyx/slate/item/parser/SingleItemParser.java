@@ -14,7 +14,7 @@ public class SingleItemParser extends MenuItemParser {
     }
 
     @Override
-    public MenuItem parse(ConfigurationSection section) {
+    public MenuItem parse(ConfigurationSection section, String menuName) {
         SingleItemBuilder builder = new SingleItemBuilder(slate);
 
         String name = section.getName();
@@ -32,6 +32,8 @@ public class SingleItemParser extends MenuItemParser {
         if (provider != null) {
             builder.provider(provider);
         }
+
+        parseActions(builder, section.getValues(false), menuName, name);
 
         return builder.build();
     }

@@ -1,5 +1,6 @@
 package com.archyx.slate;
 
+import com.archyx.slate.action.ActionManager;
 import com.archyx.slate.context.ContextManager;
 import com.archyx.slate.menu.MenuManager;
 import fr.minuskube.inv.InventoryManager;
@@ -12,6 +13,7 @@ public class Slate {
     private final MenuManager menuManager;
     private final ContextManager contextManager;
     private final InventoryManager inventoryManager;
+    private final ActionManager actionManager;
     private final boolean placeholderAPIEnabled;
 
     public Slate(JavaPlugin plugin) {
@@ -20,6 +22,7 @@ public class Slate {
         this.contextManager = new ContextManager();
         this.inventoryManager = new InventoryManager(plugin);
         inventoryManager.init();
+        this.actionManager = new ActionManager(this);
         this.placeholderAPIEnabled = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
     }
 
@@ -37,6 +40,10 @@ public class Slate {
 
     public InventoryManager getInventoryManager() {
         return inventoryManager;
+    }
+
+    public ActionManager getActionManager() {
+        return actionManager;
     }
 
     public boolean isPlaceholderAPIEnabled() {
