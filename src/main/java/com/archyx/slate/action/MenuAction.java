@@ -26,10 +26,16 @@ public class MenuAction extends Action {
                 player.closeInventory();
                 break;
             case NEXT_PAGE:
-                contents.pagination().next();
+                int nextPage = menuInventory.getCurrentPage() + 1;
+                if (nextPage < menuInventory.getTotalPages()) {
+                    slate.getMenuManager().openMenu(player, menuInventory.getMenu().getName(), nextPage);
+                }
                 break;
             case PREVIOUS_PAGE:
-                contents.pagination().previous();
+                int previousPage = menuInventory.getCurrentPage() - 1;
+                if (previousPage >= 0) {
+                    slate.getMenuManager().openMenu(player, menuInventory.getMenu().getName(), previousPage);
+                }
                 break;
         }
 

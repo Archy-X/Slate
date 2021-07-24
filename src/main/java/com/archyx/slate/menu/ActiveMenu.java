@@ -49,4 +49,31 @@ public class ActiveMenu {
         throw new IllegalArgumentException("Item with name " + itemName + " not found in menu " + menuInventory.getMenu().getName());
     }
 
+    /**
+     * Hides an item from showing up in the current menu, will not delete the item in configs
+     *
+     * @param itemName The name of the item to hide
+     */
+    public void hideItem(String itemName) {
+        menuInventory.removeActiveItem(itemName);
+    }
+
+    /**
+     * Gets the current page of the menu, 0 is the first page
+     *
+     * @return The current page number, 0 if there is no pagination set up
+     */
+    public int getCurrentPage() {
+        return menuInventory.getCurrentPage();
+    }
+
+    /**
+     * Gets the total number of pages in the menu
+     *
+     * @return The total number of pages, 1 if there is no pagination set up
+     */
+    public int getTotalPages() {
+        return menuInventory.getTotalPages();
+    }
+
 }

@@ -34,12 +34,25 @@ public class MenuInventory implements InventoryProvider {
     private final ConfigurableMenu menu;
     private final ActiveMenu activeMenu;
     private final Map<String, ActiveItem> activeItems;
+    private final int totalPages;
+    private final int currentPage;
 
-    public MenuInventory(Slate slate, ConfigurableMenu menu) {
+    public MenuInventory(Slate slate, ConfigurableMenu menu, Player player, int currentPage) {
         this.slate = slate;
         this.menu = menu;
         this.activeItems = new HashMap<>();
         this.activeMenu = new ActiveMenu(this);
+        MenuProvider provider = menu.getProvider();
+        if (provider != null) {
+            this.totalPages = provider.getPages(player);
+        } else {
+            this.totalPages = 1;
+        }
+        this.currentPage = currentPage;
+    }
+
+    public Slate getSlate() {
+        return slate;
     }
 
     public ConfigurableMenu getMenu() {
@@ -53,6 +66,18 @@ public class MenuInventory implements InventoryProvider {
     @Nullable
     public ActiveItem getActiveItem(String itemName) {
         return activeItems.get(itemName);
+    }
+
+    public void removeActiveItem(String itemName) {
+        activeItems.remove(itemName);
+    }
+
+    public int getTotalPages() {
+        return totalPages;
+    }
+
+    public int getCurrentPage() {
+        return currentPage;
     }
 
     @Override
@@ -97,7 +122,8 @@ public class MenuInventory implements InventoryProvider {
                 // Replace display name placeholders
                 if (provider != null) {
                     for (String placeholder : StringUtils.substringsBetween(displayName, "{", "}")) {
-                        displayName = TextUtil.replace(placeholder, "{" + placeholder + "}", provider.onPlaceholderReplace(placeholder, player));
+                        displayName = TextUtil.replace(placeholder, "{" + placeholder + "}",
+                                provider.onPlaceholderReplace(placeholder, player, activeMenu));
                     }
                 }
                 meta.setDisplayName(displayName);
@@ -109,7 +135,8 @@ public class MenuInventory implements InventoryProvider {
                     List<String> replacedLore = new ArrayList<>();
                     for (String line : lore) {
                         for (String placeholder : StringUtils.substringsBetween(line, "{", "}")) {
-                            replacedLore.add(TextUtil.replace(placeholder, "{" + placeholder + "}", provider.onPlaceholderReplace(placeholder, player)));
+                            replacedLore.add(TextUtil.replace(placeholder, "{" + placeholder + "}",
+                                    provider.onPlaceholderReplace(placeholder, player, activeMenu)));
                         }
                     }
                     lore = replacedLore;
@@ -151,7 +178,8 @@ public class MenuInventory implements InventoryProvider {
                     // Replace display name placeholders
                     if (provider != null) {
                         for (String placeholder : StringUtils.substringsBetween(displayName, "{", "}")) {
-                            displayName = TextUtil.replace(placeholder, "{" + placeholder + "}", provider.onPlaceholderReplace(placeholder, player, context));
+                            displayName = TextUtil.replace(placeholder, "{" + placeholder + "}",
+                                    provider.onPlaceholderReplace(placeholder, player, activeMenu, context));
                         }
                     }
                     meta.setDisplayName(displayName);
@@ -163,7 +191,8 @@ public class MenuInventory implements InventoryProvider {
                         List<String> replacedLore = new ArrayList<>();
                         for (String line : lore) {
                             for (String placeholder : StringUtils.substringsBetween(line, "{", "}")) {
-                                replacedLore.add(TextUtil.replace(placeholder, "{" + placeholder + "}", provider.onPlaceholderReplace(placeholder, player, context)));
+                                replacedLore.add(TextUtil.replace(placeholder, "{" + placeholder + "}",
+                                        provider.onPlaceholderReplace(placeholder, player, activeMenu, context)));
                             }
                         }
                         lore = replacedLore;

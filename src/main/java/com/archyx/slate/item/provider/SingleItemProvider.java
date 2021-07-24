@@ -1,5 +1,6 @@
 package com.archyx.slate.item.provider;
 
+import com.archyx.slate.menu.ActiveMenu;
 import org.bukkit.entity.Player;
 
 public interface SingleItemProvider {
@@ -12,6 +13,6 @@ public interface SingleItemProvider {
      * @param player The player that is viewing the menu
      * @return The text to replace the placeholder with
      */
-    String onPlaceholderReplace(String placeholder, Player player);
+    String onPlaceholderReplace(String placeholder, Player player, ActiveMenu menu);
 
 }

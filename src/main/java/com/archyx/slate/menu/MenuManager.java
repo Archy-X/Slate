@@ -134,15 +134,18 @@ public class MenuManager {
      *
      * @param player The player to display the menu to
      * @param name The name of the menu
+     * @param page The page number to open, 0 is the first page
      */
-    public void openMenu(Player player, String name) {
+    public void openMenu(Player player, String name, int page) {
         ConfigurableMenu menu = menus.get(name);
         if (menu == null) return;
+        MenuInventory menuInventory = new MenuInventory(slate, menu, player, page);
         String title = menu.getTitle();
         // Replace title placeholders
         if (menu.getProvider() != null) {
             for (String placeholder : StringUtils.substringsBetween(title, "{", "}")) {
-                title = TextUtil.replace(title, "{" + placeholder + "}", menu.getProvider().onPlaceholderReplace(placeholder, player));
+                title = TextUtil.replace(title, "{" + placeholder + "}",
+                        menu.getProvider().onPlaceholderReplace(placeholder, player, menuInventory.getActiveMenu()));
             }
         }
         // Build inventory and open
@@ -150,9 +153,20 @@ public class MenuManager {
                 .title(title)
                 .size(menu.getSize(), 9)
                 .manager(slate.getInventoryManager())
-                .provider(new MenuInventory(slate, menu))
+                .provider(menuInventory)
                 .build();
         smartInventory.open(player);
+    }
+
+    /**
+     * Opens a loaded menu for a player, will fail silently if the menu does not exist.
+     * Shows the first page.
+     *
+     * @param player The player to display the menu to
+     * @param name The name of the menu
+     */
+    public void openMenu(Player player, String name) {
+        openMenu(player, name, 0);
     }
 
 }
