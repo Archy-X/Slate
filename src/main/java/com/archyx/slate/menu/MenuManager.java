@@ -1,6 +1,9 @@
 package com.archyx.slate.menu;
 
 import com.archyx.slate.Slate;
+import com.archyx.slate.fill.FillData;
+import com.archyx.slate.fill.FillItem;
+import com.archyx.slate.fill.FillItemParser;
 import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.parser.SingleItemParser;
 import com.archyx.slate.item.parser.TemplateItemParser;
@@ -124,10 +127,20 @@ public class MenuManager {
                 }
             }
         }
+        // Load fill item
+        ConfigurationSection fillSection = config.getConfigurationSection("fill");
+        FillData fillData;
+        if (fillSection != null) {
+            boolean fillEnabled = fillSection.getBoolean("enabled", false);
+            FillItem fillItem = new FillItemParser(slate).parse(fillSection, name);
+            fillData = new FillData(fillItem, fillEnabled);
+        } else {
+            fillData = new FillData(FillItem.getDefault(slate), false);
+        }
 
         MenuProvider provider = menuProviders.get(name);
         // Add menu to map
-        ConfigurableMenu menu = new ConfigurableMenu(name, title, size, items, provider);
+        ConfigurableMenu menu = new ConfigurableMenu(name, title, size, items, provider, fillData);
         menus.put(name, menu);
     }
 

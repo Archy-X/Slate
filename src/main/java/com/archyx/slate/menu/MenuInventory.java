@@ -3,6 +3,8 @@ package com.archyx.slate.menu;
 import com.archyx.slate.Slate;
 import com.archyx.slate.action.Action;
 import com.archyx.slate.action.click.ClickAction;
+import com.archyx.slate.fill.FillData;
+import com.archyx.slate.fill.FillItem;
 import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.SingleItem;
 import com.archyx.slate.item.TemplateItem;
@@ -99,6 +101,25 @@ public class MenuInventory implements InventoryProvider {
         MenuProvider provider = menu.getProvider();
         if (provider != null) {
             provider.onOpen(player, activeMenu);
+        }
+        // Place fill items
+        FillData fillData = menu.getFillData();
+        if (fillData.isEnabled()) {
+            FillItem fillItem = fillData.getItem();
+            ItemStack itemStack = fillItem.getBaseItem();
+            ItemMeta meta = itemStack.getItemMeta();
+            if (meta != null) {
+                String displayName = fillItem.getDisplayName();
+                if (displayName != null) {
+                    meta.setDisplayName(displayName);
+                }
+                List<String> lore = fillItem.getLore();
+                if (lore != null) {
+                    meta.setLore(lore);
+                }
+                itemStack.setItemMeta(meta);
+            }
+            contents.fill(ClickableItem.empty(itemStack));
         }
         // Place items
         for (ActiveItem activeItem : activeItems.values()) {
