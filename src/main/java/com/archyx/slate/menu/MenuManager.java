@@ -149,12 +149,13 @@ public class MenuManager {
      *
      * @param player The player to display the menu to
      * @param name The name of the menu
+     * @param properties Map of menu properties
      * @param page The page number to open, 0 is the first page
      */
-    public void openMenu(Player player, String name, int page) {
+    public void openMenu(Player player, String name, Map<String, Object> properties, int page) {
         ConfigurableMenu menu = menus.get(name);
         if (menu == null) return;
-        MenuInventory menuInventory = new MenuInventory(slate, menu, player, page);
+        MenuInventory menuInventory = new MenuInventory(slate, menu, player, properties, page);
         String title = menu.getTitle();
         // Replace title placeholders
         if (menu.getProvider() != null) {
@@ -175,13 +176,24 @@ public class MenuManager {
 
     /**
      * Opens a loaded menu for a player, will fail silently if the menu does not exist.
+     *
+     * @param player The player to display the menu to
+     * @param name The name of the menu
+     * @param page The page number to open, 0 is the first page
+     */
+    public void openMenu(Player player, String name, int page) {
+        openMenu(player, name, new HashMap<>(), page);
+    }
+
+    /**
+     * Opens a loaded menu for a player, will fail silently if the menu does not exist.
      * Shows the first page.
      *
      * @param player The player to display the menu to
      * @param name The name of the menu
      */
     public void openMenu(Player player, String name) {
-        openMenu(player, name, 0);
+        openMenu(player, name, new HashMap<>(), 0);
     }
 
 }

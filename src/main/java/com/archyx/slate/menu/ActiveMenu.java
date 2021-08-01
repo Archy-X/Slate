@@ -76,4 +76,8 @@ public class ActiveMenu {
         return menuInventory.getTotalPages();
     }
 
+    public Object getProperty(String name) {
+        return menuInventory.getProperties().get(name);
+    }
+
 }
