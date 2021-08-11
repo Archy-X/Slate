@@ -157,8 +157,9 @@ public class MenuInventory implements InventoryProvider {
                 if (provider != null) {
                     List<String> replacedLore = new ArrayList<>();
                     for (String line : lore) {
-                        if (line != null) {
-                            for (String placeholder : StringUtils.substringsBetween(line, "{", "}")) {
+                        String[] placeholders = StringUtils.substringsBetween(line, "{", "}");
+                        if (placeholders != null) {
+                            for (String placeholder : placeholders) {
                                 replacedLore.add(TextUtil.replace(placeholder, "{" + placeholder + "}",
                                         provider.onPlaceholderReplace(placeholder, player, activeMenu)));
                             }
@@ -202,9 +203,12 @@ public class MenuInventory implements InventoryProvider {
                 if (displayName != null) {
                     // Replace display name placeholders
                     if (provider != null) {
-                        for (String placeholder : StringUtils.substringsBetween(displayName, "{", "}")) {
-                            displayName = TextUtil.replace(placeholder, "{" + placeholder + "}",
-                                    provider.onPlaceholderReplace(placeholder, player, activeMenu, context));
+                        String[] placeholders = StringUtils.substringsBetween(displayName, "{", "}");
+                        if (placeholders != null) {
+                            for (String placeholder : placeholders) {
+                                displayName = TextUtil.replace(placeholder, "{" + placeholder + "}",
+                                        provider.onPlaceholderReplace(placeholder, player, activeMenu, context));
+                            }
                         }
                     }
                     meta.setDisplayName(displayName);
