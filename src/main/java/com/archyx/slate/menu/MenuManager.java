@@ -20,7 +20,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class MenuManager {
 
@@ -32,7 +34,7 @@ public class MenuManager {
 
     public MenuManager(Slate slate) {
         this.slate = slate;
-        this.menus = new HashMap<>();
+        this.menus = new LinkedHashMap<>();
         this.singleItemProviders = new HashMap<>();
         this.templateItemProviders = new HashMap<>();
         this.menuProviders = new HashMap<>();
@@ -194,6 +196,10 @@ public class MenuManager {
      */
     public void openMenu(Player player, String name) {
         openMenu(player, name, new HashMap<>(), 0);
+    }
+
+    public Set<String> getMenuNames() {
+        return menus.keySet();
     }
 
 }
