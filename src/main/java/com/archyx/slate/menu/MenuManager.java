@@ -198,8 +198,8 @@ public class MenuManager {
         openMenu(player, name, new HashMap<>(), 0);
     }
 
-    public Set<String> getMenuNames() {
-        return menus.keySet();
+    public Set<String> getMenuProviderNames() {
+        return menuProviders.keySet();
     }
 
 }
