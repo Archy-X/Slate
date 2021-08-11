@@ -64,6 +64,6 @@ public class TemplateItemParser<C> extends MenuItemParser {
 
         parseActions(builder, section.getValues(false), menuName, name);
 
-        return null;
+        return builder.build();
     }
 }
