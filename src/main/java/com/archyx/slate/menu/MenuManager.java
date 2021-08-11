@@ -92,13 +92,13 @@ public class MenuManager {
      */
     public void loadMenu(File file) {
         FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-        String name = file.getName();
-        int pos = name.lastIndexOf(".");
+        String menuName = file.getName();
+        int pos = menuName.lastIndexOf(".");
         if (pos > 0) {
-            name = name.substring(0, pos);
+            menuName = menuName.substring(0, pos);
         }
 
-        String title = config.getString("title", name);
+        String title = config.getString("title", menuName);
         int size = config.getInt("size", 6);
 
         Map<String, MenuItem> items = new HashMap<>();
@@ -108,7 +108,7 @@ public class MenuManager {
             for (String itemName : itemsSection.getKeys(false)) {
                 ConfigurationSection itemSection = itemsSection.getConfigurationSection(itemName);
                 if (itemSection != null) {
-                    MenuItem item = new SingleItemParser(slate).parse(itemSection, name);
+                    MenuItem item = new SingleItemParser(slate).parse(itemSection, menuName);
                     items.put(itemName, item);
                 }
             }
@@ -119,12 +119,12 @@ public class MenuManager {
             for (String templateName : templatesSection.getKeys(false)) {
                 ConfigurationSection templateSection = templatesSection.getConfigurationSection(templateName);
                 if (templateSection != null) {
-                    TemplateItemProvider<?> provider = slate.getMenuManager().getTemplateItemProvider(name);
+                    TemplateItemProvider<?> provider = slate.getMenuManager().getTemplateItemProvider(templateName);
                     if (provider != null) {
-                        MenuItem item = new TemplateItemParser<>(slate, provider).parse(templateSection, name);
+                        MenuItem item = new TemplateItemParser<>(slate, provider).parse(templateSection, menuName);
                         items.put(templateName, item);
                     } else {
-                        throw new IllegalArgumentException("Could not find registered template item provider for menu " + name);
+                        throw new IllegalArgumentException("Could not find registered template item provider for name " + templateName);
                     }
                 }
             }
@@ -134,16 +134,16 @@ public class MenuManager {
         FillData fillData;
         if (fillSection != null) {
             boolean fillEnabled = fillSection.getBoolean("enabled", false);
-            FillItem fillItem = new FillItemParser(slate).parse(fillSection, name);
+            FillItem fillItem = new FillItemParser(slate).parse(fillSection, menuName);
             fillData = new FillData(fillItem, fillEnabled);
         } else {
             fillData = new FillData(FillItem.getDefault(slate), false);
         }
 
-        MenuProvider provider = menuProviders.get(name);
+        MenuProvider provider = menuProviders.get(menuName);
         // Add menu to map
-        ConfigurableMenu menu = new ConfigurableMenu(name, title, size, items, provider, fillData);
-        menus.put(name, menu);
+        ConfigurableMenu menu = new ConfigurableMenu(menuName, title, size, items, provider, fillData);
+        menus.put(menuName, menu);
     }
 
     /**
