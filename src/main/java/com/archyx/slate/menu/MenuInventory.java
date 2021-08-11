@@ -157,9 +157,11 @@ public class MenuInventory implements InventoryProvider {
                 if (provider != null) {
                     List<String> replacedLore = new ArrayList<>();
                     for (String line : lore) {
-                        for (String placeholder : StringUtils.substringsBetween(line, "{", "}")) {
-                            replacedLore.add(TextUtil.replace(placeholder, "{" + placeholder + "}",
-                                    provider.onPlaceholderReplace(placeholder, player, activeMenu)));
+                        if (line != null) {
+                            for (String placeholder : StringUtils.substringsBetween(line, "{", "}")) {
+                                replacedLore.add(TextUtil.replace(placeholder, "{" + placeholder + "}",
+                                        provider.onPlaceholderReplace(placeholder, player, activeMenu)));
+                            }
                         }
                     }
                     lore = replacedLore;
@@ -213,9 +215,11 @@ public class MenuInventory implements InventoryProvider {
                     if (provider != null) {
                         List<String> replacedLore = new ArrayList<>();
                         for (String line : lore) {
-                            for (String placeholder : StringUtils.substringsBetween(line, "{", "}")) {
-                                replacedLore.add(TextUtil.replace(placeholder, "{" + placeholder + "}",
-                                        provider.onPlaceholderReplace(placeholder, player, activeMenu, context)));
+                            if (line != null) {
+                                for (String placeholder : StringUtils.substringsBetween(line, "{", "}")) {
+                                    replacedLore.add(TextUtil.replace(placeholder, "{" + placeholder + "}",
+                                            provider.onPlaceholderReplace(placeholder, player, activeMenu, context)));
+                                }
                             }
                         }
                         lore = replacedLore;
