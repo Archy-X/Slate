@@ -147,7 +147,7 @@ public class MenuInventory implements InventoryProvider {
                     String[] placeholders = StringUtils.substringsBetween(displayName, "{", "}");
                     if (placeholders != null) {
                         for (String placeholder : placeholders) {
-                            displayName = TextUtil.replace(placeholder, "{" + placeholder + "}",
+                            displayName = TextUtil.replace(displayName, "{" + placeholder + "}",
                                     provider.onPlaceholderReplace(placeholder, player, activeMenu));
                         }
                     }
@@ -163,7 +163,7 @@ public class MenuInventory implements InventoryProvider {
                         String[] placeholders = StringUtils.substringsBetween(line, "{", "}");
                         if (placeholders != null) {
                             for (String placeholder : placeholders) {
-                                replacedLore.add(TextUtil.replace(placeholder, "{" + placeholder + "}",
+                                replacedLore.add(TextUtil.replace(line, "{" + placeholder + "}",
                                         provider.onPlaceholderReplace(placeholder, player, activeMenu)));
                             }
                         }
@@ -209,7 +209,7 @@ public class MenuInventory implements InventoryProvider {
                         String[] placeholders = StringUtils.substringsBetween(displayName, "{", "}");
                         if (placeholders != null) {
                             for (String placeholder : placeholders) {
-                                displayName = TextUtil.replace(placeholder, "{" + placeholder + "}",
+                                displayName = TextUtil.replace(displayName, "{" + placeholder + "}",
                                         provider.onPlaceholderReplace(placeholder, player, activeMenu, context));
                             }
                         }
@@ -225,7 +225,7 @@ public class MenuInventory implements InventoryProvider {
                             String[] placeholders = StringUtils.substringsBetween(line, "{", "}");
                             if (placeholders != null) {
                                 for (String placeholder : placeholders) {
-                                    replacedLore.add(TextUtil.replace(placeholder, "{" + placeholder + "}",
+                                    replacedLore.add(TextUtil.replace(line, "{" + placeholder + "}",
                                             provider.onPlaceholderReplace(placeholder, player, activeMenu, context)));
                                 }
                             }
