@@ -1,5 +1,9 @@
 package com.archyx.slate.util;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class TextUtil {
 
     public static String replace(String source, String os, String ns) {
@@ -52,6 +56,14 @@ public class TextUtil {
         String replaced = replace(source, "\\" + os, "\uE000"); // Replace escaped characters with intermediate char
         replaced = replace(replaced, os, ns); // Replace normal chars
         return replace(replaced, "\uE000", os); // Replace intermediate with original
+    }
+
+    public static List<String> applyNewLines(List<String> input) {
+        List<String> lore = new ArrayList<>();
+        for (String entry : input) {
+            lore.addAll(Arrays.asList(entry.split("(\\u005C\\u006E)|(\\n)")));
+        }
+        return lore;
     }
 
 }

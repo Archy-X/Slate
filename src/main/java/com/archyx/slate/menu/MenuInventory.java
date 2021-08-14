@@ -117,6 +117,7 @@ public class MenuInventory implements InventoryProvider {
                 }
                 List<String> lore = fillItem.getLore();
                 if (lore != null) {
+                    lore = TextUtil.applyNewLines(lore);
                     meta.setLore(lore);
                 }
                 itemStack.setItemMeta(meta);
@@ -170,6 +171,7 @@ public class MenuInventory implements InventoryProvider {
                     }
                     lore = replacedLore;
                 }
+                lore = TextUtil.applyNewLines(lore);
                 meta.setLore(lore);
             }
             itemStack.setItemMeta(meta);
@@ -232,6 +234,7 @@ public class MenuInventory implements InventoryProvider {
                         }
                         lore = replacedLore;
                     }
+                    lore = TextUtil.applyNewLines(lore);
                     meta.setLore(lore);
                 }
                 itemStack.setItemMeta(meta);
