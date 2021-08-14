@@ -18,6 +18,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -139,6 +140,7 @@ public abstract class MenuItemParser extends MapParser {
         }
         // Glowing w/o enchantments visible
         if (section.getBoolean("glow", false)) {
+            meta = item.getItemMeta();
             meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
             meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
             item.setItemMeta(meta);
@@ -149,6 +151,33 @@ public abstract class MenuItemParser extends MapParser {
             if (nbtSection != null) {
                 Map<?, ?> nbtMap = nbtSection.getValues(true);
                 item = parseNBT(item, nbtMap);
+            }
+        }
+        if (section.contains("flags")) {
+            meta = item.getItemMeta();
+            if (meta != null) {
+                List<String> flags = section.getStringList("flags");
+                for (String flagName : flags) {
+                    ItemFlag itemFlag = ItemFlag.valueOf(flagName.toUpperCase(Locale.ROOT));
+                    meta.addItemFlags(itemFlag);
+                }
+                item.setItemMeta(meta);
+            }
+        }
+        if (section.contains("durability")) {
+            meta = item.getItemMeta();
+            int durability = section.getInt("durability");
+            if (XMaterial.isNewVersion()) {
+                if (meta instanceof Damageable) {
+                    Damageable damageable = (Damageable) meta;
+                    short maxDurability = item.getType().getMaxDurability();
+                    damageable.setDamage(Math.max(maxDurability - durability, maxDurability));
+                    item.setItemMeta(meta);
+                }
+            } else {
+                // For old versions
+                short maxDurability = item.getType().getMaxDurability();
+                item.setDurability((short) Math.max(maxDurability - durability, maxDurability));
             }
         }
         return item;
