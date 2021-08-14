@@ -11,6 +11,7 @@ import com.archyx.slate.item.TemplateItem;
 import com.archyx.slate.item.active.ActiveItem;
 import com.archyx.slate.item.active.ActiveSingleItem;
 import com.archyx.slate.item.active.ActiveTemplateItem;
+import com.archyx.slate.item.provider.PlaceholderType;
 import com.archyx.slate.item.provider.SingleItemProvider;
 import com.archyx.slate.item.provider.TemplateItemProvider;
 import com.archyx.slate.util.TextUtil;
@@ -149,7 +150,7 @@ public class MenuInventory implements InventoryProvider {
                     if (placeholders != null) {
                         for (String placeholder : placeholders) {
                             displayName = TextUtil.replace(displayName, "{" + placeholder + "}",
-                                    provider.onPlaceholderReplace(placeholder, player, activeMenu));
+                                    provider.onPlaceholderReplace(placeholder, player, activeMenu, PlaceholderType.DISPLAY_NAME));
                         }
                     }
                 }
@@ -165,7 +166,7 @@ public class MenuInventory implements InventoryProvider {
                         if (placeholders != null) {
                             for (String placeholder : placeholders) {
                                 replacedLore.add(TextUtil.replace(line, "{" + placeholder + "}",
-                                        provider.onPlaceholderReplace(placeholder, player, activeMenu)));
+                                        provider.onPlaceholderReplace(placeholder, player, activeMenu, PlaceholderType.LORE)));
                             }
                         }
                     }
@@ -212,7 +213,7 @@ public class MenuInventory implements InventoryProvider {
                         if (placeholders != null) {
                             for (String placeholder : placeholders) {
                                 displayName = TextUtil.replace(displayName, "{" + placeholder + "}",
-                                        provider.onPlaceholderReplace(placeholder, player, activeMenu, context));
+                                        provider.onPlaceholderReplace(placeholder, player, activeMenu, PlaceholderType.DISPLAY_NAME, context));
                             }
                         }
                     }
@@ -228,7 +229,7 @@ public class MenuInventory implements InventoryProvider {
                             if (placeholders != null) {
                                 for (String placeholder : placeholders) {
                                     replacedLore.add(TextUtil.replace(line, "{" + placeholder + "}",
-                                            provider.onPlaceholderReplace(placeholder, player, activeMenu, context)));
+                                            provider.onPlaceholderReplace(placeholder, player, activeMenu, PlaceholderType.LORE, context)));
                                 }
                             }
                         }

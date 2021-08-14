@@ -13,6 +13,6 @@ public interface SingleItemProvider {
      * @param player The player that is viewing the menu
      * @return The text to replace the placeholder with
      */
-    String onPlaceholderReplace(String placeholder, Player player, ActiveMenu menu);
+    String onPlaceholderReplace(String placeholder, Player player, ActiveMenu menu, PlaceholderType type);
 
 }
