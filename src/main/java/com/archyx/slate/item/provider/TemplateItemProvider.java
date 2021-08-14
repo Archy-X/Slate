@@ -1,7 +1,10 @@
 package com.archyx.slate.item.provider;
 
 import com.archyx.slate.menu.ActiveMenu;
+import fr.minuskube.inv.content.SlotPos;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Set;
 
@@ -31,5 +34,7 @@ public interface TemplateItemProvider<C> {
      * @return The set of valid contexts, or null if any context is valid.
      */
     Set<C> getDefinedContexts();
+
+    default void onClick(Player player, InventoryClickEvent event, ItemStack item, SlotPos pos, C context) {}
 
 }

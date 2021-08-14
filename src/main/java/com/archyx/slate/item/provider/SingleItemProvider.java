@@ -1,7 +1,10 @@
 package com.archyx.slate.item.provider;
 
 import com.archyx.slate.menu.ActiveMenu;
+import fr.minuskube.inv.content.SlotPos;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemStack;
 
 public interface SingleItemProvider {
 
@@ -14,5 +17,7 @@ public interface SingleItemProvider {
      * @return The text to replace the placeholder with
      */
     String onPlaceholderReplace(String placeholder, Player player, ActiveMenu menu, PlaceholderType type);
+
+    default void onClick(Player player, InventoryClickEvent event, ItemStack item, SlotPos pos) {}
 
 }

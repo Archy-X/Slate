@@ -29,7 +29,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 public class MenuInventory implements InventoryProvider {
 
@@ -180,9 +179,8 @@ public class MenuInventory implements InventoryProvider {
         }
 
         // Add item to inventory
-        Consumer<ItemClickData> listener = activeItem.getClickListener();
         SlotPos pos = item.getPosition();
-        addItemToInventory(item, itemStack, pos, contents, listener, player);
+        addSingleItemToInventory(item, itemStack, pos, contents, player);
     }
 
     private <C> void addTemplateItem(ActiveTemplateItem<C> activeItem, InventoryContents contents, Player player) {
@@ -243,24 +241,42 @@ public class MenuInventory implements InventoryProvider {
                 itemStack.setItemMeta(meta);
             }
             // Add item to inventory
-            Consumer<ItemClickData> listener = activeItem.bindContext(context);
             SlotPos pos = item.getPosition(context);
-            addItemToInventory(item, itemStack, pos, contents, listener, player);
+            addTemplateItemToInventory(item, itemStack, pos, contents, player, context);
         }
     }
 
     /**
      * Adds the menu item itself to the inventory menu and registers click listeners, both listeners and actions
      */
-    private void addItemToInventory(MenuItem menuItem, ItemStack itemStack, SlotPos pos, InventoryContents contents, Consumer<ItemClickData> listener, Player player) {
-        if (listener != null) { // If listener is defined
-            contents.set(pos, ClickableItem.from(itemStack, c -> {
-                listener.accept(c);
-                executeActions(menuItem, player, contents, c);
-            }));
-        } else {
-            contents.set(pos, ClickableItem.from(itemStack, clickData -> executeActions(menuItem, player, contents, clickData)));
-        }
+    private void addSingleItemToInventory(SingleItem singleItem, ItemStack itemStack, SlotPos pos, InventoryContents contents, Player player) {
+        contents.set(pos, ClickableItem.from(itemStack, c -> {
+            if (!(c.getEvent() instanceof InventoryClickEvent)) return;
+            InventoryClickEvent event = (InventoryClickEvent) c.getEvent();
+
+            // Run coded click functionality
+            SingleItemProvider provider = singleItem.getProvider();
+            if (provider != null) {
+                provider.onClick(player, event, c.getItem(), pos);
+            }
+
+            executeActions(singleItem, player, contents, c); // Run custom click actions
+        }));
+    }
+
+    private <C> void addTemplateItemToInventory(TemplateItem<C> templateItem, ItemStack itemStack, SlotPos pos, InventoryContents contents, Player player, C context) {
+        contents.set(pos, ClickableItem.from(itemStack, c -> {
+            if (!(c.getEvent() instanceof InventoryClickEvent)) return;
+            InventoryClickEvent event = (InventoryClickEvent) c.getEvent();
+
+            // Run coded click functionality
+            TemplateItemProvider<C> provider = templateItem.getProvider();
+            if (provider != null) {
+                provider.onClick(player, event, c.getItem(), pos, context);
+            }
+
+            executeActions(templateItem, player, contents, c); // Run custom click actions
+        }));
     }
 
     /**
