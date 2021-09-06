@@ -11,7 +11,7 @@ public interface MenuProvider {
      * @param player The player that is viewing the menu
      * @param menu The active menu instance
      */
-    void onOpen(Player player, ActiveMenu menu);
+    default void onOpen(Player player, ActiveMenu menu) {}
 
     /**
      * Replaces a requested placeholder from the menu title.

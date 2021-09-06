@@ -156,7 +156,9 @@ public class MenuManager {
      */
     public void openMenu(Player player, String name, Map<String, Object> properties, int page) {
         ConfigurableMenu menu = menus.get(name);
-        if (menu == null) return;
+        if (menu == null) {
+            throw new IllegalArgumentException("Menu with name " + name + " not registered");
+        }
         MenuInventory menuInventory = new MenuInventory(slate, menu, player, properties, page);
         String title = menu.getTitle();
         // Replace title placeholders
