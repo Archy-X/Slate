@@ -140,7 +140,7 @@ public class MenuInventory implements InventoryProvider {
 
         ItemStack itemStack = item.getBaseItem();
         if (provider != null) {
-            itemStack = modifyBaseItem(provider, itemStack); // Apply provider base item modifications
+            itemStack = modifyBaseItem(provider, itemStack, player); // Apply provider base item modifications
         }
         ItemMeta meta = itemStack.getItemMeta();
         if (meta != null) {
@@ -206,7 +206,7 @@ public class MenuInventory implements InventoryProvider {
                 }
             }
             if (provider != null) {
-                itemStack = modifyBaseItem(provider, itemStack); // Apply provider base item modifications
+                itemStack = modifyBaseItem(provider, itemStack, player, context); // Apply provider base item modifications
             }
             ItemMeta meta = itemStack.getItemMeta();
             if (meta != null) {
@@ -334,12 +334,12 @@ public class MenuInventory implements InventoryProvider {
         return properties;
     }
 
-    private ItemStack modifyBaseItem(SingleItemProvider provider, ItemStack baseItem) {
-        return provider.onItemModify(baseItem);
+    private ItemStack modifyBaseItem(SingleItemProvider provider, ItemStack baseItem, Player player) {
+        return provider.onItemModify(baseItem, player);
     }
 
-    private ItemStack modifyBaseItem(TemplateItemProvider<?> provider, ItemStack baseItem) {
-        return provider.onItemModify(baseItem);
+    private <C> ItemStack modifyBaseItem(TemplateItemProvider<C> provider, ItemStack baseItem, Player player, C context) {
+        return provider.onItemModify(baseItem, player, context);
     }
 
 }
