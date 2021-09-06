@@ -139,6 +139,9 @@ public class MenuInventory implements InventoryProvider {
         SingleItemProvider provider = item.getProvider();
 
         ItemStack itemStack = item.getBaseItem();
+        if (provider != null) {
+            itemStack = modifyBaseItem(provider, itemStack); // Apply provider base item modifications
+        }
         ItemMeta meta = itemStack.getItemMeta();
         if (meta != null) {
             String displayName = item.getDisplayName();
@@ -201,6 +204,9 @@ public class MenuInventory implements InventoryProvider {
                 if (itemStack == null) {
                     continue;
                 }
+            }
+            if (provider != null) {
+                itemStack = modifyBaseItem(provider, itemStack); // Apply provider base item modifications
             }
             ItemMeta meta = itemStack.getItemMeta();
             if (meta != null) {
@@ -326,6 +332,14 @@ public class MenuInventory implements InventoryProvider {
 
     public Map<String, Object> getProperties() {
         return properties;
+    }
+
+    private ItemStack modifyBaseItem(SingleItemProvider provider, ItemStack baseItem) {
+        return provider.onItemModify(baseItem);
+    }
+
+    private ItemStack modifyBaseItem(TemplateItemProvider<?> provider, ItemStack baseItem) {
+        return provider.onItemModify(baseItem);
     }
 
 }

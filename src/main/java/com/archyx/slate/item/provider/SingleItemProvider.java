@@ -20,4 +20,14 @@ public interface SingleItemProvider {
 
     default void onClick(Player player, InventoryClickEvent event, ItemStack item, SlotPos pos) {}
 
+    /**
+     * Method for modifying the base item through code, such as player specific item meta
+     *
+     * @param baseItem The base item before modification
+     * @return The base item after modification
+     */
+    default ItemStack onItemModify(ItemStack baseItem) {
+        return baseItem;
+    }
+
 }
