@@ -48,7 +48,7 @@ public class MenuInventory implements InventoryProvider {
         this.properties = properties;
         MenuProvider provider = menu.getProvider();
         if (provider != null) {
-            this.totalPages = provider.getPages(player);
+            this.totalPages = provider.getPages(player, activeMenu);
         } else {
             this.totalPages = 1;
         }

@@ -29,7 +29,7 @@ public interface MenuProvider {
      * @param player The player that is viewing the menu
      * @return The number of pages
      */
-    default int getPages(Player player) {
+    default int getPages(Player player, ActiveMenu activeMenu) {
         return 1;
     }
 
