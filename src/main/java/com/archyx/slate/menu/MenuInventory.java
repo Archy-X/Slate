@@ -192,7 +192,7 @@ public class MenuInventory implements InventoryProvider {
 
         Set<C> contexts;
         if (provider != null) {
-            contexts = provider.getDefinedContexts();
+            contexts = provider.getDefinedContexts(player, activeMenu);
         } else {
             contexts = item.getBaseItems().keySet();
         }

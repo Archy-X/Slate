@@ -33,7 +33,7 @@ public interface TemplateItemProvider<C> {
      *
      * @return The set of valid contexts, or null if any context is valid.
      */
-    Set<C> getDefinedContexts();
+    Set<C> getDefinedContexts(Player player, ActiveMenu activeMenu);
 
     default void onClick(Player player, InventoryClickEvent event, ItemStack item, SlotPos pos, C context) {}
 
