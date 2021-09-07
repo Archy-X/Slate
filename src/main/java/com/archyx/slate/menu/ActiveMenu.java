@@ -5,6 +5,8 @@ import com.archyx.slate.item.active.ActiveSingleItem;
 import com.archyx.slate.item.active.ActiveTemplateItem;
 import org.bukkit.Bukkit;
 
+import java.util.Map;
+
 public class ActiveMenu {
 
     private final MenuInventory menuInventory;
@@ -78,6 +80,10 @@ public class ActiveMenu {
 
     public Object getProperty(String name) {
         return menuInventory.getProperties().get(name);
+    }
+
+    public Map<String, Object> getProperties() {
+        return menuInventory.getProperties();
     }
 
 }

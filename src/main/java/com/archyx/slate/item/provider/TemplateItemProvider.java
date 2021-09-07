@@ -35,7 +35,7 @@ public interface TemplateItemProvider<C> {
      */
     Set<C> getDefinedContexts(Player player, ActiveMenu activeMenu);
 
-    default void onClick(Player player, InventoryClickEvent event, ItemStack item, SlotPos pos, C context) {}
+    default void onClick(Player player, InventoryClickEvent event, ItemStack item, SlotPos pos, ActiveMenu activeMenu, C context) {}
 
     /**
      * Method for modifying the base item through code, such as player specific item meta

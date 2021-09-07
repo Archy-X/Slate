@@ -18,7 +18,7 @@ public interface SingleItemProvider {
      */
     String onPlaceholderReplace(String placeholder, Player player, ActiveMenu menu, PlaceholderType type);
 
-    default void onClick(Player player, InventoryClickEvent event, ItemStack item, SlotPos pos) {}
+    default void onClick(Player player, InventoryClickEvent event, ItemStack item, SlotPos pos, ActiveMenu activeMenu) {}
 
     /**
      * Method for modifying the base item through code, such as player specific item meta

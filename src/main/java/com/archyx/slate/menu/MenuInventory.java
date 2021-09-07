@@ -263,7 +263,7 @@ public class MenuInventory implements InventoryProvider {
             // Run coded click functionality
             SingleItemProvider provider = singleItem.getProvider();
             if (provider != null) {
-                provider.onClick(player, event, c.getItem(), pos);
+                provider.onClick(player, event, c.getItem(), pos, activeMenu);
             }
 
             executeActions(singleItem, player, contents, c); // Run custom click actions
@@ -278,7 +278,7 @@ public class MenuInventory implements InventoryProvider {
             // Run coded click functionality
             TemplateItemProvider<C> provider = templateItem.getProvider();
             if (provider != null) {
-                provider.onClick(player, event, c.getItem(), pos, context);
+                provider.onClick(player, event, c.getItem(), pos, activeMenu, context);
             }
 
             executeActions(templateItem, player, contents, c); // Run custom click actions
