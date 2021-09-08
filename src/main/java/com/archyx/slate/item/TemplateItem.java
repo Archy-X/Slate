@@ -41,7 +41,10 @@ public class TemplateItem<C> extends MenuItem {
 
     @Nullable
     public ItemStack getDefaultBaseItem() {
-        return defaultBaseItem;
+        if (defaultBaseItem != null) {
+            return defaultBaseItem.clone();
+        }
+        return null;
     }
 
     @Nullable
