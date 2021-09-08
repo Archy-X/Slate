@@ -4,7 +4,6 @@ import com.archyx.slate.Slate;
 import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.builder.SingleItemBuilder;
 import com.archyx.slate.item.provider.SingleItemProvider;
-import com.archyx.slate.menu.MenuProvider;
 import org.apache.commons.lang.Validate;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -15,7 +14,7 @@ public class SingleItemParser extends MenuItemParser {
     }
 
     @Override
-    public MenuItem parse(ConfigurationSection section, String menuName, MenuProvider menuProvider) {
+    public MenuItem parse(ConfigurationSection section, String menuName) {
         SingleItemBuilder builder = new SingleItemBuilder(slate);
 
         String name = section.getName();
@@ -29,7 +28,7 @@ public class SingleItemParser extends MenuItemParser {
         builder.displayName(parseDisplayName(section));
         builder.lore(parseLore(section));
 
-        SingleItemProvider provider = menuProvider.getSingleItemProvider(name);
+        SingleItemProvider provider = slate.getMenuManager().getSingleItemProvider(name);
         if (provider != null) {
             builder.provider(provider);
         }

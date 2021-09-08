@@ -5,7 +5,6 @@ import com.archyx.slate.action.Action;
 import com.archyx.slate.action.click.ClickAction;
 import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.builder.MenuItemBuilder;
-import com.archyx.slate.menu.MenuProvider;
 import com.archyx.slate.util.MapParser;
 import com.archyx.slate.util.TextUtil;
 import com.cryptomorin.xseries.XEnchantment;
@@ -42,7 +41,7 @@ public abstract class MenuItemParser extends MapParser {
         this.slate = slate;
     }
 
-    public abstract MenuItem parse(ConfigurationSection section, String menuName, MenuProvider menuProvider);
+    public abstract MenuItem parse(ConfigurationSection section, String menuName);
 
     @SuppressWarnings("deprecation")
     protected ItemStack parseBaseItem(ConfigurationSection section) {

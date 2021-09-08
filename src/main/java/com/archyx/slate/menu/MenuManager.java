@@ -7,6 +7,8 @@ import com.archyx.slate.fill.FillItemParser;
 import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.parser.SingleItemParser;
 import com.archyx.slate.item.parser.TemplateItemParser;
+import com.archyx.slate.item.provider.SingleItemProvider;
+import com.archyx.slate.item.provider.TemplateItemProvider;
 import com.archyx.slate.util.TextUtil;
 import fr.minuskube.inv.SmartInventory;
 import org.apache.commons.lang.StringUtils;
@@ -26,17 +28,51 @@ public class MenuManager {
 
     private final Slate slate;
     private final Map<String, ConfigurableMenu> menus;
+    private final Map<String, SingleItemProvider> singleItemProviders;
+    private final Map<String, TemplateItemProvider<?>> templateItemProviders;
     private final Map<String, MenuProvider> menuProviders;
 
     public MenuManager(Slate slate) {
         this.slate = slate;
         this.menus = new LinkedHashMap<>();
+        this.singleItemProviders = new HashMap<>();
+        this.templateItemProviders = new HashMap<>();
         this.menuProviders = new HashMap<>();
     }
 
     @Nullable
     public ConfigurableMenu getMenu(String name) {
         return menus.get(name);
+    }
+
+    @Nullable
+    public SingleItemProvider getSingleItemProvider(String menuName) {
+        return singleItemProviders.get(menuName);
+    }
+
+    @Nullable
+    public TemplateItemProvider<?> getTemplateItemProvider(String menuName) {
+        return templateItemProviders.get(menuName);
+    }
+
+    /**
+     * Registers an item provider for a single item. Providers are used to define unique behavior for items.
+     *
+     * @param name The name of the single item
+     * @param provider The provider instance
+     */
+    public void registerItemProvider(String name, SingleItemProvider provider) {
+        singleItemProviders.put(name, provider);
+    }
+
+    /**
+     * Registers an item provider for a template item. Providers are used to define unique behavior for items.
+     *
+     * @param name The name of the template item
+     * @param provider The provider instance
+     */
+    public void registerItemProvider(String name, TemplateItemProvider<?> provider) {
+        templateItemProviders.put(name, provider);
     }
 
     /**
@@ -65,11 +101,6 @@ public class MenuManager {
         String title = config.getString("title", menuName);
         int size = config.getInt("size", 6);
 
-        MenuProvider menuProvider = menuProviders.get(menuName);
-        if (menuProvider == null) {
-            throw new IllegalArgumentException("Registered MenuProvider not found for menu with name " + menuName);
-        }
-
         Map<String, MenuItem> items = new HashMap<>();
         // Load single items
         ConfigurationSection itemsSection = config.getConfigurationSection("items");
@@ -77,7 +108,7 @@ public class MenuManager {
             for (String itemName : itemsSection.getKeys(false)) {
                 ConfigurationSection itemSection = itemsSection.getConfigurationSection(itemName);
                 if (itemSection != null) {
-                    MenuItem item = new SingleItemParser(slate).parse(itemSection, menuName, menuProvider);
+                    MenuItem item = new SingleItemParser(slate).parse(itemSection, menuName);
                     items.put(itemName, item);
                 }
             }
@@ -88,8 +119,13 @@ public class MenuManager {
             for (String templateName : templatesSection.getKeys(false)) {
                 ConfigurationSection templateSection = templatesSection.getConfigurationSection(templateName);
                 if (templateSection != null) {
-                    MenuItem item = new TemplateItemParser<>(slate).parse(templateSection, menuName, menuProvider);
-                    items.put(templateName, item);
+                    TemplateItemProvider<?> provider = slate.getMenuManager().getTemplateItemProvider(templateName);
+                    if (provider != null) {
+                        MenuItem item = new TemplateItemParser<>(slate, provider).parse(templateSection, menuName);
+                        items.put(templateName, item);
+                    } else {
+                        throw new IllegalArgumentException("Could not find registered template item provider for name " + templateName);
+                    }
                 }
             }
         }
@@ -98,14 +134,15 @@ public class MenuManager {
         FillData fillData;
         if (fillSection != null) {
             boolean fillEnabled = fillSection.getBoolean("enabled", false);
-            FillItem fillItem = new FillItemParser(slate).parse(fillSection, menuName, menuProvider);
+            FillItem fillItem = new FillItemParser(slate).parse(fillSection, menuName);
             fillData = new FillData(fillItem, fillEnabled);
         } else {
             fillData = new FillData(FillItem.getDefault(slate), false);
         }
 
+        MenuProvider provider = menuProviders.get(menuName);
         // Add menu to map
-        ConfigurableMenu menu = new ConfigurableMenu(menuName, title, size, items, menuProvider, fillData);
+        ConfigurableMenu menu = new ConfigurableMenu(menuName, title, size, items, provider, fillData);
         menus.put(menuName, menu);
     }
 

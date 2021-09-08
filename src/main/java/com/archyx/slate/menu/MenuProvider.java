@@ -1,18 +1,8 @@
 package com.archyx.slate.menu;
 
-import com.archyx.slate.item.provider.SingleItemProvider;
-import com.archyx.slate.item.provider.TemplateItemProvider;
 import org.bukkit.entity.Player;
 
 public interface MenuProvider {
-
-    default SingleItemProvider getSingleItemProvider(String name) {
-        return null;
-    }
-
-    default <C> TemplateItemProvider<C> getTemplateItemProvider(String name) {
-        return null;
-    }
 
     /**
      * Calls when a menu is in the process of being opened.
