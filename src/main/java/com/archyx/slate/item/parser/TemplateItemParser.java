@@ -51,6 +51,13 @@ public class TemplateItemParser<C> extends MenuItemParser {
                 }
             }
         }
+
+        String defaultPos = section.getString("pos");
+        if (positions.size() == 0 && defaultPos != null) {
+            SlotPos pos = parsePosition(defaultPos);
+            builder.defaultPosition(pos);
+        }
+
         builder.baseItems(baseItems);
         builder.positions(positions);
 

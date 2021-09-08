@@ -15,6 +15,7 @@ public class TemplateItemBuilder<C> extends MenuItemBuilder {
     private Map<C, ItemStack> baseItems;
     private ItemStack defaultBaseItem;
     private TemplateItemProvider<C> provider;
+    private SlotPos defaultPosition;
 
     public TemplateItemBuilder(Slate slate) {
         super(slate);
@@ -40,8 +41,13 @@ public class TemplateItemBuilder<C> extends MenuItemBuilder {
         return this;
     }
 
+    public TemplateItemBuilder<C> defaultPosition(SlotPos defaultPosition) {
+        this.defaultPosition = defaultPosition;
+        return this;
+    }
+
     @Override
     public MenuItem build() {
-        return new TemplateItem<>(slate, name, baseItems, defaultBaseItem, displayName, lore, actions, positions, provider);
+        return new TemplateItem<>(slate, name, baseItems, defaultBaseItem, displayName, lore, actions, positions, defaultPosition, provider);
     }
 }
