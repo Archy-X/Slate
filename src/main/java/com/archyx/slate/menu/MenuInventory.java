@@ -142,6 +142,9 @@ public class MenuInventory implements InventoryProvider {
         if (provider != null) {
             itemStack = modifyBaseItem(provider, itemStack, player); // Apply provider base item modifications
         }
+        if (itemStack == null) {
+            return;
+        }
         ItemMeta meta = itemStack.getItemMeta();
         if (meta != null) {
             String displayName = item.getDisplayName();
@@ -201,12 +204,12 @@ public class MenuInventory implements InventoryProvider {
             ItemStack itemStack = item.getBaseItems().get(context);
             if (itemStack == null) {
                 itemStack = item.getDefaultBaseItem();
-                if (itemStack == null) {
-                    continue;
-                }
             }
             if (provider != null) {
                 itemStack = modifyBaseItem(provider, itemStack, player, context); // Apply provider base item modifications
+            }
+            if (itemStack == null) {
+                continue;
             }
             ItemMeta meta = itemStack.getItemMeta();
             if (meta != null) {
