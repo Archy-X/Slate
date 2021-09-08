@@ -140,7 +140,7 @@ public class MenuInventory implements InventoryProvider {
 
         ItemStack itemStack = item.getBaseItem();
         if (provider != null) {
-            itemStack = modifyBaseItem(provider, itemStack, player); // Apply provider base item modifications
+            itemStack = modifyBaseItem(provider, itemStack, player, activeMenu); // Apply provider base item modifications
         }
         if (itemStack == null) {
             return;
@@ -206,7 +206,7 @@ public class MenuInventory implements InventoryProvider {
                 itemStack = item.getDefaultBaseItem();
             }
             if (provider != null) {
-                itemStack = modifyBaseItem(provider, itemStack, player, context); // Apply provider base item modifications
+                itemStack = modifyBaseItem(provider, itemStack, player, activeMenu, context); // Apply provider base item modifications
             }
             if (itemStack == null) {
                 continue;
@@ -342,12 +342,12 @@ public class MenuInventory implements InventoryProvider {
         return properties;
     }
 
-    private ItemStack modifyBaseItem(SingleItemProvider provider, ItemStack baseItem, Player player) {
-        return provider.onItemModify(baseItem, player);
+    private ItemStack modifyBaseItem(SingleItemProvider provider, ItemStack baseItem, Player player, ActiveMenu activeMenu) {
+        return provider.onItemModify(baseItem, player, activeMenu);
     }
 
-    private <C> ItemStack modifyBaseItem(TemplateItemProvider<C> provider, ItemStack baseItem, Player player, C context) {
-        return provider.onItemModify(baseItem, player, context);
+    private <C> ItemStack modifyBaseItem(TemplateItemProvider<C> provider, ItemStack baseItem, Player player, ActiveMenu activeMenu, C context) {
+        return provider.onItemModify(baseItem, player, activeMenu, context);
     }
 
 }

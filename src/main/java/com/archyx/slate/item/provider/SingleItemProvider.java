@@ -26,7 +26,7 @@ public interface SingleItemProvider {
      * @param baseItem The base item before modification
      * @return The base item after modification
      */
-    default ItemStack onItemModify(ItemStack baseItem, Player player) {
+    default ItemStack onItemModify(ItemStack baseItem, Player player, ActiveMenu activeMenu) {
         return baseItem;
     }
 

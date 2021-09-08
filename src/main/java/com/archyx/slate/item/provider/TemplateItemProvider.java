@@ -43,7 +43,7 @@ public interface TemplateItemProvider<C> {
      * @param baseItem The base item before modification
      * @return The base item after modification
      */
-    default ItemStack onItemModify(ItemStack baseItem, Player player, C context) {
+    default ItemStack onItemModify(ItemStack baseItem, Player player, ActiveMenu activeMenu, C context) {
         return baseItem;
     }
 
