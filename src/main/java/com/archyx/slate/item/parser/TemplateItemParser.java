@@ -5,6 +5,7 @@ import com.archyx.slate.context.ContextProvider;
 import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.builder.TemplateItemBuilder;
 import com.archyx.slate.item.provider.TemplateItemProvider;
+import com.archyx.slate.menu.MenuProvider;
 import fr.minuskube.inv.content.SlotPos;
 import org.apache.commons.lang.Validate;
 import org.bukkit.configuration.ConfigurationSection;
@@ -15,21 +16,22 @@ import java.util.Map;
 
 public class TemplateItemParser<C> extends MenuItemParser {
 
-    private final TemplateItemProvider<C> provider;
-
-    public TemplateItemParser(Slate slate, TemplateItemProvider<C> provider) {
+    public TemplateItemParser(Slate slate) {
         super(slate);
-        this.provider = provider;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public MenuItem parse(ConfigurationSection section, String menuName) {
+    public MenuItem parse(ConfigurationSection section, String menuName, MenuProvider menuProvider) {
         TemplateItemBuilder<C> builder = new TemplateItemBuilder<>(slate);
 
         String name = section.getName();
         builder.name(name);
 
+        TemplateItemProvider<C> provider = menuProvider.getTemplateItemProvider(name);
+        if (provider == null) {
+            throw new IllegalArgumentException("Could not find registered template item provider for name " + name);
+        }
         builder.provider(provider);
 
         // Get context provider

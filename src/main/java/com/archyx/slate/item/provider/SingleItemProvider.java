@@ -8,6 +8,8 @@ import org.bukkit.inventory.ItemStack;
 
 public interface SingleItemProvider {
 
+    String getName();
+
     /**
      * Replaces a requested placeholder from display name or lore.
      * Can be used to localize content or inject contextual information.

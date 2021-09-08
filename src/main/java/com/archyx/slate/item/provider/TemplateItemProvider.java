@@ -10,6 +10,8 @@ import java.util.Set;
 
 public interface TemplateItemProvider<C> {
 
+    String getName();
+
     /**
      * Gets the context class for this item template
      *
