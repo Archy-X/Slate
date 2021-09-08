@@ -248,7 +248,12 @@ public class MenuInventory implements InventoryProvider {
             }
             // Add item to inventory
             SlotPos pos = item.getPosition(context);
-            addTemplateItemToInventory(item, itemStack, pos, contents, player, context);
+            if (pos == null && provider != null) {
+                pos = provider.getSlotPos(player, activeMenu, context); // Use provider position if config pos is not defined
+            }
+            if (pos != null) {
+                addTemplateItemToInventory(item, itemStack, pos, contents, player, context);
+            }
         }
     }
 

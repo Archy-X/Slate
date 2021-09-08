@@ -47,4 +47,8 @@ public interface TemplateItemProvider<C> {
         return baseItem;
     }
 
+    default SlotPos getSlotPos(Player player, ActiveMenu activeMenu, C context) {
+        return null;
+    }
+
 }
