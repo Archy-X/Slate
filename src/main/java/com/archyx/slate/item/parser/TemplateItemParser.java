@@ -44,7 +44,9 @@ public class TemplateItemParser<C> extends MenuItemParser {
             C context = contextProvider.parse(key);
             ConfigurationSection contextSection = section.getConfigurationSection(key);
             if (context != null && contextSection != null) { // Context parse found a match
-                baseItems.put(context, parseBaseItem(contextSection));
+                if (contextSection.contains("material")) {
+                    baseItems.put(context, parseBaseItem(contextSection));
+                }
                 String positionString = contextSection.getString("pos");
                 if (positionString != null) {
                     positions.put(context, parsePosition(positionString));
