@@ -7,6 +7,7 @@ import com.archyx.slate.fill.FillItemParser;
 import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.parser.SingleItemParser;
 import com.archyx.slate.item.parser.TemplateItemParser;
+import com.archyx.slate.item.provider.ProviderManager;
 import com.archyx.slate.item.provider.SingleItemProvider;
 import com.archyx.slate.item.provider.TemplateItemProvider;
 import com.archyx.slate.util.TextUtil;
@@ -28,15 +29,15 @@ public class MenuManager {
 
     private final Slate slate;
     private final Map<String, ConfigurableMenu> menus;
-    private final Map<String, SingleItemProvider> singleItemProviders;
-    private final Map<String, TemplateItemProvider<?>> templateItemProviders;
+    private final ProviderManager globalProviderManager;
+    private final Map<String, ProviderManager> menuProviderManagers;
     private final Map<String, MenuProvider> menuProviders;
 
     public MenuManager(Slate slate) {
         this.slate = slate;
         this.menus = new LinkedHashMap<>();
-        this.singleItemProviders = new HashMap<>();
-        this.templateItemProviders = new HashMap<>();
+        this.globalProviderManager = new ProviderManager();
+        this.menuProviderManagers = new HashMap<>();
         this.menuProviders = new HashMap<>();
     }
 
@@ -46,13 +47,29 @@ public class MenuManager {
     }
 
     @Nullable
-    public SingleItemProvider getSingleItemProvider(String menuName) {
-        return singleItemProviders.get(menuName);
+    public SingleItemProvider getSingleItemProvider(String itemName, String menuName) {
+        // Use skill specific provider if exits
+        ProviderManager menuProviderManager = menuProviderManagers.get(menuName);
+        if (menuProviderManager != null) {
+            SingleItemProvider provider = menuProviderManager.getSingle(itemName);
+            if (provider != null) {
+                return provider;
+            }
+        }
+        return globalProviderManager.getSingle(itemName); // Otherwise use global provider
     }
 
     @Nullable
-    public TemplateItemProvider<?> getTemplateItemProvider(String menuName) {
-        return templateItemProviders.get(menuName);
+    public TemplateItemProvider<?> getTemplateItemProvider(String itemName, String menuName) {
+        // Use skill specific provider if exits
+        ProviderManager menuProviderManager = menuProviderManagers.get(menuName);
+        if (menuProviderManager != null) {
+            TemplateItemProvider<?> provider = menuProviderManager.getTemplate(itemName);
+            if (provider != null) {
+                return provider;
+            }
+        }
+        return globalProviderManager.getTemplate(itemName);
     }
 
     /**
@@ -62,7 +79,7 @@ public class MenuManager {
      * @param provider The provider instance
      */
     public void registerItemProvider(String name, SingleItemProvider provider) {
-        singleItemProviders.put(name, provider);
+        globalProviderManager.registerSingle(name, provider);
     }
 
     /**
@@ -72,7 +89,7 @@ public class MenuManager {
      * @param provider The provider instance
      */
     public void registerItemProvider(String name, TemplateItemProvider<?> provider) {
-        templateItemProviders.put(name, provider);
+        globalProviderManager.registerTemplate(name, provider);
     }
 
     /**
@@ -83,6 +100,10 @@ public class MenuManager {
      */
     public void registerMenuProvider(String name, MenuProvider provider) {
         menuProviders.put(name, provider);
+    }
+
+    public ProviderManager getProviderManager(String menuName) {
+        return menuProviderManagers.computeIfAbsent(menuName, k -> new ProviderManager());
     }
 
     /**
@@ -119,7 +140,7 @@ public class MenuManager {
             for (String templateName : templatesSection.getKeys(false)) {
                 ConfigurationSection templateSection = templatesSection.getConfigurationSection(templateName);
                 if (templateSection != null) {
-                    TemplateItemProvider<?> provider = slate.getMenuManager().getTemplateItemProvider(templateName);
+                    TemplateItemProvider<?> provider = slate.getMenuManager().getTemplateItemProvider(templateName, menuName);
                     if (provider != null) {
                         MenuItem item = new TemplateItemParser<>(slate, provider).parse(templateSection, menuName);
                         items.put(templateName, item);

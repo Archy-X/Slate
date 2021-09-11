@@ -1,0 +1,48 @@
+package com.archyx.slate.item.provider;
+
+import org.jetbrains.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class ProviderManager {
+
+    private final Map<String, SingleItemProvider> singleItemProviders;
+    private final Map<String, TemplateItemProvider<?>> templateItemProviders;
+
+    public ProviderManager() {
+        this.singleItemProviders = new HashMap<>();
+        this.templateItemProviders = new HashMap<>();
+    }
+
+    @Nullable
+    public SingleItemProvider getSingle(String itemName) {
+        return singleItemProviders.get(itemName);
+    }
+
+    @Nullable
+    public TemplateItemProvider<?> getTemplate(String itemName) {
+        return templateItemProviders.get(itemName);
+    }
+
+    /**
+     * Registers an item provider for a single item. Providers are used to define unique behavior for items.
+     *
+     * @param name The name of the single item
+     * @param provider The provider instance
+     */
+    public void registerSingle(String name, SingleItemProvider provider) {
+        singleItemProviders.put(name, provider);
+    }
+
+    /**
+     * Registers an item provider for a template item. Providers are used to define unique behavior for items.
+     *
+     * @param name The name of the template item
+     * @param provider The provider instance
+     */
+    public void registerTemplate(String name, TemplateItemProvider<?> provider) {
+        templateItemProviders.put(name, provider);
+    }
+
+}
