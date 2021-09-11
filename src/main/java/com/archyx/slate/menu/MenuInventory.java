@@ -75,10 +75,6 @@ public class MenuInventory implements InventoryProvider {
         return activeItems.get(itemName);
     }
 
-    public void removeActiveItem(String itemName) {
-        activeItems.remove(itemName);
-    }
-
     public int getTotalPages() {
         return totalPages;
     }
@@ -92,7 +88,10 @@ public class MenuInventory implements InventoryProvider {
         this.contents = contents;
         // Add active items
         for (MenuItem menuItem : menu.getItems().values()) {
-            ActiveItem activeItem;
+            ActiveItem activeItem = activeItems.get(menuItem.getName());
+            if (activeItem != null && activeItem.isHidden()) {
+                continue;
+            }
             if (menuItem instanceof SingleItem) {
                 activeItem = new ActiveSingleItem((SingleItem) menuItem);
             } else if (menuItem instanceof TemplateItem) {
