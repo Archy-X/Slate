@@ -39,6 +39,8 @@ public class MenuInventory implements InventoryProvider {
     private final Map<String, Object> properties;
     private final int totalPages;
     private final int currentPage;
+    private final Player player;
+    private InventoryContents contents;
 
     public MenuInventory(Slate slate, ConfigurableMenu menu, Player player, Map<String, Object> properties, int currentPage) {
         this.slate = slate;
@@ -46,6 +48,7 @@ public class MenuInventory implements InventoryProvider {
         this.activeItems = new HashMap<>();
         this.activeMenu = new ActiveMenu(this);
         this.properties = properties;
+        this.player = player;
         MenuProvider provider = menu.getProvider();
         if (provider != null) {
             this.totalPages = provider.getPages(player, activeMenu);
@@ -86,6 +89,7 @@ public class MenuInventory implements InventoryProvider {
 
     @Override
     public void init(Player player, InventoryContents contents) {
+        this.contents = contents;
         // Add active items
         for (MenuItem menuItem : menu.getItems().values()) {
             ActiveItem activeItem;
@@ -351,6 +355,14 @@ public class MenuInventory implements InventoryProvider {
 
     private <C> ItemStack modifyBaseItem(TemplateItemProvider<C> provider, ItemStack baseItem, Player player, ActiveMenu activeMenu, C context) {
         return provider.onItemModify(baseItem, player, activeMenu, context);
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public InventoryContents getContents() {
+        return contents;
     }
 
 }

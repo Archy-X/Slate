@@ -86,4 +86,12 @@ public class ActiveMenu {
         return menuInventory.getProperties();
     }
 
+    public void setProperty(String name, Object value) {
+        menuInventory.getProperties().put(name, value);
+    }
+
+    public void reload() {
+        menuInventory.init(menuInventory.getPlayer(), menuInventory.getContents());
+    }
+
 }
