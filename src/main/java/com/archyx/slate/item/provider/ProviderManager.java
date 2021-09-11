@@ -16,12 +16,12 @@ public class ProviderManager {
     }
 
     @Nullable
-    public SingleItemProvider getSingle(String itemName) {
+    public SingleItemProvider getSingleItem(String itemName) {
         return singleItemProviders.get(itemName);
     }
 
     @Nullable
-    public TemplateItemProvider<?> getTemplate(String itemName) {
+    public TemplateItemProvider<?> getTemplateItem(String itemName) {
         return templateItemProviders.get(itemName);
     }
 
@@ -31,7 +31,7 @@ public class ProviderManager {
      * @param name The name of the single item
      * @param provider The provider instance
      */
-    public void registerSingle(String name, SingleItemProvider provider) {
+    public void registerSingleItem(String name, SingleItemProvider provider) {
         singleItemProviders.put(name, provider);
     }
 
@@ -41,7 +41,7 @@ public class ProviderManager {
      * @param name The name of the template item
      * @param provider The provider instance
      */
-    public void registerTemplate(String name, TemplateItemProvider<?> provider) {
+    public void registerTemplateItem(String name, TemplateItemProvider<?> provider) {
         templateItemProviders.put(name, provider);
     }
 

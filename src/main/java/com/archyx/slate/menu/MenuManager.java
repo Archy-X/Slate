@@ -47,29 +47,29 @@ public class MenuManager {
     }
 
     @Nullable
-    public SingleItemProvider getSingleItemProvider(String itemName, String menuName) {
+    public SingleItemProvider getSingleItem(String itemName, String menuName) {
         // Use skill specific provider if exits
         ProviderManager menuProviderManager = menuProviderManagers.get(menuName);
         if (menuProviderManager != null) {
-            SingleItemProvider provider = menuProviderManager.getSingle(itemName);
+            SingleItemProvider provider = menuProviderManager.getSingleItem(itemName);
             if (provider != null) {
                 return provider;
             }
         }
-        return globalProviderManager.getSingle(itemName); // Otherwise use global provider
+        return globalProviderManager.getSingleItem(itemName); // Otherwise use global provider
     }
 
     @Nullable
-    public TemplateItemProvider<?> getTemplateItemProvider(String itemName, String menuName) {
+    public TemplateItemProvider<?> getTemplateItem(String itemName, String menuName) {
         // Use skill specific provider if exits
         ProviderManager menuProviderManager = menuProviderManagers.get(menuName);
         if (menuProviderManager != null) {
-            TemplateItemProvider<?> provider = menuProviderManager.getTemplate(itemName);
+            TemplateItemProvider<?> provider = menuProviderManager.getTemplateItem(itemName);
             if (provider != null) {
                 return provider;
             }
         }
-        return globalProviderManager.getTemplate(itemName);
+        return globalProviderManager.getTemplateItem(itemName);
     }
 
     /**
@@ -78,8 +78,8 @@ public class MenuManager {
      * @param name The name of the single item
      * @param provider The provider instance
      */
-    public void registerItemProvider(String name, SingleItemProvider provider) {
-        globalProviderManager.registerSingle(name, provider);
+    public void registerSingleItem(String name, SingleItemProvider provider) {
+        globalProviderManager.registerSingleItem(name, provider);
     }
 
     /**
@@ -88,8 +88,8 @@ public class MenuManager {
      * @param name The name of the template item
      * @param provider The provider instance
      */
-    public void registerItemProvider(String name, TemplateItemProvider<?> provider) {
-        globalProviderManager.registerTemplate(name, provider);
+    public void registerTemplateItem(String name, TemplateItemProvider<?> provider) {
+        globalProviderManager.registerTemplateItem(name, provider);
     }
 
     /**
@@ -140,7 +140,7 @@ public class MenuManager {
             for (String templateName : templatesSection.getKeys(false)) {
                 ConfigurationSection templateSection = templatesSection.getConfigurationSection(templateName);
                 if (templateSection != null) {
-                    TemplateItemProvider<?> provider = slate.getMenuManager().getTemplateItemProvider(templateName, menuName);
+                    TemplateItemProvider<?> provider = slate.getMenuManager().getTemplateItem(templateName, menuName);
                     if (provider != null) {
                         MenuItem item = new TemplateItemParser<>(slate, provider).parse(templateSection, menuName);
                         items.put(templateName, item);

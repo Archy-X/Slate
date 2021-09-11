@@ -28,7 +28,7 @@ public class SingleItemParser extends MenuItemParser {
         builder.displayName(parseDisplayName(section));
         builder.lore(parseLore(section));
 
-        SingleItemProvider provider = slate.getMenuManager().getSingleItemProvider(name, menuName);
+        SingleItemProvider provider = slate.getMenuManager().getSingleItem(name, menuName);
         if (provider != null) {
             builder.provider(provider);
         }
