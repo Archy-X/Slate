@@ -12,6 +12,10 @@ public class ActiveMenu {
         this.menuInventory = menuInventory;
     }
 
+    public String getName() {
+        return menuInventory.getMenu().getName();
+    }
+
     /**
      * Hides or shows an item in the current menu, will not delete the item in configs.
      * Will not take effect unless the menu is reloaded.
