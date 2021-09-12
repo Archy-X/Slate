@@ -199,6 +199,10 @@ public class MenuManager {
         smartInventory.open(player);
     }
 
+    public void openMenu(Player player, String name, Map<String, Object> properties) {
+        openMenu(player, name, properties, 0);
+    }
+
     /**
      * Opens a loaded menu for a player, will fail silently if the menu does not exist.
      *
