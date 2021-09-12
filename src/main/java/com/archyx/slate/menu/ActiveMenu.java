@@ -63,4 +63,11 @@ public class ActiveMenu {
         menuInventory.init(menuInventory.getPlayer(), menuInventory.getContents());
     }
 
+    public void setCooldown(String itemName, int cooldown) {
+        ActiveItem activeItem = menuInventory.getActiveItem(itemName);
+        if (activeItem != null) {
+            activeItem.setCooldown(cooldown);
+        }
+    }
+
 }

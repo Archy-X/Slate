@@ -137,6 +137,16 @@ public class MenuInventory implements InventoryProvider {
         }
     }
 
+    @Override
+    public void update(Player player, InventoryContents contents) {
+        // Decrement item cooldowns
+        for (ActiveItem activeItem : activeItems.values()) {
+            if (activeItem.getCooldown() > 0) {
+                activeItem.setCooldown(activeItem.getCooldown() - 1);
+            }
+        }
+    }
+
     private void addSingleItem(ActiveSingleItem activeItem, InventoryContents contents, Player player) {
         SingleItem item = activeItem.getItem();
         SingleItemProvider provider = item.getProvider();
@@ -274,6 +284,11 @@ public class MenuInventory implements InventoryProvider {
             if (!(c.getEvent() instanceof InventoryClickEvent)) return;
             InventoryClickEvent event = (InventoryClickEvent) c.getEvent();
 
+            ActiveItem activeItem = activeItems.get(singleItem.getName());
+            if (activeItem != null && activeItem.getCooldown() != 0) {
+                return;
+            }
+
             // Run coded click functionality
             SingleItemProvider provider = singleItem.getProvider();
             if (provider != null) {
@@ -288,6 +303,11 @@ public class MenuInventory implements InventoryProvider {
         contents.set(pos, ClickableItem.from(itemStack, c -> {
             if (!(c.getEvent() instanceof InventoryClickEvent)) return;
             InventoryClickEvent event = (InventoryClickEvent) c.getEvent();
+
+            ActiveItem activeItem = activeItems.get(templateItem.getName());
+            if (activeItem != null && activeItem.getCooldown() != 0) {
+                return;
+            }
 
             // Run coded click functionality
             TemplateItemProvider<C> provider = templateItem.getProvider();
