@@ -70,4 +70,20 @@ public class MapParser {
         }
     }
 
+    public Map<?, ?> getMap(Map<?, ?> map, String key) {
+        Object object = getElement(map, key);
+        if (!(object instanceof Map<?, ?>)) {
+            throw new IllegalArgumentException("Key " + key + " must be a section map");
+        }
+        return (Map<?, ?>) object;
+    }
+
+    public Map<?, ?> getMap(Map<?, ?> map, String key, Map<?, ?> def) {
+        try {
+            return getMap(map, key);
+        } catch (IllegalArgumentException e) {
+            return def;
+        }
+    }
+
 }

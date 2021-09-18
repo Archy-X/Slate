@@ -10,9 +10,11 @@ import java.util.Map;
 public class ContextManager {
 
     private final Map<Class<?>, ContextProvider<?>> contexts;
+    private final Map<String, ContextProvider<?>> keyedContexts;
 
     public ContextManager() {
         this.contexts = new HashMap<>();
+        this.keyedContexts = new HashMap<>();
         registerDefaults();
     }
 
@@ -27,9 +29,19 @@ public class ContextManager {
         contexts.put(contextClass, provider);
     }
 
+    public <C> void registerContext(String key, Class<C> contextClass, ContextProvider<C> provider) {
+        registerContext(contextClass, provider);
+        keyedContexts.put(key, provider);
+    }
+
     @Nullable
     public ContextProvider<?> getContextProvider(Class<?> contextClass) {
         return contexts.get(contextClass);
+    }
+
+    @Nullable
+    public ContextProvider<?> getContextProvider(String key) {
+        return keyedContexts.get(key);
     }
 
     private void registerDefaults() {
