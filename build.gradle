@@ -29,12 +29,17 @@ repositories {
     maven {
         url = "https://repo.codemc.io/repository/maven-public/"
     }
+    maven {
+        name = 'skullcreator-repo'
+        url = 'https://github.com/deanveloper/SkullCreator/raw/mvn-repo/'
+    }
 }
 
 dependencies {
     compile 'com.github.Archy-X:SmartInvs:1.3.0'
     compile 'com.github.cryptomorin:XSeries:8.1.0'
     compile 'de.tr7zw:item-nbt-api:2.8.0'
+    compile 'dev.dbassett:skullcreator:3.0.1'
     compileOnly 'org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT'
     compileOnly 'me.clip:placeholderapi:2.10.10'
 }

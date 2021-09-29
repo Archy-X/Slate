@@ -10,18 +10,17 @@ import com.archyx.slate.util.TextUtil;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import de.tr7zw.changeme.nbtapi.NBTItem;
+import dev.dbassett.skullcreator.SkullCreator;
 import fr.minuskube.inv.content.SlotPos;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.math.NumberUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.EnchantmentStorageMeta;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.inventory.meta.*;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -180,6 +179,10 @@ public abstract class MenuItemParser extends MapParser {
                 item.setDurability((short) Math.max(maxDurability - durability, maxDurability));
             }
         }
+        ConfigurationSection skullMetaSection = section.getConfigurationSection("skull_meta");
+        if (skullMetaSection != null) {
+            parseSkullMeta(item, item.getItemMeta(), skullMetaSection);
+        }
         return item;
     }
 
@@ -272,6 +275,27 @@ public abstract class MenuItemParser extends MapParser {
             }
         }
         builder.actions(actions);
+    }
+
+    private void parseSkullMeta(ItemStack item, ItemMeta meta, ConfigurationSection section) {
+        if (!(meta instanceof SkullMeta)) {
+            return;
+        }
+        SkullMeta skullMeta = (SkullMeta) meta;
+        String uuid = section.getString("uuid");
+        if (uuid != null) { // From UUID of player
+            UUID id = UUID.fromString(uuid);
+            skullMeta.setOwningPlayer(Bukkit.getOfflinePlayer(id));
+            item.setItemMeta(meta);
+        }
+        String base64 = section.getString("base64");
+        if (base64 != null) { // From base64 string
+            SkullCreator.itemWithBase64(item, base64);
+        }
+        String url = section.getString("url");
+        if (url != null) { // From Mojang URL
+            SkullCreator.itemWithUrl(item, url);
+        }
     }
 
 }
