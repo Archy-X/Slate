@@ -44,12 +44,6 @@ dependencies {
     compileOnly 'me.clip:placeholderapi:2.10.10'
 }
 
-shadowJar {
-    relocate 'fr.minuskube.inv', 'com.archyx.slate.smartinvs'
-    relocate 'com.cryptomorin.xseries', 'com.archyx.slate.xseries'
-    relocate 'de.tr7zw.changeme.nbtapi', 'com.archyx.slate.nbtapi'
-}
-
 processResources {
     from(sourceSets.main.resources.srcDirs) {
         filter ReplaceTokens, tokens: [version: version]
