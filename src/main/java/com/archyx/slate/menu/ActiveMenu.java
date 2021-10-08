@@ -1,6 +1,7 @@
 package com.archyx.slate.menu;
 
 import com.archyx.slate.item.active.ActiveItem;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
@@ -68,6 +69,11 @@ public class ActiveMenu {
         if (activeItem != null) {
             activeItem.setCooldown(cooldown);
         }
+    }
+
+    @Nullable
+    public Object getOption(String key) {
+        return menuInventory.getMenu().getOptions().get(key);
     }
 
 }

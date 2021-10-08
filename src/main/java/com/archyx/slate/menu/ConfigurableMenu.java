@@ -2,6 +2,7 @@ package com.archyx.slate.menu;
 
 import com.archyx.slate.fill.FillData;
 import com.archyx.slate.item.MenuItem;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
@@ -13,14 +14,16 @@ public class ConfigurableMenu {
     private final Map<String, MenuItem> items;
     private final MenuProvider provider;
     private final FillData fillData;
+    private final Map<String, Object> options;
 
-    public ConfigurableMenu(String name, String title, int size, Map<String, MenuItem> items, MenuProvider provider, FillData fillData) {
+    public ConfigurableMenu(String name, String title, int size, Map<String, MenuItem> items, MenuProvider provider, FillData fillData, Map<String, Object> options) {
         this.name = name;
         this.title = title;
         this.size = size;
         this.items = items;
         this.provider = provider;
         this.fillData = fillData;
+        this.options = options;
     }
 
     public String getName() {
@@ -39,12 +42,17 @@ public class ConfigurableMenu {
         return items;
     }
 
+    @Nullable
     public MenuProvider getProvider() {
         return provider;
     }
 
     public FillData getFillData() {
         return fillData;
+    }
+
+    public Map<String, Object> getOptions() {
+        return options;
     }
 
 }

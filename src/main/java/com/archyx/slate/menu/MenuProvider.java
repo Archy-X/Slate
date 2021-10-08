@@ -1,6 +1,10 @@
 package com.archyx.slate.menu;
 
+import com.archyx.slate.item.option.Option;
 import org.bukkit.entity.Player;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public interface MenuProvider {
 
@@ -31,6 +35,10 @@ public interface MenuProvider {
      */
     default int getPages(Player player, ActiveMenu activeMenu) {
         return 1;
+    }
+
+    default Set<Option<?>> getOptions() {
+        return new HashSet<>();
     }
 
 }
