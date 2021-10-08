@@ -70,6 +70,8 @@ public abstract class MenuItemParser extends MapParser {
             }
         }
 
+        parseAmount(item, section);
+
         ItemMeta meta = item.getItemMeta();
         if (meta == null) return item;
         // Enchantments
@@ -295,6 +297,13 @@ public abstract class MenuItemParser extends MapParser {
         String url = section.getString("url");
         if (url != null) { // From Mojang URL
             SkullCreator.itemWithUrl(item, url);
+        }
+    }
+
+    private void parseAmount(ItemStack item, ConfigurationSection section) {
+        if (section.contains("amount")) {
+            int amount = section.getInt("amount", 1);
+            item.setAmount(amount);
         }
     }
 
