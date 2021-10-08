@@ -45,7 +45,7 @@ public class MenuInventory implements InventoryProvider {
     public MenuInventory(Slate slate, ConfigurableMenu menu, Player player, Map<String, Object> properties, int currentPage) {
         this.slate = slate;
         this.menu = menu;
-        this.activeItems = new HashMap<>();
+        this.activeItems = new LinkedHashMap<>();
         this.activeMenu = new ActiveMenu(this);
         this.properties = properties;
         this.player = player;

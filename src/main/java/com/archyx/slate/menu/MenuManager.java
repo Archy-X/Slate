@@ -122,7 +122,7 @@ public class MenuManager {
         String title = config.getString("title", menuName);
         int size = config.getInt("size", 6);
 
-        Map<String, MenuItem> items = new HashMap<>();
+        Map<String, MenuItem> items = new LinkedHashMap<>();
         // Load single items
         ConfigurationSection itemsSection = config.getConfigurationSection("items");
         if (itemsSection != null) {
