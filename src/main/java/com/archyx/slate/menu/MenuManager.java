@@ -203,9 +203,12 @@ public class MenuManager {
         String title = menu.getTitle();
         // Replace title placeholders
         if (menu.getProvider() != null) {
-            for (String placeholder : StringUtils.substringsBetween(title, "{", "}")) {
-                title = TextUtil.replace(title, "{" + placeholder + "}",
-                        menu.getProvider().onPlaceholderReplace(placeholder, player, menuInventory.getActiveMenu()));
+            String[] placeholders = StringUtils.substringsBetween(title, "{", "}");
+            if (placeholders != null) {
+                for (String placeholder : placeholders) {
+                    title = TextUtil.replace(title, "{" + placeholder + "}",
+                            menu.getProvider().onPlaceholderReplace(placeholder, player, menuInventory.getActiveMenu()));
+                }
             }
         }
         // Build inventory and open
