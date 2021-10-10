@@ -21,6 +21,7 @@ import fr.minuskube.inv.content.InventoryContents;
 import fr.minuskube.inv.content.InventoryProvider;
 import fr.minuskube.inv.content.SlotPos;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -172,6 +173,8 @@ public class MenuInventory implements InventoryProvider {
             itemStack = modifyBaseItem(provider, itemStack, player, activeMenu); // Apply provider base item modifications
         }
         if (itemStack == null) {
+            SlotPos pos = item.getPosition();
+            contents.set(pos, ClickableItem.empty(new ItemStack(Material.AIR)));
             return;
         }
         ItemMeta meta = itemStack.getItemMeta();
@@ -239,7 +242,17 @@ public class MenuInventory implements InventoryProvider {
             if (provider != null) {
                 itemStack = modifyBaseItem(provider, itemStack, player, activeMenu, context); // Apply provider base item modifications
             }
+            SlotPos pos = item.getPosition(context);
+            if (pos == null && provider != null) {
+                pos = provider.getSlotPos(player, activeMenu, context); // Use provider position if config pos is not defined
+            }
+            if (pos == null) {
+                pos = item.getDefaultPosition();
+            }
             if (itemStack == null) {
+                if (pos != null) {
+                    contents.set(pos, ClickableItem.empty(new ItemStack(Material.AIR)));
+                }
                 continue;
             }
             ItemMeta meta = itemStack.getItemMeta();
@@ -283,13 +296,6 @@ public class MenuInventory implements InventoryProvider {
                 itemStack.setItemMeta(meta);
             }
             // Add item to inventory
-            SlotPos pos = item.getPosition(context);
-            if (pos == null && provider != null) {
-                pos = provider.getSlotPos(player, activeMenu, context); // Use provider position if config pos is not defined
-            }
-            if (pos == null) {
-                pos = item.getDefaultPosition();
-            }
             if (pos != null) {
                 addTemplateItemToInventory(item, itemStack, pos, contents, player, context);
             }
