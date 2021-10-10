@@ -42,7 +42,7 @@ public interface MenuProvider {
         return new HashSet<>();
     }
 
-    default FillItem getFillItem() {
+    default FillItem getFillItem(Player player, ActiveMenu activeMenu) {
         return null;
     }
 
