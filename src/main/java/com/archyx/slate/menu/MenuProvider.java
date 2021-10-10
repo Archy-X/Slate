@@ -1,5 +1,6 @@
 package com.archyx.slate.menu;
 
+import com.archyx.slate.fill.FillItem;
 import com.archyx.slate.item.option.Option;
 import org.bukkit.entity.Player;
 
@@ -39,6 +40,10 @@ public interface MenuProvider {
 
     default Set<Option<?>> getOptions() {
         return new HashSet<>();
+    }
+
+    default FillItem getFillItem() {
+        return null;
     }
 
 }

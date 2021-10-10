@@ -12,6 +12,10 @@ public class FillItemParser extends MenuItemParser {
 
     @Override
     public FillItem parse(ConfigurationSection section, String menuName) {
-        return new FillItem(slate, parseBaseItem(section));
+        if (section.contains("material")) {
+            return new FillItem(slate, parseBaseItem(section));
+        } else {
+            return null;
+        }
     }
 }
