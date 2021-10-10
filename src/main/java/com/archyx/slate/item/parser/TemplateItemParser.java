@@ -6,7 +6,6 @@ import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.builder.TemplateItemBuilder;
 import com.archyx.slate.item.provider.TemplateItemProvider;
 import fr.minuskube.inv.content.SlotPos;
-import org.apache.commons.lang.Validate;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
@@ -34,13 +33,15 @@ public class TemplateItemParser<C> extends MenuItemParser {
 
         // Get context provider
         ContextProvider<C> contextProvider = (ContextProvider<C>) slate.getContextManager().getContextProvider(provider.getContext());
-        Validate.notNull(contextProvider, "Could not find registered context provider for class " + provider.getContext().getName());
 
         // Look through keys for contexts
         Map<C, ItemStack> baseItems = new HashMap<>();
         Map<C, SlotPos> positions = new HashMap<>();
         for (String key : section.getKeys(false)) {
             if (isKeyWord(key)) continue; // Skip for key words used for default item parsing
+            if (contextProvider == null) {
+                throw new IllegalArgumentException("Could not find registered context provider for class " + provider.getContext().getName());
+            }
             C context = contextProvider.parse(key);
             ConfigurationSection contextSection = section.getConfigurationSection(key);
             if (context != null && contextSection != null) { // Context parse found a match
