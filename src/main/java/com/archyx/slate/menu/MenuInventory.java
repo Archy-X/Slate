@@ -157,6 +157,10 @@ public class MenuInventory implements InventoryProvider {
                 activeItem.setCooldown(activeItem.getCooldown() - 1);
             }
         }
+        MenuProvider provider = menu.getProvider();
+        if (provider != null) {
+            provider.onUpdate(player, activeMenu);
+        }
     }
 
     private void addSingleItem(ActiveSingleItem activeItem, InventoryContents contents, Player player) {

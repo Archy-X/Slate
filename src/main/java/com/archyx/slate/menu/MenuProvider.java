@@ -46,4 +46,6 @@ public interface MenuProvider {
         return null;
     }
 
+    default void onUpdate(Player player, ActiveMenu menu) {}
+
 }
