@@ -112,9 +112,9 @@ public class MenuInventory implements InventoryProvider {
         if (fillData.isEnabled()) {
             FillItem fillItem = fillData.getItem();
             if (provider != null) { // Check for provided fill item
-                FillItem providedFill = provider.getFillItem(player, activeMenu);
+                ItemStack providedFill = provider.getFillItem(player, activeMenu);
                 if (providedFill != null) {
-                    fillItem = providedFill;
+                    fillItem =  new FillItem(slate, providedFill);
                 }
             }
             ItemStack itemStack = fillItem.getBaseItem();

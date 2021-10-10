@@ -1,8 +1,8 @@
 package com.archyx.slate.menu;
 
-import com.archyx.slate.fill.FillItem;
 import com.archyx.slate.item.option.Option;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -42,7 +42,7 @@ public interface MenuProvider {
         return new HashSet<>();
     }
 
-    default FillItem getFillItem(Player player, ActiveMenu activeMenu) {
+    default ItemStack getFillItem(Player player, ActiveMenu activeMenu) {
         return null;
     }
 
