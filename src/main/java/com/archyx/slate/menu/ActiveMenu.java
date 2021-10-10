@@ -52,6 +52,15 @@ public class ActiveMenu {
         return menuInventory.getProperties().get(name);
     }
 
+    public Object getProperty(String name, Object def) {
+        Object value = menuInventory.getProperties().get(name);
+        if (value != null) {
+            return value;
+        } else {
+            return def;
+        }
+    }
+
     public Map<String, Object> getProperties() {
         return menuInventory.getProperties();
     }
