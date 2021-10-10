@@ -4,6 +4,7 @@ import com.archyx.slate.Slate;
 import com.archyx.slate.fill.FillData;
 import com.archyx.slate.fill.FillItem;
 import com.archyx.slate.fill.FillItemParser;
+import com.archyx.slate.fill.SlotParser;
 import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.option.Option;
 import com.archyx.slate.item.parser.SingleItemParser;
@@ -157,9 +158,9 @@ public class MenuManager {
         if (fillSection != null) {
             boolean fillEnabled = fillSection.getBoolean("enabled", false);
             FillItem fillItem = new FillItemParser(slate).parse(fillSection, menuName);
-            fillData = new FillData(fillItem, fillEnabled);
+            fillData = new FillData(fillItem, new SlotParser().parse(fillSection), fillEnabled);
         } else {
-            fillData = new FillData(FillItem.getDefault(slate), false);
+            fillData = new FillData(FillItem.getDefault(slate), null, false);
         }
 
         MenuProvider provider = menuProviders.get(menuName);

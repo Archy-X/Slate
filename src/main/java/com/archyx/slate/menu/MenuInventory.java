@@ -131,7 +131,13 @@ public class MenuInventory implements InventoryProvider {
                 }
                 itemStack.setItemMeta(meta);
             }
-            contents.fill(ClickableItem.empty(itemStack));
+            if (fillData.getSlots() == null) { // Use default fill
+                contents.fill(ClickableItem.empty(itemStack));
+            } else { // Use defined slot positions
+                for (SlotPos slot : fillData.getSlots()) {
+                    contents.set(slot, ClickableItem.empty(itemStack));
+                }
+            }
         }
         // Place items
         for (ActiveItem activeItem : activeItems.values()) {
