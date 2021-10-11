@@ -21,7 +21,6 @@ import fr.minuskube.inv.content.InventoryContents;
 import fr.minuskube.inv.content.InventoryProvider;
 import fr.minuskube.inv.content.SlotPos;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -87,7 +86,6 @@ public class MenuInventory implements InventoryProvider {
     @Override
     public void init(Player player, InventoryContents contents) {
         this.contents = contents;
-        contents.fill(ClickableItem.empty(new ItemStack(Material.AIR)));
         // Add active items
         for (MenuItem menuItem : menu.getItems().values()) {
             ActiveItem activeItem = activeItems.get(menuItem.getName());
