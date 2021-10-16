@@ -17,8 +17,8 @@ public class SingleItem extends MenuItem {
     private final ItemStack baseItem;
     private final SingleItemProvider provider;
 
-    public SingleItem(Slate slate, String name, ItemStack baseItem, String displayName, List<String> lore, Map<ClickAction, List<Action>> actions, SlotPos position, SingleItemProvider provider) {
-        super(slate, name, displayName, lore, actions);
+    public SingleItem(Slate slate, String name, ItemStack baseItem, String displayName, List<String> lore, Map<ClickAction, List<Action>> actions, SlotPos position, SingleItemProvider provider, Map<String, Object> options) {
+        super(slate, name, displayName, lore, actions, options);
         this.position = position;
         this.baseItem = baseItem;
         this.provider = provider;

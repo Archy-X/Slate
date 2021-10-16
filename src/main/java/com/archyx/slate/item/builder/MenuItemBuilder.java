@@ -16,6 +16,7 @@ public abstract class MenuItemBuilder {
     protected String displayName;
     protected List<String> lore;
     protected Map<ClickAction, List<Action>> actions;
+    protected Map<String, Object> options;
 
     public MenuItemBuilder(Slate slate) {
         this.slate = slate;
@@ -41,6 +42,11 @@ public abstract class MenuItemBuilder {
 
     public MenuItemBuilder actions(Map<ClickAction, List<Action>> actions) {
         this.actions = actions;
+        return this;
+    }
+
+    public MenuItemBuilder options(Map<String, Object> options) {
+        this.options = options;
         return this;
     }
 

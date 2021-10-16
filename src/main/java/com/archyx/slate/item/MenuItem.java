@@ -15,13 +15,15 @@ public abstract class MenuItem {
     private final String displayName;
     private final List<String> lore;
     private final Map<ClickAction, List<Action>> actions;
+    private final Map<String, Object> options;
 
-    public MenuItem(Slate slate, String name, String displayName, List<String> lore, Map<ClickAction, List<Action>> actions) {
+    public MenuItem(Slate slate, String name, String displayName, List<String> lore, Map<ClickAction, List<Action>> actions, Map<String, Object> options) {
         this.slate = slate;
         this.name = name;
         this.displayName = displayName;
         this.lore = lore;
         this.actions = actions;
+        this.options = options;
     }
 
     public String getName() {
@@ -40,6 +42,10 @@ public abstract class MenuItem {
 
     public Map<ClickAction, List<Action>> getActions() {
         return actions;
+    }
+
+    public Map<String, Object> getOptions() {
+        return options;
     }
 
 }

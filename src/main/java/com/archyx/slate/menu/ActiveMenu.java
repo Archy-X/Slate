@@ -1,5 +1,6 @@
 package com.archyx.slate.menu;
 
+import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.active.ActiveItem;
 import org.jetbrains.annotations.Nullable;
 
@@ -83,6 +84,16 @@ public class ActiveMenu {
     @Nullable
     public Object getOption(String key) {
         return menuInventory.getMenu().getOptions().get(key);
+    }
+
+    @Nullable
+    public Object getItemOption(String itemName, String key) {
+        MenuItem menuItem = menuInventory.getMenu().getItems().get(itemName);
+        if (menuItem != null) {
+            return menuItem.getOptions().get(key);
+        } else {
+            return null;
+        }
     }
 
 }

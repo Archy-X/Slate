@@ -20,8 +20,8 @@ public class TemplateItem<C> extends MenuItem {
     private final SlotPos defaultPosition;
     private final TemplateItemProvider<C> provider;
 
-    public TemplateItem(Slate slate, String name, Map<C, ItemStack> baseItems, ItemStack defaultBaseItem, String displayName, List<String> lore, Map<ClickAction, List<Action>> actions, Map<C, SlotPos> positions, SlotPos defaultPosition, TemplateItemProvider<C> provider) {
-        super(slate, name, displayName, lore, actions);
+    public TemplateItem(Slate slate, String name, Map<C, ItemStack> baseItems, ItemStack defaultBaseItem, String displayName, List<String> lore, Map<ClickAction, List<Action>> actions, Map<C, SlotPos> positions, SlotPos defaultPosition, TemplateItemProvider<C> provider, Map<String, Object> options) {
+        super(slate, name, displayName, lore, actions, options);
         this.positions = positions;
         this.baseItems = baseItems;
         this.provider = provider;
