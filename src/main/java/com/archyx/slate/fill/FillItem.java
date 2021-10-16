@@ -5,6 +5,7 @@ import com.archyx.slate.item.MenuItem;
 import com.cryptomorin.xseries.XMaterial;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 public class FillItem extends MenuItem {
@@ -12,7 +13,7 @@ public class FillItem extends MenuItem {
     private final ItemStack baseItem;
 
     public FillItem(Slate slate, ItemStack baseItem) {
-        super(slate, "fill", " ", null, new LinkedHashMap<>());
+        super(slate, "fill", " ", null, new LinkedHashMap<>(), new HashMap<>());
         this.baseItem = baseItem;
     }
 
