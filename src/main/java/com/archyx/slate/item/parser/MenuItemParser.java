@@ -5,7 +5,6 @@ import com.archyx.slate.action.Action;
 import com.archyx.slate.action.click.ClickAction;
 import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.builder.MenuItemBuilder;
-import com.archyx.slate.item.option.Option;
 import com.archyx.slate.util.MapParser;
 import com.archyx.slate.util.TextUtil;
 import com.cryptomorin.xseries.XEnchantment;
@@ -306,19 +305,6 @@ public abstract class MenuItemParser extends MapParser {
             int amount = section.getInt("amount", 1);
             item.setAmount(amount);
         }
-    }
-
-    protected Map<String, Object> parseOptions(ConfigurationSection section, Set<Option<?>> optionKeys) {
-        Map<String, Object> options = new HashMap<>();
-        for (Option<?> option : optionKeys) {
-            String key = option.getKey();
-            if (section.contains(key)) {
-                options.put(key, section.get(key));
-            } else {
-                options.put(key, option.getDefaultValue());
-            }
-        }
-        return options;
     }
 
 }

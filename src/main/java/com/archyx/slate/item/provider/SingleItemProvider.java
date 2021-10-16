@@ -1,14 +1,10 @@
 package com.archyx.slate.item.provider;
 
-import com.archyx.slate.item.option.Option;
 import com.archyx.slate.menu.ActiveMenu;
 import fr.minuskube.inv.content.SlotPos;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public interface SingleItemProvider {
 
@@ -32,10 +28,6 @@ public interface SingleItemProvider {
      */
     default ItemStack onItemModify(ItemStack baseItem, Player player, ActiveMenu activeMenu) {
         return baseItem;
-    }
-
-    default Set<Option<?>> getOptions() {
-        return new HashSet<>();
     }
 
 }

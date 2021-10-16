@@ -6,7 +6,6 @@ import com.archyx.slate.fill.FillItem;
 import com.archyx.slate.fill.FillItemParser;
 import com.archyx.slate.fill.SlotParser;
 import com.archyx.slate.item.MenuItem;
-import com.archyx.slate.item.option.Option;
 import com.archyx.slate.item.parser.SingleItemParser;
 import com.archyx.slate.item.parser.TemplateItemParser;
 import com.archyx.slate.item.provider.ProviderManager;
@@ -164,23 +163,18 @@ public class MenuManager {
         }
 
         MenuProvider provider = menuProviders.get(menuName);
-        Map<String, Object> options = loadOptions(provider, config);
+        Map<String, Object> options = loadOptions(config);
         // Add menu to map
         ConfigurableMenu menu = new ConfigurableMenu(menuName, title, size, items, provider, fillData, options);
         menus.put(menuName, menu);
     }
 
-    private Map<String, Object> loadOptions(@Nullable MenuProvider provider, FileConfiguration config) {
-        if (provider == null) { // Return blank map if no options
-            return new HashMap<>();
-        }
+    public Map<String, Object> loadOptions(ConfigurationSection config) {
         Map<String, Object> options = new HashMap<>();
-        for (Option<?> option : provider.getOptions()) {
-            String key = option.getKey();
-            if (config.contains(key)) {
+        ConfigurationSection optionSection = config.getConfigurationSection("options");
+        if (optionSection != null) {
+            for (String key : optionSection.getKeys(false)) {
                 options.put(key, config.get(key));
-            } else {
-                options.put(key, option.getDefaultValue());
             }
         }
         return options;

@@ -86,14 +86,33 @@ public class ActiveMenu {
         return menuInventory.getMenu().getOptions().get(key);
     }
 
+    public Object getOption(String key, Object def) {
+        Object obj = menuInventory.getMenu().getOptions().get(key);
+        if (obj != null) {
+            return obj;
+        } else {
+            return def;
+        }
+    }
+
     @Nullable
     public Object getItemOption(String itemName, String key) {
         MenuItem menuItem = menuInventory.getMenu().getItems().get(itemName);
         if (menuItem != null) {
             return menuItem.getOptions().get(key);
-        } else {
-            return null;
         }
+        return null;
+    }
+
+    public Object getItemOption(String itemName, String key, Object def) {
+        MenuItem menuItem = menuInventory.getMenu().getItems().get(itemName);
+        if (menuItem != null) {
+            Object obj = menuItem.getOptions().get(key);
+            if (obj != null) {
+                return obj;
+            }
+        }
+        return def;
     }
 
 }

@@ -35,6 +35,8 @@ public class SingleItemParser extends MenuItemParser {
 
         parseActions(builder, section.getValues(false), menuName, name);
 
+        builder.options(slate.getMenuManager().loadOptions(section));
+
         return builder.build();
     }
 
