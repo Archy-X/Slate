@@ -174,7 +174,7 @@ public class MenuManager {
         ConfigurationSection optionSection = config.getConfigurationSection("options");
         if (optionSection != null) {
             for (String key : optionSection.getKeys(false)) {
-                options.put(key, config.get(key));
+                options.put(key, optionSection.get(key));
             }
         }
         return options;
