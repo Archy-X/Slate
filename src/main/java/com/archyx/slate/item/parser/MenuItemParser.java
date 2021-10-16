@@ -33,7 +33,7 @@ public abstract class MenuItemParser extends MapParser {
 
     protected final Slate slate;
     private final String[] KEY_WORDS = new String[] {
-        "material", "display_name", "lore", "enchantments", "potion_data", "custom_effects", "glow", "nbt", "item_flags"
+        "pos", "material", "display_name", "lore", "enchantments", "potion_data", "custom_effects", "glow", "nbt", "item_flags"
     };
 
     public MenuItemParser(Slate slate) {
