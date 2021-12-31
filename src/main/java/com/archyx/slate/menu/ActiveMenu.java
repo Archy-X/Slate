@@ -104,7 +104,6 @@ public class ActiveMenu {
         }
     }
 
-    @Nullable
     public <T> T getOption(Class<T> clazz, String key, T def) {
         try {
             T result = clazz.cast(menuInventory.getMenu().getOptions().get(key));
