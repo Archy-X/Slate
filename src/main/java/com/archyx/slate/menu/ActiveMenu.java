@@ -86,11 +86,34 @@ public class ActiveMenu {
         return menuInventory.getMenu().getOptions().get(key);
     }
 
+    @Nullable
+    public <T> T getOption(Class<T> clazz, String key) {
+        try {
+            return clazz.cast(menuInventory.getMenu().getOptions().get(key));
+        } catch (ClassCastException e) {
+            return null;
+        }
+    }
+
     public Object getOption(String key, Object def) {
         Object obj = menuInventory.getMenu().getOptions().get(key);
         if (obj != null) {
             return obj;
         } else {
+            return def;
+        }
+    }
+
+    @Nullable
+    public <T> T getOption(Class<T> clazz, String key, T def) {
+        try {
+            T result = clazz.cast(menuInventory.getMenu().getOptions().get(key));
+            if (result != null) {
+                return result;
+            } else {
+                return def;
+            }
+        } catch (ClassCastException e) {
             return def;
         }
     }
