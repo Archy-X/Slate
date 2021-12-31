@@ -167,7 +167,7 @@ public class MenuInventory implements InventoryProvider {
         SingleItem item = activeItem.getItem();
         SingleItemProvider provider = item.getProvider();
 
-        ItemStack itemStack = item.getBaseItem();
+        ItemStack itemStack = item.getBaseItem().clone();
         if (provider != null) {
             itemStack = modifyBaseItem(provider, itemStack, player, activeMenu); // Apply provider base item modifications
         }
@@ -235,6 +235,9 @@ public class MenuInventory implements InventoryProvider {
             ItemStack itemStack = item.getBaseItems().get(context);
             if (itemStack == null) {
                 itemStack = item.getDefaultBaseItem();
+            }
+            if (itemStack != null) {
+                itemStack = itemStack.clone();
             }
             if (provider != null) {
                 itemStack = modifyBaseItem(provider, itemStack, player, activeMenu, context); // Apply provider base item modifications
