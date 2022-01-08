@@ -9,6 +9,7 @@ public class ProviderManager {
 
     private final Map<String, SingleItemProvider> singleItemProviders;
     private final Map<String, TemplateItemProvider<?>> templateItemProviders;
+    private KeyedItemProvider keyedItemProvider;
 
     public ProviderManager() {
         this.singleItemProviders = new HashMap<>();
@@ -23,6 +24,11 @@ public class ProviderManager {
     @Nullable
     public TemplateItemProvider<?> getTemplateItem(String itemName) {
         return templateItemProviders.get(itemName);
+    }
+
+    @Nullable
+    public KeyedItemProvider getKeyedItemProvider() {
+        return keyedItemProvider;
     }
 
     /**
@@ -43,6 +49,10 @@ public class ProviderManager {
      */
     public void registerTemplateItem(String name, TemplateItemProvider<?> provider) {
         templateItemProviders.put(name, provider);
+    }
+
+    public void registerKeyedItemProvider(KeyedItemProvider provider) {
+        keyedItemProvider = provider;
     }
 
 }

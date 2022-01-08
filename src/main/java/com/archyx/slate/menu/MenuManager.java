@@ -245,4 +245,7 @@ public class MenuManager {
         return menuProviders.keySet();
     }
 
+    public ProviderManager getGlobalProviderManager() {
+        return globalProviderManager;
+    }
 }

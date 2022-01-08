@@ -5,6 +5,7 @@ import com.archyx.slate.action.Action;
 import com.archyx.slate.action.click.ClickAction;
 import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.builder.MenuItemBuilder;
+import com.archyx.slate.item.provider.KeyedItemProvider;
 import com.archyx.slate.util.MapParser;
 import com.archyx.slate.util.TextUtil;
 import com.cryptomorin.xseries.XEnchantment;
@@ -25,6 +26,7 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -42,11 +44,173 @@ public abstract class MenuItemParser extends MapParser {
 
     public abstract MenuItem parse(ConfigurationSection section, String menuName);
 
-    @SuppressWarnings("deprecation")
     protected ItemStack parseBaseItem(ConfigurationSection section) {
+        String key = section.getString("key");
+        if (key != null) {
+            ItemStack item = parseItemKey(key);
+            if (item != null) {
+                return item; // Returns the item if key parse was successful
+            }
+        }
+
         String materialString = section.getString("material");
         Validate.notNull(materialString, "Item must specify a material");
 
+        ItemStack item = parseMaterialString(materialString);
+
+        parseAmount(item, section);
+
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return item;
+        // Enchantments
+        if (section.contains("enchantments")) {
+            parseEnchantments(item, section);
+        }
+        // Potions
+        ConfigurationSection potionDataSection = section.getConfigurationSection("potion_data");
+        if (potionDataSection != null) {
+            parsePotionData(item, potionDataSection);
+        }
+        // Custom potion effects
+        if (section.contains("custom_effects")) {
+            parseCustomEffects(section, item);
+        }
+        // Glowing w/o enchantments visible
+        if (section.getBoolean("glow", false)) {
+            parseGlow(item);
+        }
+        // Custom NBT
+        if (section.contains("nbt")) {
+            ConfigurationSection nbtSection = section.getConfigurationSection("nbt");
+            if (nbtSection != null) {
+                Map<?, ?> nbtMap = nbtSection.getValues(true);
+                item = parseNBT(item, nbtMap);
+            }
+        }
+        if (section.contains("flags")) {
+            parseFlags(section, item);
+        }
+        if (section.contains("durability")) {
+            parseDurability(section, item);
+        }
+        ConfigurationSection skullMetaSection = section.getConfigurationSection("skull_meta");
+        if (skullMetaSection != null) {
+            parseSkullMeta(item, item.getItemMeta(), skullMetaSection);
+        }
+        return item;
+    }
+
+    @Nullable
+    private ItemStack parseItemKey(String key) {
+        KeyedItemProvider provider = slate.getMenuManager().getGlobalProviderManager().getKeyedItemProvider();
+        if (provider != null) {
+            return provider.getItem(key);
+        }
+        return null;
+    }
+
+    @SuppressWarnings("deprecation")
+    private void parseDurability(ConfigurationSection section, ItemStack item) {
+        ItemMeta meta = getMeta(item);
+        int durability = section.getInt("durability");
+        if (XMaterial.isNewVersion()) {
+            if (meta instanceof Damageable) {
+                Damageable damageable = (Damageable) meta;
+                short maxDurability = item.getType().getMaxDurability();
+                damageable.setDamage(Math.max(maxDurability - durability, maxDurability));
+                item.setItemMeta(meta);
+            }
+        } else {
+            // For old versions
+            short maxDurability = item.getType().getMaxDurability();
+            item.setDurability((short) Math.max(maxDurability - durability, maxDurability));
+        }
+    }
+
+    private void parseFlags(ConfigurationSection section, ItemStack item) {
+        ItemMeta meta = getMeta(item);
+        List<String> flags = section.getStringList("flags");
+        for (String flagName : flags) {
+            ItemFlag itemFlag = ItemFlag.valueOf(flagName.toUpperCase(Locale.ROOT));
+            meta.addItemFlags(itemFlag);
+        }
+        item.setItemMeta(meta);
+    }
+
+    private void parseGlow(ItemStack item) {
+        ItemMeta meta = getMeta(item);
+        meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
+        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        item.setItemMeta(meta);
+    }
+
+    private void parseCustomEffects(ConfigurationSection section, ItemStack item) {
+        PotionMeta potionMeta = (PotionMeta) getMeta(item);
+        for (Map<?, ?> effectMap : section.getMapList("custom_effects")) {
+            String effectName = getString(effectMap, "type");
+            PotionEffectType type = PotionEffectType.getByName(effectName);
+            if (type != null) {
+                int duration = getInt(effectMap, "duration");
+                int amplifier = getInt(effectMap, "amplifier");
+                potionMeta.addCustomEffect(new PotionEffect(type, duration, amplifier), true);
+                potionMeta.setColor(type.getColor());
+            } else {
+                throw new IllegalArgumentException("Invalid potion effect type " + effectName);
+            }
+        }
+        item.setItemMeta(potionMeta);
+    }
+
+    private void parsePotionData(ItemStack item, ConfigurationSection potionDataSection) {
+        PotionMeta potionMeta = (PotionMeta) getMeta(item);
+        PotionType potionType = PotionType.valueOf(potionDataSection.getString("type", "WATER").toUpperCase(Locale.ROOT));
+        boolean extended = false;
+        if (potionDataSection.contains("extended")) {
+            extended = potionDataSection.getBoolean("extended");
+        }
+        boolean upgraded = false;
+        if (potionDataSection.contains("upgraded")) {
+            upgraded = potionDataSection.getBoolean("upgraded");
+        }
+
+        PotionData potionData = new PotionData(potionType, extended, upgraded);
+        potionMeta.setBasePotionData(potionData);
+        item.setItemMeta(potionMeta);
+    }
+
+    private void parseEnchantments(ItemStack item, ConfigurationSection section) {
+        ItemMeta meta = getMeta(item);
+        List<String> enchantmentStrings = section.getStringList("enchantments");
+        for (String enchantmentEntry : enchantmentStrings) {
+            String[] splitEntry = enchantmentEntry.split(" ");
+            String enchantmentName = splitEntry[0];
+            int level = 1;
+            if (splitEntry.length > 1) {
+                level = NumberUtils.toInt(splitEntry[1], 1);
+            }
+            Optional<XEnchantment> xEnchantment = XEnchantment.matchXEnchantment(enchantmentName.toUpperCase(Locale.ROOT));
+            if (xEnchantment.isPresent()) {
+                Enchantment enchantment = xEnchantment.get().parseEnchantment();
+                if (enchantment != null) {
+                    if (item.getType() == Material.ENCHANTED_BOOK && meta instanceof EnchantmentStorageMeta) {
+                        EnchantmentStorageMeta esm = (EnchantmentStorageMeta) meta;
+                        esm.addStoredEnchant(enchantment, level, true);
+                        item.setItemMeta(esm);
+                    } else {
+                        meta.addEnchant(enchantment, level, true);
+                        item.setItemMeta(meta);
+                    }
+                } else {
+                    throw new IllegalArgumentException("Invalid enchantment name " + enchantmentName);
+                }
+            } else {
+                throw new IllegalArgumentException("Invalid enchantment name " + enchantmentName);
+            }
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private ItemStack parseMaterialString(String materialString) {
         ItemStack item;
         if (!materialString.contains(":")) { // No legacy data
             String materialName = materialString.toUpperCase(Locale.ROOT);
@@ -69,123 +233,11 @@ public abstract class MenuItemParser extends MapParser {
                 throw new IllegalArgumentException("Material with data value can only have one :");
             }
         }
-
-        parseAmount(item, section);
-
-        ItemMeta meta = item.getItemMeta();
-        if (meta == null) return item;
-        // Enchantments
-        if (section.contains("enchantments")) {
-            List<String> enchantmentStrings = section.getStringList("enchantments");
-            for (String enchantmentEntry : enchantmentStrings) {
-                String[] splitEntry = enchantmentEntry.split(" ");
-                String enchantmentName = splitEntry[0];
-                int level = 1;
-                if (splitEntry.length > 1) {
-                    level = NumberUtils.toInt(splitEntry[1], 1);
-                }
-                Optional<XEnchantment> xEnchantment = XEnchantment.matchXEnchantment(enchantmentName.toUpperCase(Locale.ROOT));
-                if (xEnchantment.isPresent()) {
-                    Enchantment enchantment = xEnchantment.get().parseEnchantment();
-                    if (enchantment != null) {
-                        if (item.getType() == Material.ENCHANTED_BOOK && meta instanceof EnchantmentStorageMeta) {
-                            EnchantmentStorageMeta esm = (EnchantmentStorageMeta) meta;
-                            esm.addStoredEnchant(enchantment, level, true);
-                            item.setItemMeta(esm);
-                        } else {
-                            meta.addEnchant(enchantment, level, true);
-                            item.setItemMeta(meta);
-                        }
-                    } else {
-                        throw new IllegalArgumentException("Invalid enchantment name " + enchantmentName);
-                    }
-                } else {
-                    throw new IllegalArgumentException("Invalid enchantment name " + enchantmentName);
-                }
-            }
-        }
-        // Potions
-        ConfigurationSection potionDataSection = section.getConfigurationSection("potion_data");
-        if (potionDataSection != null) {
-            PotionMeta potionMeta = (PotionMeta) item.getItemMeta();
-            PotionType potionType = PotionType.valueOf(potionDataSection.getString("type", "WATER").toUpperCase(Locale.ROOT));
-            boolean extended = false;
-            if (potionDataSection.contains("extended")) {
-                extended = potionDataSection.getBoolean("extended");
-            }
-            boolean upgraded = false;
-            if (potionDataSection.contains("upgraded")) {
-                upgraded = potionDataSection.getBoolean("upgraded");
-            }
-
-            PotionData potionData = new PotionData(potionType, extended, upgraded);
-            potionMeta.setBasePotionData(potionData);
-            item.setItemMeta(potionMeta);
-        }
-        // Custom potion effects
-        if (section.contains("custom_effects")) {
-            PotionMeta potionMeta = (PotionMeta) item.getItemMeta();
-            for (Map<?, ?> effectMap : section.getMapList("custom_effects")) {
-                String effectName = getString(effectMap, "type");
-                PotionEffectType type = PotionEffectType.getByName(effectName);
-                if (type != null) {
-                    int duration = getInt(effectMap, "duration");
-                    int amplifier = getInt(effectMap, "amplifier");
-                    potionMeta.addCustomEffect(new PotionEffect(type, duration, amplifier), true);
-                    potionMeta.setColor(type.getColor());
-                } else {
-                    throw new IllegalArgumentException("Invalid potion effect type " + effectName);
-                }
-            }
-            item.setItemMeta(potionMeta);
-        }
-        // Glowing w/o enchantments visible
-        if (section.getBoolean("glow", false)) {
-            meta = item.getItemMeta();
-            meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
-            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-            item.setItemMeta(meta);
-        }
-        // Custom NBT
-        if (section.contains("nbt")) {
-            ConfigurationSection nbtSection = section.getConfigurationSection("nbt");
-            if (nbtSection != null) {
-                Map<?, ?> nbtMap = nbtSection.getValues(true);
-                item = parseNBT(item, nbtMap);
-            }
-        }
-        if (section.contains("flags")) {
-            meta = item.getItemMeta();
-            if (meta != null) {
-                List<String> flags = section.getStringList("flags");
-                for (String flagName : flags) {
-                    ItemFlag itemFlag = ItemFlag.valueOf(flagName.toUpperCase(Locale.ROOT));
-                    meta.addItemFlags(itemFlag);
-                }
-                item.setItemMeta(meta);
-            }
-        }
-        if (section.contains("durability")) {
-            meta = item.getItemMeta();
-            int durability = section.getInt("durability");
-            if (XMaterial.isNewVersion()) {
-                if (meta instanceof Damageable) {
-                    Damageable damageable = (Damageable) meta;
-                    short maxDurability = item.getType().getMaxDurability();
-                    damageable.setDamage(Math.max(maxDurability - durability, maxDurability));
-                    item.setItemMeta(meta);
-                }
-            } else {
-                // For old versions
-                short maxDurability = item.getType().getMaxDurability();
-                item.setDurability((short) Math.max(maxDurability - durability, maxDurability));
-            }
-        }
-        ConfigurationSection skullMetaSection = section.getConfigurationSection("skull_meta");
-        if (skullMetaSection != null) {
-            parseSkullMeta(item, item.getItemMeta(), skullMetaSection);
-        }
         return item;
+    }
+
+    private @NotNull ItemMeta getMeta(ItemStack item) {
+        return Objects.requireNonNull(item.getItemMeta());
     }
 
     @Nullable
