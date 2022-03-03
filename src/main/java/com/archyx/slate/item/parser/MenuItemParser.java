@@ -17,11 +17,16 @@ import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.*;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -190,7 +195,7 @@ public abstract class MenuItemParser extends MapParser {
             }
             Optional<XEnchantment> xEnchantment = XEnchantment.matchXEnchantment(enchantmentName.toUpperCase(Locale.ROOT));
             if (xEnchantment.isPresent()) {
-                Enchantment enchantment = xEnchantment.get().parseEnchantment();
+                Enchantment enchantment = xEnchantment.get().getEnchant();
                 if (enchantment != null) {
                     if (item.getType() == Material.ENCHANTED_BOOK && meta instanceof EnchantmentStorageMeta) {
                         EnchantmentStorageMeta esm = (EnchantmentStorageMeta) meta;
@@ -349,6 +354,14 @@ public abstract class MenuItemParser extends MapParser {
         String url = section.getString("url");
         if (url != null) { // From Mojang URL
             SkullCreator.itemWithUrl(item, url);
+        }
+        if (XMaterial.getVersion() >= 14) { // Persistent data container requires 1.14+
+            String placeholder = section.getString("placeholder_uuid");
+            if (placeholder != null) {
+                PersistentDataContainer container = meta.getPersistentDataContainer();
+                NamespacedKey key = new NamespacedKey(slate.getPlugin(), "skull_placeholder_uuid");
+                container.set(key, PersistentDataType.STRING, placeholder);
+            }
         }
     }
 

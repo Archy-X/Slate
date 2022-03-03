@@ -15,17 +15,24 @@ import com.archyx.slate.item.provider.PlaceholderType;
 import com.archyx.slate.item.provider.SingleItemProvider;
 import com.archyx.slate.item.provider.TemplateItemProvider;
 import com.archyx.slate.util.TextUtil;
+import com.cryptomorin.xseries.XMaterial;
 import fr.minuskube.inv.ClickableItem;
 import fr.minuskube.inv.ItemClickData;
 import fr.minuskube.inv.content.InventoryContents;
 import fr.minuskube.inv.content.InventoryProvider;
 import fr.minuskube.inv.content.SlotPos;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -396,7 +403,32 @@ public class MenuInventory implements InventoryProvider {
     }
 
     private <C> ItemStack modifyBaseItem(TemplateItemProvider<C> provider, ItemStack baseItem, Player player, ActiveMenu activeMenu, C context) {
+        replaceItemPlaceholders(baseItem);
         return provider.onItemModify(baseItem, player, activeMenu, context);
+    }
+
+    private void replaceItemPlaceholders(ItemStack item) {
+        if (XMaterial.getVersion() < 14) {
+            return;
+        }
+        ItemMeta meta = item.getItemMeta();
+        if (meta instanceof SkullMeta) {
+            SkullMeta skullMeta = (SkullMeta) meta;
+            PersistentDataContainer container = skullMeta.getPersistentDataContainer();
+            NamespacedKey key = new NamespacedKey(slate.getPlugin(), "skull_placeholder_uuid");
+            String placeholder = container.get(key, PersistentDataType.STRING);
+            if (placeholder != null) {
+                placeholder = StringUtils.replace(placeholder, "{player}", player.getUniqueId().toString());
+                placeholder = PlaceholderAPI.setPlaceholders(player, placeholder);
+                try {
+                    UUID uuid = UUID.fromString(placeholder);
+                    skullMeta.setOwningPlayer(Bukkit.getOfflinePlayer(uuid));
+                } catch (IllegalArgumentException e) {
+                    slate.getPlugin().getLogger().warning("Error while opening menu: Unable to parse UUID for skull placeholder " + placeholder);
+                }
+            }
+            item.setItemMeta(skullMeta);
+        }
     }
 
     public Player getPlayer() {
