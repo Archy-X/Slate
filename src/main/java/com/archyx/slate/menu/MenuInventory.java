@@ -427,6 +427,8 @@ public class MenuInventory implements InventoryProvider {
                 } catch (IllegalArgumentException e) {
                     slate.getPlugin().getLogger().warning("Error while opening menu: Unable to parse UUID for skull placeholder " + placeholder);
                 }
+            } else {
+                slate.getPlugin().getLogger().info("Placeholder was null");
             }
             item.setItemMeta(skullMeta);
         }
