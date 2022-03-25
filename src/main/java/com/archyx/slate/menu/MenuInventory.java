@@ -399,6 +399,7 @@ public class MenuInventory implements InventoryProvider {
     }
 
     private ItemStack modifyBaseItem(SingleItemProvider provider, ItemStack baseItem, Player player, ActiveMenu activeMenu) {
+        replaceItemPlaceholders(baseItem);
         return provider.onItemModify(baseItem, player, activeMenu);
     }
 
