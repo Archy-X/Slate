@@ -25,8 +25,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.*;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -361,6 +359,7 @@ public abstract class MenuItemParser extends MapParser {
                 PersistentDataContainer container = meta.getPersistentDataContainer();
                 NamespacedKey key = new NamespacedKey(slate.getPlugin(), "skull_placeholder_uuid");
                 container.set(key, PersistentDataType.STRING, placeholder);
+                item.setItemMeta(meta);
             }
         }
     }
