@@ -353,17 +353,13 @@ public abstract class MenuItemParser extends MapParser {
         if (url != null) { // From Mojang URL
             SkullCreator.itemWithUrl(item, url);
         }
-        slate.getPlugin().getLogger().info("Parsing skull meta");
         if (XMaterial.getVersion() >= 14) { // Persistent data container requires 1.14+
-            slate.getPlugin().getLogger().info("Version greater than 14");
             String placeholder = section.getString("placeholder_uuid");
             if (placeholder != null) {
-                slate.getPlugin().getLogger().info("placeholder_uuid string not null");
                 PersistentDataContainer container = meta.getPersistentDataContainer();
                 NamespacedKey key = new NamespacedKey(slate.getPlugin(), "skull_placeholder_uuid");
                 container.set(key, PersistentDataType.STRING, placeholder);
                 item.setItemMeta(meta);
-                slate.getPlugin().getLogger().info("Finished setting persistent data container");
             }
         }
     }
