@@ -201,15 +201,21 @@ public class MenuManager {
             config = mainConfig.createSection("options");
         }
         // Loop through each option and set default if option does not exist
+        boolean changed = false;
         for (Map.Entry<String, Object> entry : defaultOptions.entrySet()) {
             if (!config.contains(entry.getKey())) {
                 config.set(entry.getKey(), entry.getValue());
+                if (!changed) {
+                    changed = true;
+                }
             }
         }
-        try {
-            mainConfig.save(file);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (changed) { // Save file if modified
+            try {
+                mainConfig.save(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
