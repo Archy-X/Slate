@@ -206,6 +206,9 @@ public class MenuManager {
         if (providerClass == null) return;
         try {
             // Get the values of the enum by invoking values method
+            for (Method method : providerClass.getMethods()) {
+                slate.getPlugin().getLogger().info("Method name: " + method.getName() + ", Return type: " + method.getReturnType().getName());
+            }
             Method valuesMethod = providerClass.getMethod("values", MenuOptionProvider[].class);
             MenuOptionProvider[] values = (MenuOptionProvider[]) valuesMethod.invoke(null, (Object) null);
             // Create options section if it does not exist
