@@ -209,7 +209,7 @@ public class MenuManager {
             for (Method method : providerClass.getMethods()) {
                 slate.getPlugin().getLogger().info("Method name: " + method.getName() + ", Return type: " + method.getReturnType().getName());
             }
-            Method valuesMethod = providerClass.getMethod("values", MenuOptionProvider[].class);
+            Method valuesMethod = providerClass.getMethod("values", providerClass.getClasses());
             MenuOptionProvider[] values = (MenuOptionProvider[]) valuesMethod.invoke(null, (Object) null);
             // Create options section if it does not exist
             ConfigurationSection config = mainConfig.getConfigurationSection("options");
