@@ -33,7 +33,7 @@ public class MenuManager {
     private final ProviderManager globalProviderManager;
     private final Map<String, ProviderManager> menuProviderManagers;
     private final Map<String, MenuProvider> menuProviders;
-    private final Map<String, Class<? extends MenuOptionProvider>> optionProviders;
+    private final Map<String, Class<? extends Enum<?>>> optionProviders;
     private final Map<String, Class<?>> optionProviderArrays;
 
     public MenuManager(Slate slate) {
@@ -117,7 +117,7 @@ public class MenuManager {
      * @param name The name of the menu
      * @param provider The provider instance
      */
-    public void registerOptionProvider(String name, Class<? extends MenuOptionProvider> provider, Class<?> providerArray) {
+    public void registerOptionProvider(String name, Class<? extends Enum<?>> provider, Class<?> providerArray) {
         if (!provider.isEnum()) {
             throw new IllegalArgumentException("Provider class must be an enum");
         }
@@ -126,7 +126,7 @@ public class MenuManager {
     }
 
     @Nullable
-    public Class<? extends MenuOptionProvider> getOptionProvider(String menuName) {
+    public Class<? extends Enum<?>> getOptionProvider(String menuName) {
         return optionProviders.get(menuName);
     }
 
@@ -205,7 +205,7 @@ public class MenuManager {
     }
 
     private void generateDefaultOptions(String menuName, File file, FileConfiguration mainConfig) {
-        Class<? extends MenuOptionProvider> providerClass = getOptionProvider(menuName);
+        Class<? extends Enum<?>> providerClass = getOptionProvider(menuName);
         if (providerClass == null) return;
         Class<?> providerArray = optionProviderArrays.get(menuName);
         if (providerArray == null) return;
