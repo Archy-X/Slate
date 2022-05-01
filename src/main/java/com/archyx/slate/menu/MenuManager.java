@@ -22,8 +22,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 
 public class MenuManager {
@@ -33,8 +31,7 @@ public class MenuManager {
     private final ProviderManager globalProviderManager;
     private final Map<String, ProviderManager> menuProviderManagers;
     private final Map<String, MenuProvider> menuProviders;
-    private final Map<String, Class<? extends Enum<?>>> optionProviders;
-    private final Map<String, Class<?>> optionProviderArrays;
+    private final Map<String, Map<String, Object>> defaultOptions;
 
     public MenuManager(Slate slate) {
         this.slate = slate;
@@ -42,8 +39,7 @@ public class MenuManager {
         this.globalProviderManager = new ProviderManager();
         this.menuProviderManagers = new HashMap<>();
         this.menuProviders = new HashMap<>();
-        this.optionProviders = new HashMap<>();
-        this.optionProviderArrays = new HashMap<>();
+        this.defaultOptions = new HashMap<>();
     }
 
     @Nullable
@@ -111,23 +107,13 @@ public class MenuManager {
         return menuProviderManagers.computeIfAbsent(menuName, k -> new ProviderManager());
     }
 
-    /**
-     * Registers a menu option provider for a given menu, used to generate default menu options in configuration files
-     *
-     * @param name The name of the menu
-     * @param provider The provider instance
-     */
-    public void registerOptionProvider(String name, Class<? extends Enum<?>> provider, Class<?> providerArray) {
-        if (!provider.isEnum()) {
-            throw new IllegalArgumentException("Provider class must be an enum");
-        }
-        optionProviders.put(name, provider);
-        optionProviderArrays.put(name, providerArray);
+    public void registerDefaultOptions(String name, Map<String, Object> map) {
+        defaultOptions.put(name, map);
     }
 
     @Nullable
-    public Class<? extends Enum<?>> getOptionProvider(String menuName) {
-        return optionProviders.get(menuName);
+    public Map<String, Object> getDefaultOptions(String menuName) {
+        return defaultOptions.get(menuName);
     }
 
     /**
@@ -205,27 +191,24 @@ public class MenuManager {
     }
 
     private void generateDefaultOptions(String menuName, File file, FileConfiguration mainConfig) {
-        Class<? extends Enum<?>> providerClass = getOptionProvider(menuName);
-        if (providerClass == null) return;
-        Class<?> providerArray = optionProviderArrays.get(menuName);
-        if (providerArray == null) return;
+        Map<String, Object> defaultOptions = getDefaultOptions(menuName);
+        if (defaultOptions == null) {
+            return;
+        }
+        // Create options section if it does not exist
+        ConfigurationSection config = mainConfig.getConfigurationSection("options");
+        if (config == null) {
+            config = mainConfig.createSection("options");
+        }
+        // Loop through each option and set default if option does not exist
+        for (Map.Entry<String, Object> entry : defaultOptions.entrySet()) {
+            if (!config.contains(entry.getKey())) {
+                config.set(entry.getKey(), entry.getValue());
+            }
+        }
         try {
-            Method valuesMethod = providerClass.getMethod("values", providerArray);
-            MenuOptionProvider[] values = (MenuOptionProvider[]) valuesMethod.invoke(null, (Object) null);
-            // Create options section if it does not exist
-            ConfigurationSection config = mainConfig.getConfigurationSection("options");
-            if (config == null) {
-                config = mainConfig.createSection("options");
-            }
-            // Loop through each option and set default if option does not exist
-            for (MenuOptionProvider provider : values) {
-                String key = provider.toString().toLowerCase(Locale.ROOT);
-                if (!config.contains(key)) {
-                    config.set(key, provider.getDefaultValue());
-                }
-            }
             mainConfig.save(file);
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
