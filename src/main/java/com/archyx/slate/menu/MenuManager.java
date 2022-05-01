@@ -34,6 +34,7 @@ public class MenuManager {
     private final Map<String, ProviderManager> menuProviderManagers;
     private final Map<String, MenuProvider> menuProviders;
     private final Map<String, Class<? extends MenuOptionProvider>> optionProviders;
+    private final Map<String, Class<?>[]> optionProviderArrays;
 
     public MenuManager(Slate slate) {
         this.slate = slate;
@@ -42,6 +43,7 @@ public class MenuManager {
         this.menuProviderManagers = new HashMap<>();
         this.menuProviders = new HashMap<>();
         this.optionProviders = new HashMap<>();
+        this.optionProviderArrays = new HashMap<>();
     }
 
     @Nullable
@@ -115,11 +117,12 @@ public class MenuManager {
      * @param name The name of the menu
      * @param provider The provider instance
      */
-    public void registerOptionProvider(String name, Class<? extends MenuOptionProvider> provider) {
+    public void registerOptionProvider(String name, Class<? extends MenuOptionProvider> provider, Class<?>[] providerArray) {
         if (!provider.isEnum()) {
             throw new IllegalArgumentException("Provider class must be an enum");
         }
         optionProviders.put(name, provider);
+        optionProviderArrays.put(name, providerArray);
     }
 
     @Nullable
@@ -204,12 +207,10 @@ public class MenuManager {
     private void generateDefaultOptions(String menuName, File file, FileConfiguration mainConfig) {
         Class<? extends MenuOptionProvider> providerClass = getOptionProvider(menuName);
         if (providerClass == null) return;
+        Class<?>[] providerArray = optionProviderArrays.get(menuName);
+        if (providerArray == null) return;
         try {
-            // Get the values of the enum by invoking values method
-            for (Method method : providerClass.getMethods()) {
-                slate.getPlugin().getLogger().info("Method name: " + method.getName() + ", Return type: " + method.getReturnType().getName());
-            }
-            Method valuesMethod = providerClass.getMethod("values", providerClass.getClasses());
+            Method valuesMethod = providerClass.getMethod("values", providerArray);
             MenuOptionProvider[] values = (MenuOptionProvider[]) valuesMethod.invoke(null, (Object) null);
             // Create options section if it does not exist
             ConfigurationSection config = mainConfig.getConfigurationSection("options");
