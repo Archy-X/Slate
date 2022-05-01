@@ -33,7 +33,7 @@ public class MenuManager {
     private final ProviderManager globalProviderManager;
     private final Map<String, ProviderManager> menuProviderManagers;
     private final Map<String, MenuProvider> menuProviders;
-    private final Map<String, Enum<? extends MenuOptionProvider>> optionProviders;
+    private final Map<String, Class<? extends MenuOptionProvider>> optionProviders;
 
     public MenuManager(Slate slate) {
         this.slate = slate;
@@ -115,12 +115,15 @@ public class MenuManager {
      * @param name The name of the menu
      * @param provider The provider instance
      */
-    public void registerOptionProvider(String name, Enum<? extends MenuOptionProvider> provider) {
+    public void registerOptionProvider(String name, Class<? extends MenuOptionProvider> provider) {
+        if (!provider.isEnum()) {
+            throw new IllegalArgumentException("Provider class must be an enum");
+        }
         optionProviders.put(name, provider);
     }
 
     @Nullable
-    public Enum<? extends MenuOptionProvider> getOptionProvider(String menuName) {
+    public Class<? extends MenuOptionProvider> getOptionProvider(String menuName) {
         return optionProviders.get(menuName);
     }
 
@@ -199,11 +202,11 @@ public class MenuManager {
     }
 
     private void generateDefaultOptions(String menuName, File file, FileConfiguration mainConfig) {
-        Enum<? extends MenuOptionProvider> providerClass = getOptionProvider(menuName);
+        Class<? extends MenuOptionProvider> providerClass = getOptionProvider(menuName);
         if (providerClass == null) return;
         try {
             // Get the values of the enum by invoking values method
-            Method valuesMethod = providerClass.getClass().getMethod("values", MenuOptionProvider[].class);
+            Method valuesMethod = providerClass.getMethod("values", MenuOptionProvider[].class);
             MenuOptionProvider[] values = (MenuOptionProvider[]) valuesMethod.invoke(null, (Object) null);
             // Create options section if it does not exist
             ConfigurationSection config = mainConfig.getConfigurationSection("options");
@@ -219,7 +222,7 @@ public class MenuManager {
             }
             mainConfig.save(file);
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | IOException e) {
-            e.printStackTrace();;
+            e.printStackTrace();
         }
     }
 
