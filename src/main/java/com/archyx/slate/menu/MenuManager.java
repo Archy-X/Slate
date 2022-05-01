@@ -21,10 +21,10 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
 
 public class MenuManager {
 
@@ -33,6 +33,7 @@ public class MenuManager {
     private final ProviderManager globalProviderManager;
     private final Map<String, ProviderManager> menuProviderManagers;
     private final Map<String, MenuProvider> menuProviders;
+    private final Map<String, Enum<? extends MenuOptionProvider>> optionProviders;
 
     public MenuManager(Slate slate) {
         this.slate = slate;
@@ -40,6 +41,7 @@ public class MenuManager {
         this.globalProviderManager = new ProviderManager();
         this.menuProviderManagers = new HashMap<>();
         this.menuProviders = new HashMap<>();
+        this.optionProviders = new HashMap<>();
     }
 
     @Nullable
@@ -108,6 +110,21 @@ public class MenuManager {
     }
 
     /**
+     * Registers a menu option provider for a given menu, used to generate default menu options in configuration files
+     *
+     * @param name The name of the menu
+     * @param provider The provider instance
+     */
+    public void registerOptionProvider(String name, Enum<? extends MenuOptionProvider> provider) {
+        optionProviders.put(name, provider);
+    }
+
+    @Nullable
+    public Enum<? extends MenuOptionProvider> getOptionProvider(String menuName) {
+        return optionProviders.get(menuName);
+    }
+
+    /**
      * Attempts to load a menu from a file
      *
      * @param file The file to load from, must be in Yaml syntax
@@ -163,6 +180,7 @@ public class MenuManager {
         }
 
         MenuProvider provider = menuProviders.get(menuName);
+        generateDefaultOptions(menuName, file, config);
         Map<String, Object> options = loadOptions(config);
         // Add menu to map
         ConfigurableMenu menu = new ConfigurableMenu(menuName, title, size, items, provider, fillData, options);
@@ -178,6 +196,31 @@ public class MenuManager {
             }
         }
         return options;
+    }
+
+    private void generateDefaultOptions(String menuName, File file, FileConfiguration mainConfig) {
+        Enum<? extends MenuOptionProvider> providerClass = getOptionProvider(menuName);
+        if (providerClass == null) return;
+        try {
+            // Get the values of the enum by invoking values method
+            Method valuesMethod = providerClass.getClass().getMethod("values", MenuOptionProvider[].class);
+            MenuOptionProvider[] values = (MenuOptionProvider[]) valuesMethod.invoke(null, (Object) null);
+            // Create options section if it does not exist
+            ConfigurationSection config = mainConfig.getConfigurationSection("options");
+            if (config == null) {
+                config = mainConfig.createSection("options");
+            }
+            // Loop through each option and set default if option does not exist
+            for (MenuOptionProvider provider : values) {
+                String key = provider.toString().toLowerCase(Locale.ROOT);
+                if (!config.contains(key)) {
+                    config.set(key, provider.getDefaultValue());
+                }
+            }
+            mainConfig.save(file);
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | IOException e) {
+            e.printStackTrace();;
+        }
     }
 
     /**
