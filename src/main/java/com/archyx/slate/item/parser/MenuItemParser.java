@@ -13,6 +13,7 @@ import com.cryptomorin.xseries.XMaterial;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import dev.dbassett.skullcreator.SkullCreator;
 import fr.minuskube.inv.content.SlotPos;
+import net.md_5.bungee.api.ChatColor;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
@@ -33,6 +34,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class MenuItemParser extends MapParser {
 
@@ -40,6 +43,7 @@ public abstract class MenuItemParser extends MapParser {
     private final String[] KEY_WORDS = new String[] {
         "pos", "material", "display_name", "lore", "enchantments", "potion_data", "custom_effects", "glow", "nbt", "flags", "durability", "skull_meta"
     };
+    private final Pattern hexPattern = Pattern.compile("&#([A-Fa-f0-9]{6})");
 
     public MenuItemParser(Slate slate) {
         this.slate = slate;
@@ -246,9 +250,25 @@ public abstract class MenuItemParser extends MapParser {
     @Nullable
     protected String parseDisplayName(ConfigurationSection section) {
         if (section.contains("display_name")) {
-            return TextUtil.replaceNonEscaped(section.getString("display_name"), "&", "§");
+            return applyColor(section.getString("display_name"));
         }
         return null;
+    }
+
+    private String applyColor(String message) {
+        Matcher matcher = hexPattern.matcher(message);
+        StringBuffer buffer = new StringBuffer(message.length() + 4 * 8);
+        while (matcher.find()) {
+            String group = matcher.group(1);
+            char COLOR_CHAR = ChatColor.COLOR_CHAR;
+            matcher.appendReplacement(buffer, COLOR_CHAR + "x"
+                    + COLOR_CHAR + group.charAt(0) + COLOR_CHAR + group.charAt(1)
+                    + COLOR_CHAR + group.charAt(2) + COLOR_CHAR + group.charAt(3)
+                    + COLOR_CHAR + group.charAt(4) + COLOR_CHAR + group.charAt(5)
+            );
+        }
+        message = matcher.appendTail(buffer).toString();
+        return TextUtil.replaceNonEscaped(message, "&", "§");
     }
 
     protected List<String> parseLore(ConfigurationSection section) {
@@ -256,7 +276,7 @@ public abstract class MenuItemParser extends MapParser {
             List<String> lore = section.getStringList("lore");
             List<String> formattedLore = new ArrayList<>();
             for (String line : lore) {
-                formattedLore.add(TextUtil.replaceNonEscaped(line, "&", "§"));
+                formattedLore.add(applyColor(line));
             }
             return formattedLore;
         }
