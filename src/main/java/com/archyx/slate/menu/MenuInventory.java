@@ -196,6 +196,9 @@ public class MenuInventory implements InventoryProvider {
                         }
                     }
                 }
+                if (slate.isPlaceholderAPIEnabled()) {
+                    displayName = PlaceholderAPI.setPlaceholders(player, displayName);
+                }
                 meta.setDisplayName(displayName);
             }
             List<String> lore = item.getLore();
@@ -211,6 +214,9 @@ public class MenuInventory implements InventoryProvider {
                                 replacedLine = TextUtil.replace(replacedLine, "&", "§");
                                 line = TextUtil.replace(line, "{" + placeholder + "}", replacedLine);
                             }
+                        }
+                        if (slate.isPlaceholderAPIEnabled()) {
+                            line = PlaceholderAPI.setPlaceholders(player, line);
                         }
                         replacedLore.add(line);
                     }
@@ -267,6 +273,9 @@ public class MenuInventory implements InventoryProvider {
                             }
                         }
                     }
+                    if (slate.isPlaceholderAPIEnabled()) {
+                        displayName = PlaceholderAPI.setPlaceholders(player, displayName);
+                    }
                     meta.setDisplayName(displayName);
                 }
                 List<String> lore = item.getLore();
@@ -282,6 +291,9 @@ public class MenuInventory implements InventoryProvider {
                                     replacedLine = TextUtil.replace(replacedLine, "&", "§");
                                     line = TextUtil.replace(line, "{" + placeholder + "}", replacedLine);
                                 }
+                            }
+                            if (slate.isPlaceholderAPIEnabled()) {
+                                line = PlaceholderAPI.setPlaceholders(player, line);
                             }
                             replacedLore.add(line);
                         }
