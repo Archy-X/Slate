@@ -293,6 +293,7 @@ public abstract class MenuItemParser extends MapParser {
         for (Map.Entry<?, ?> entry : map.entrySet()) {
             Object key = entry.getKey();
             Object value = entry.getValue();
+            slate.getPlugin().getLogger().info("Value type: " + value.getClass().getName());
             if (key instanceof String) {
                 if (value instanceof Map<?, ?>) { // Recursively apply sub maps
                     applyMapToNBT(item, (Map<?, ?>) value);
