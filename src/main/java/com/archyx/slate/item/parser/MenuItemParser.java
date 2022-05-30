@@ -10,6 +10,8 @@ import com.archyx.slate.util.MapParser;
 import com.archyx.slate.util.TextUtil;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
+import de.tr7zw.changeme.nbtapi.NBTCompound;
+import de.tr7zw.changeme.nbtapi.NBTContainer;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import dev.dbassett.skullcreator.SkullCreator;
 import fr.minuskube.inv.content.SlotPos;
@@ -88,10 +90,17 @@ public abstract class MenuItemParser extends MapParser {
         }
         // Custom NBT
         if (section.contains("nbt")) {
-            ConfigurationSection nbtSection = section.getConfigurationSection("nbt");
-            if (nbtSection != null) {
-                Map<?, ?> nbtMap = nbtSection.getValues(true);
-                item = parseNBT(item, nbtMap);
+            if (section.isConfigurationSection("nbt")) {
+                ConfigurationSection nbtSection = section.getConfigurationSection("nbt");
+                if (nbtSection != null) {
+                    Map<?, ?> nbtMap = nbtSection.getValues(true);
+                    item = parseNBT(item, nbtMap);
+                }
+            } else if (section.isString("nbt")) {
+                String nbtString = section.getString("nbt");
+                if (nbtString != null) {
+                    item = parseNBTString(item, nbtString);
+                }
             }
         }
         if (section.contains("flags")) {
@@ -289,18 +298,33 @@ public abstract class MenuItemParser extends MapParser {
         return nbtItem.getItem();
     }
 
-    private void applyMapToNBT(NBTItem item, Map<?, ?> map) {
+    private void applyMapToNBT(NBTCompound item, Map<?, ?> map) {
         for (Map.Entry<?, ?> entry : map.entrySet()) {
             Object key = entry.getKey();
             Object value = entry.getValue();
             if (key instanceof String) {
                 if (value instanceof Map<?, ?>) { // Recursively apply sub maps
-                    applyMapToNBT(item, (Map<?, ?>) value);
+                    applyMapToNBT(item.getOrCreateCompound((String) key), (Map<?, ?>) value);
                 } else {
-                    item.setObject((String) key, value);
+                    if (value instanceof Integer) {
+                        item.setInteger((String) key, (int) value);
+                    } else if (value instanceof Double) {
+                        item.setDouble((String) key, (double) value);
+                    } else if (value instanceof Boolean) {
+                        item.setBoolean((String) key, (boolean) value);
+                    } else if (value instanceof String) {
+                        item.setString((String) key, (String) value);
+                    }
                 }
             }
         }
+    }
+
+    private ItemStack parseNBTString(ItemStack item, String nbtString) {
+        NBTContainer container = new NBTContainer(nbtString);
+        NBTItem nbtItem = new NBTItem(item);
+        nbtItem.mergeCompound(container);
+        return nbtItem.getItem();
     }
 
     protected Material parseMaterial(String name) {
