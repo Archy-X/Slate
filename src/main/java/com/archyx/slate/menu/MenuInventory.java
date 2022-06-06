@@ -421,6 +421,7 @@ public class MenuInventory implements InventoryProvider {
     }
 
     private void replaceItemPlaceholders(ItemStack item) {
+        if (item == null) return;
         if (XMaterial.getVersion() < 14) {
             return;
         }
