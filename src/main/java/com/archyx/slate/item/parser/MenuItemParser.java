@@ -53,7 +53,7 @@ public abstract class MenuItemParser extends MapParser {
 
     public abstract MenuItem parse(ConfigurationSection section, String menuName);
 
-    protected ItemStack parseBaseItem(ConfigurationSection section) {
+    public ItemStack parseBaseItem(ConfigurationSection section) {
         String key = section.getString("key");
         if (key != null) {
             ItemStack item = parseItemKey(key);
