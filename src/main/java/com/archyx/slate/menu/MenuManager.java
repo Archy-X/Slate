@@ -122,12 +122,22 @@ public class MenuManager {
      * @param file The file to load from, must be in Yaml syntax
      */
     public void loadMenu(File file) {
-        FileConfiguration config = YamlConfiguration.loadConfiguration(file);
         String menuName = file.getName();
         int pos = menuName.lastIndexOf(".");
         if (pos > 0) {
             menuName = menuName.substring(0, pos);
         }
+        loadMenu(file, menuName);
+    }
+
+    /**
+     * Attempts to load a menu from a file
+     *
+     * @param file The file to load from, must be in Yaml syntax
+     * @param menuName The name of the menu to be used when opening
+     */
+    public void loadMenu(File file, String menuName) {
+        FileConfiguration config = YamlConfiguration.loadConfiguration(file);
 
         String title = config.getString("title", menuName);
         int size = config.getInt("size", 6);
