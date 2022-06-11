@@ -26,7 +26,7 @@ public interface TemplateItemProvider<C> {
      * @param context The context for this item
      * @return The text to replace the placeholder with
      */
-    String onPlaceholderReplace(String placeholder, Player player, ActiveMenu menu, PlaceholderType type, C context);
+    String onPlaceholderReplace(String placeholder, Player player, ActiveMenu menu, PlaceholderData data, C context);
 
     /**
      * Gets a set of defined contexts that are the only valid contexts for this template.

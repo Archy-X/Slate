@@ -11,10 +11,12 @@ import com.archyx.slate.item.TemplateItem;
 import com.archyx.slate.item.active.ActiveItem;
 import com.archyx.slate.item.active.ActiveSingleItem;
 import com.archyx.slate.item.active.ActiveTemplateItem;
+import com.archyx.slate.item.provider.PlaceholderData;
 import com.archyx.slate.item.provider.PlaceholderType;
 import com.archyx.slate.item.provider.SingleItemProvider;
 import com.archyx.slate.item.provider.TemplateItemProvider;
 import com.archyx.slate.util.TextUtil;
+import com.archyx.slate.util.LoreUtil;
 import com.cryptomorin.xseries.XMaterial;
 import fr.minuskube.inv.ClickableItem;
 import fr.minuskube.inv.ItemClickData;
@@ -189,8 +191,9 @@ public class MenuInventory implements InventoryProvider {
                 if (provider != null) {
                     String[] placeholders = StringUtils.substringsBetween(displayName, "{", "}");
                     if (placeholders != null) {
+                        String style = LoreUtil.getStyle(displayName);
                         for (String placeholder : placeholders) {
-                            String replacedText = provider.onPlaceholderReplace(placeholder, player, activeMenu, PlaceholderType.DISPLAY_NAME);
+                            String replacedText = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.DISPLAY_NAME, style));
                             replacedText = TextUtil.replace(replacedText, "&", "§");
                             displayName = TextUtil.replace(displayName, "{" + placeholder + "}", replacedText);
                         }
@@ -209,8 +212,9 @@ public class MenuInventory implements InventoryProvider {
                     for (String line : lore) {
                         String[] placeholders = StringUtils.substringsBetween(line, "{", "}");
                         if (placeholders != null) {
+                            String style = LoreUtil.getStyle(line);
                             for (String placeholder : placeholders) {
-                                String replacedLine = provider.onPlaceholderReplace(placeholder, player, activeMenu, PlaceholderType.LORE);
+                                String replacedLine = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.LORE, style));
                                 replacedLine = TextUtil.replace(replacedLine, "&", "§");
                                 line = TextUtil.replace(line, "{" + placeholder + "}", replacedLine);
                             }
@@ -266,8 +270,9 @@ public class MenuInventory implements InventoryProvider {
                     if (provider != null) {
                         String[] placeholders = StringUtils.substringsBetween(displayName, "{", "}");
                         if (placeholders != null) {
+                            String style = LoreUtil.getStyle(displayName);
                             for (String placeholder : placeholders) {
-                                String replacedText = provider.onPlaceholderReplace(placeholder, player, activeMenu, PlaceholderType.DISPLAY_NAME, context);
+                                String replacedText = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.DISPLAY_NAME, style), context);
                                 replacedText = TextUtil.replace(replacedText, "&", "§");
                                 displayName = TextUtil.replace(displayName, "{" + placeholder + "}", replacedText);
                             }
@@ -286,8 +291,9 @@ public class MenuInventory implements InventoryProvider {
                         for (String line : lore) {
                             String[] placeholders = StringUtils.substringsBetween(line, "{", "}");
                             if (placeholders != null) {
+                                String style = LoreUtil.getStyle(line);
                                 for (String placeholder : placeholders) {
-                                    String replacedLine = provider.onPlaceholderReplace(placeholder, player, activeMenu, PlaceholderType.LORE, context);
+                                    String replacedLine = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.LORE, style), context);
                                     replacedLine = TextUtil.replace(replacedLine, "&", "§");
                                     line = TextUtil.replace(line, "{" + placeholder + "}", replacedLine);
                                 }
