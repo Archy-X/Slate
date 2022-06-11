@@ -45,32 +45,32 @@ public class ContextManager {
     }
 
     private void registerDefaults() {
-        registerContext(Integer.class, Ints::tryParse);
-        registerContext(Long.class, Longs::tryParse);
-        registerContext(Float.class, Floats::tryParse);
-        registerContext(Double.class, Doubles::tryParse);
-        registerContext(Short.class, input -> {
+        registerContext(Integer.class, ((menuName, input) -> Ints.tryParse(input)));
+        registerContext(Long.class, ((menuName, input) -> Longs.tryParse(input)));
+        registerContext(Float.class, ((menuName, input) -> Floats.tryParse(input)));
+        registerContext(Double.class, ((menuName, input) -> Doubles.tryParse(input)));
+        registerContext(Short.class, (menuName, input) -> {
             Integer integer = Ints.tryParse(input);
             if (integer != null) {
                 return (short) integer.intValue();
             }
             return null;
         });
-        registerContext(Byte.class, input -> {
+        registerContext(Byte.class, (menuName, input) -> {
             Integer integer = Ints.tryParse(input);
             if (integer != null) {
                 return (byte) integer.intValue();
             }
             return null;
         });
-        registerContext(Boolean.class, input -> input.equalsIgnoreCase("true"));
-        registerContext(Character.class, input -> {
+        registerContext(Boolean.class, (menuName, input) -> input.equalsIgnoreCase("true"));
+        registerContext(Character.class, (menuName, input) -> {
             if (input.length() == 1) {
                 return input.toCharArray()[0];
             }
             return null;
         });
-        registerContext(String.class, input -> input);
+        registerContext(String.class, (menuName, input) -> input);
     }
 
 }
