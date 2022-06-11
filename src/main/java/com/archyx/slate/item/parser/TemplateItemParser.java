@@ -42,7 +42,7 @@ public class TemplateItemParser<C> extends MenuItemParser {
             if (contextProvider == null) {
                 throw new IllegalArgumentException("Could not find registered context provider for class " + provider.getContext().getName());
             }
-            C context = contextProvider.parse(name, key);
+            C context = contextProvider.parse(menuName, key);
             ConfigurationSection contextSection = section.getConfigurationSection(key);
             if (context != null && contextSection != null) { // Context parse found a match
                 if (contextSection.contains("material")) {
