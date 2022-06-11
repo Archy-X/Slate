@@ -11,6 +11,6 @@ public interface ContextProvider<C> {
      * @return The parsed context, or null if the input does not belong to the context type
      */
     @Nullable
-    C parse(String input);
+    C parse(String menuName, String input);
 
 }

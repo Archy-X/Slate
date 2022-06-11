@@ -19,14 +19,15 @@ public class MenuActionParser extends ActionParser {
 
     @Override
     public Action parse(Map<?, ?> map) {
-        return new MenuActionBuilder(slate)
-                .actionType(MenuAction.ActionType.valueOf(getString(map, "action").toUpperCase(Locale.ROOT)))
-                .menuName(getString(map, "menu", null))
-                .properties(getProperties(map))
-                .build();
+        MenuActionBuilder builder = new MenuActionBuilder(slate);
+        builder.actionType(MenuAction.ActionType.valueOf(getString(map, "action").toUpperCase(Locale.ROOT)));
+        String menuName = getString(map, "menu", null);
+        builder.menuName(menuName);
+        builder.properties(getProperties(menuName, map));
+        return builder.build();
     }
 
-    private Map<String, Object> getProperties(Map<?, ?> map) {
+    private Map<String, Object> getProperties(String menuName, Map<?, ?> map) {
         Map<?, ?> propertiesConfig = getMap(map, "properties", null);
         Map<String, Object> properties = new HashMap<>();
         if (propertiesConfig != null) {
@@ -41,7 +42,7 @@ public class MenuActionParser extends ActionParser {
                         // Get context provider from type
                         ContextProvider<?> contextProvider = slate.getContextManager().getContextProvider(type);
                         if (contextProvider != null) {
-                            properties.put(key, contextProvider.parse(value)); // Add the parsed object
+                            properties.put(key, contextProvider.parse(menuName, value)); // Add the parsed object
                         }
                     } else {
                         properties.put(key, value);
