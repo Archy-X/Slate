@@ -174,7 +174,7 @@ public class MenuInventory implements InventoryProvider {
 
     private void addSingleItem(ActiveSingleItem activeItem, InventoryContents contents, Player player) {
         SingleItem item = activeItem.getItem();
-        SingleItemProvider provider = item.getProvider();
+        SingleItemProvider provider = slate.getMenuManager().constructSingleItem(item.getName(), menu.getName());
 
         ItemStack itemStack = item.getBaseItem().clone();
         if (provider != null) {
@@ -234,12 +234,12 @@ public class MenuInventory implements InventoryProvider {
 
         // Add item to inventory
         SlotPos pos = item.getPosition();
-        addSingleItemToInventory(item, itemStack, pos, contents, player);
+        addSingleItemToInventory(item, itemStack, pos, contents, player, provider);
     }
 
     private <C> void addTemplateItem(ActiveTemplateItem<C> activeItem, InventoryContents contents, Player player) {
         TemplateItem<C> item = activeItem.getItem();
-        TemplateItemProvider<C> provider = item.getProvider();
+        TemplateItemProvider<C> provider = slate.getMenuManager().constructTemplateItem(item.getName(), menu.getName());
 
         Set<C> contexts;
         if (provider != null) {
@@ -319,7 +319,7 @@ public class MenuInventory implements InventoryProvider {
                 pos = item.getDefaultPosition();
             }
             if (pos != null) {
-                addTemplateItemToInventory(item, itemStack, pos, contents, player, context);
+                addTemplateItemToInventory(item, itemStack, pos, contents, player, provider, context);
             }
         }
     }
@@ -327,7 +327,7 @@ public class MenuInventory implements InventoryProvider {
     /**
      * Adds the menu item itself to the inventory menu and registers click listeners, both listeners and actions
      */
-    private void addSingleItemToInventory(SingleItem singleItem, ItemStack itemStack, SlotPos pos, InventoryContents contents, Player player) {
+    private void addSingleItemToInventory(SingleItem singleItem, ItemStack itemStack, SlotPos pos, InventoryContents contents, Player player, SingleItemProvider provider) {
         contents.set(pos, ClickableItem.from(itemStack, c -> {
             if (!(c.getEvent() instanceof InventoryClickEvent)) return;
             InventoryClickEvent event = (InventoryClickEvent) c.getEvent();
@@ -338,7 +338,6 @@ public class MenuInventory implements InventoryProvider {
             }
 
             // Run coded click functionality
-            SingleItemProvider provider = singleItem.getProvider();
             if (provider != null) {
                 provider.onClick(player, event, c.getItem(), pos, activeMenu);
             }
@@ -347,7 +346,7 @@ public class MenuInventory implements InventoryProvider {
         }));
     }
 
-    private <C> void addTemplateItemToInventory(TemplateItem<C> templateItem, ItemStack itemStack, SlotPos pos, InventoryContents contents, Player player, C context) {
+    private <C> void addTemplateItemToInventory(TemplateItem<C> templateItem, ItemStack itemStack, SlotPos pos, InventoryContents contents, Player player, TemplateItemProvider<C> provider, C context) {
         contents.set(pos, ClickableItem.from(itemStack, c -> {
             if (!(c.getEvent() instanceof InventoryClickEvent)) return;
             InventoryClickEvent event = (InventoryClickEvent) c.getEvent();
@@ -358,7 +357,6 @@ public class MenuInventory implements InventoryProvider {
             }
 
             // Run coded click functionality
-            TemplateItemProvider<C> provider = templateItem.getProvider();
             if (provider != null) {
                 provider.onClick(player, event, c.getItem(), pos, activeMenu, context);
             }
