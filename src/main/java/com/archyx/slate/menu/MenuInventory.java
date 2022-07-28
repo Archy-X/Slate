@@ -178,6 +178,7 @@ public class MenuInventory implements InventoryProvider {
 
         ItemStack itemStack = item.getBaseItem().clone();
         if (provider != null) {
+            provider.onInitialize(player, activeMenu);
             itemStack = modifyBaseItem(provider, itemStack, player, activeMenu); // Apply provider base item modifications
         }
         if (itemStack == null) {
@@ -257,6 +258,7 @@ public class MenuInventory implements InventoryProvider {
                 itemStack = itemStack.clone();
             }
             if (provider != null) {
+                provider.onInitialize(player, activeMenu, context);
                 itemStack = modifyBaseItem(provider, itemStack, player, activeMenu, context); // Apply provider base item modifications
             }
             if (itemStack == null) {
