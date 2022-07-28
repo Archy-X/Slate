@@ -1,5 +1,6 @@
 package com.archyx.slate.item.provider;
 
+import com.archyx.slate.Slate;
 import com.archyx.slate.context.ContextProvider;
 import org.jetbrains.annotations.Nullable;
 
@@ -8,12 +9,14 @@ import java.util.Map;
 
 public class ProviderManager {
 
+    private final Slate slate;
     private final Map<String, SingleItemConstructor<? extends SingleItemProvider>> singleItemConstructors;
     private final Map<String, TemplateItemConstructor<? extends TemplateItemProvider<?>>> templateItemConstructors;
     private final Map<String, ContextProvider<?>> templateContextProviders;
     private KeyedItemProvider keyedItemProvider;
 
-    public ProviderManager() {
+    public ProviderManager(Slate slate) {
+        this.slate = slate;
         this.singleItemConstructors = new HashMap<>();
         this.templateItemConstructors = new HashMap<>();
         this.templateContextProviders = new HashMap<>();
@@ -29,6 +32,7 @@ public class ProviderManager {
     }
 
     @Nullable
+    @SuppressWarnings("unchecked")
     public <C> TemplateItemProvider<C> constructTemplateItem(String itemName) {
         TemplateItemConstructor<? extends TemplateItemProvider<C>> constructor = (TemplateItemConstructor<? extends TemplateItemProvider<C>>) templateItemConstructors.get(itemName);
         if (constructor != null) {
@@ -63,7 +67,8 @@ public class ProviderManager {
      * @param name The name of the template item
      * @param constructor The constructor instance
      */
-    public void registerTemplateItem(String name, TemplateItemConstructor<? extends TemplateItemProvider<?>> constructor, ContextProvider<?> contextProvider) {
+    public void registerTemplateItem(String name, Class<?> contextClass, TemplateItemConstructor<? extends TemplateItemProvider<?>> constructor) {
+        ContextProvider<?> contextProvider = slate.getContextManager().getContextProvider(contextClass);
         templateItemConstructors.put(name, constructor);
         templateContextProviders.put(name, contextProvider);
     }

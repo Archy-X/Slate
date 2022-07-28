@@ -38,7 +38,7 @@ public class MenuManager {
     public MenuManager(Slate slate) {
         this.slate = slate;
         this.menus = new LinkedHashMap<>();
-        this.globalProviderManager = new ProviderManager();
+        this.globalProviderManager = new ProviderManager(slate);
         this.menuProviderManagers = new HashMap<>();
         this.menuProviders = new HashMap<>();
         this.defaultOptions = new HashMap<>();
@@ -91,9 +91,8 @@ public class MenuManager {
      * @param name The name of the template item
      * @param constructor The constructor instance
      */
-    public <T extends TemplateItemProvider<?>> void registerTemplateItem(String name, Class<T> contextClass, TemplateItemConstructor<T> constructor) {
-        ContextProvider<?> contextProvider = slate.getContextManager().getContextProvider(contextClass);
-        globalProviderManager.registerTemplateItem(name, constructor, contextProvider);
+    public <T> void registerTemplateItem(String name, Class<T> contextClass, TemplateItemConstructor<? extends TemplateItemProvider<T>> constructor) {
+        globalProviderManager.registerTemplateItem(name, contextClass, constructor);
     }
 
     /**
@@ -107,7 +106,7 @@ public class MenuManager {
     }
 
     public ProviderManager getProviderManager(String menuName) {
-        return menuProviderManagers.computeIfAbsent(menuName, k -> new ProviderManager());
+        return menuProviderManagers.computeIfAbsent(menuName, k -> new ProviderManager(slate));
     }
 
     public void registerDefaultOptions(String name, Map<String, Object> map) {
