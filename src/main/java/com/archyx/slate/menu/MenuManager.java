@@ -165,12 +165,8 @@ public class MenuManager {
                     ProviderManager providerManager = menuProviderManagers.get(menuName);
                     if (providerManager != null) {
                         ContextProvider<?> contextProvider = providerManager.getContextProvider(templateName);
-                        if (contextProvider != null) {
-                            MenuItem item = new TemplateItemParser<>(slate, contextProvider).parse(templateSection, menuName);
-                            items.put(templateName, item);
-                        } else {
-                            throw new IllegalArgumentException("Could not find context provider for template " + templateName);
-                        }
+                        MenuItem item = new TemplateItemParser<>(slate, contextProvider).parse(templateSection, menuName);
+                        items.put(templateName, item);
                     }
                 }
             }

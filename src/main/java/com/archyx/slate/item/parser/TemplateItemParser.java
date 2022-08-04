@@ -30,17 +30,20 @@ public class TemplateItemParser<C> extends MenuItemParser {
         // Look through keys for contexts
         Map<C, ItemStack> baseItems = new HashMap<>();
         Map<C, SlotPos> positions = new HashMap<>();
-        for (String key : section.getKeys(false)) {
-            if (isKeyWord(key)) continue; // Skip for key words used for default item parsing
-            C context = contextProvider.parse(menuName, key);
-            ConfigurationSection contextSection = section.getConfigurationSection(key);
-            if (context != null && contextSection != null) { // Context parse found a match
-                if (contextSection.contains("material")) {
-                    baseItems.put(context, parseBaseItem(contextSection));
-                }
-                String positionString = contextSection.getString("pos");
-                if (positionString != null) {
-                    positions.put(context, parsePosition(positionString));
+
+        if (contextProvider != null) {
+            for (String key : section.getKeys(false)) {
+                if (isKeyWord(key)) continue; // Skip for key words used for default item parsing
+                C context = contextProvider.parse(menuName, key);
+                ConfigurationSection contextSection = section.getConfigurationSection(key);
+                if (context != null && contextSection != null) { // Context parse found a match
+                    if (contextSection.contains("material")) {
+                        baseItems.put(context, parseBaseItem(contextSection));
+                    }
+                    String positionString = contextSection.getString("pos");
+                    if (positionString != null) {
+                        positions.put(context, parsePosition(positionString));
+                    }
                 }
             }
         }

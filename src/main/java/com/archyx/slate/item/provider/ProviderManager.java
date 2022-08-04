@@ -70,7 +70,9 @@ public class ProviderManager {
     public void registerTemplateItem(String name, Class<?> contextClass, TemplateItemConstructor<? extends TemplateItemProvider<?>> constructor) {
         ContextProvider<?> contextProvider = slate.getContextManager().getContextProvider(contextClass);
         templateItemConstructors.put(name, constructor);
-        templateContextProviders.put(name, contextProvider);
+        if (contextProvider != null) {
+            templateContextProviders.put(name, contextProvider);
+        }
     }
 
     public void registerKeyedItemProvider(KeyedItemProvider provider) {
