@@ -194,7 +194,8 @@ public class MenuManager {
         Map<String, Object> options = new HashMap<>();
         ConfigurationSection optionSection = config.getConfigurationSection("options");
         if (optionSection != null) {
-            for (String key : optionSection.getKeys(false)) {
+            for (String key : optionSection.getKeys(true)) {
+                if (optionSection.isConfigurationSection(key)) continue; // Ignore config sections
                 options.put(key, optionSection.get(key));
             }
         }
