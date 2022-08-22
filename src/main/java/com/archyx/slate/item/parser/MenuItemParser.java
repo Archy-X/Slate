@@ -268,6 +268,10 @@ public abstract class MenuItemParser extends MapParser {
     }
 
     private String applyColor(String message) {
+        MiniMessage mm = MiniMessage.miniMessage();
+        Component component = mm.deserialize(message);
+        message = LegacyComponentSerializer.legacySection().serialize(component);
+
         Matcher matcher = hexPattern.matcher(message);
         StringBuffer buffer = new StringBuffer(message.length() + 4 * 8);
         while (matcher.find()) {
@@ -282,10 +286,6 @@ public abstract class MenuItemParser extends MapParser {
         message = matcher.appendTail(buffer).toString();
         message = TextUtil.replaceNonEscaped(message, "&", "§");
         // MiniMessage parsing
-        MiniMessage mm = MiniMessage.miniMessage();
-        Component component = mm.deserialize(message);
-        message = LegacyComponentSerializer.legacySection().serialize(component);
-
         return message;
     }
 
