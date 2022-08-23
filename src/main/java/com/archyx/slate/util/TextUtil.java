@@ -1,10 +1,19 @@
 package com.archyx.slate.util;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.md_5.bungee.api.ChatColor;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TextUtil {
+
+    private static final Pattern hexPattern = Pattern.compile("&#([A-Fa-f0-9]{6})");
 
     public static String replace(String source, String os, String ns) {
         if (source == null) {
@@ -64,6 +73,28 @@ public class TextUtil {
             lore.addAll(Arrays.asList(entry.split("(\\u005C\\u006E)|(\\n)")));
         }
         return lore;
+    }
+
+    public static String applyColor(String message) {
+        MiniMessage mm = MiniMessage.miniMessage();
+        Component component = mm.deserialize(message);
+        message = LegacyComponentSerializer.legacySection().serialize(component);
+
+        Matcher matcher = hexPattern.matcher(message);
+        StringBuffer buffer = new StringBuffer(message.length() + 4 * 8);
+        while (matcher.find()) {
+            String group = matcher.group(1);
+            char COLOR_CHAR = ChatColor.COLOR_CHAR;
+            matcher.appendReplacement(buffer, COLOR_CHAR + "x"
+                    + COLOR_CHAR + group.charAt(0) + COLOR_CHAR + group.charAt(1)
+                    + COLOR_CHAR + group.charAt(2) + COLOR_CHAR + group.charAt(3)
+                    + COLOR_CHAR + group.charAt(4) + COLOR_CHAR + group.charAt(5)
+            );
+        }
+        message = matcher.appendTail(buffer).toString();
+        message = TextUtil.replaceNonEscaped(message, "&", "§");
+        // MiniMessage parsing
+        return message;
     }
 
 }
