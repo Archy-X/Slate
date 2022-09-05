@@ -195,7 +195,7 @@ public class MenuInventory implements InventoryProvider {
                         String style = LoreUtil.getStyle(displayName);
                         for (String placeholder : placeholders) {
                             String replacedText = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.DISPLAY_NAME, style));
-                            replacedText = TextUtil.replace(replacedText, "&", "§");
+                            replacedText = TextUtil.applyColor(replacedText);
                             displayName = TextUtil.replace(displayName, "{" + placeholder + "}", replacedText);
                         }
                     }
@@ -216,7 +216,7 @@ public class MenuInventory implements InventoryProvider {
                             String style = LoreUtil.getStyle(line);
                             for (String placeholder : placeholders) {
                                 String replacedLine = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.LORE, style));
-                                replacedLine = TextUtil.replace(replacedLine, "&", "§");
+                                replacedLine = TextUtil.applyColor(replacedLine);
                                 line = TextUtil.replace(line, "{" + placeholder + "}", replacedLine);
                             }
                         }
@@ -275,7 +275,7 @@ public class MenuInventory implements InventoryProvider {
                             String style = LoreUtil.getStyle(displayName);
                             for (String placeholder : placeholders) {
                                 String replacedText = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.DISPLAY_NAME, style), context);
-                                replacedText = TextUtil.replace(replacedText, "&", "§");
+                                replacedText = TextUtil.applyColor(replacedText);
                                 displayName = TextUtil.replace(displayName, "{" + placeholder + "}", replacedText);
                             }
                         }
@@ -296,7 +296,7 @@ public class MenuInventory implements InventoryProvider {
                                 String style = LoreUtil.getStyle(line);
                                 for (String placeholder : placeholders) {
                                     String replacedLine = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.LORE, style), context);
-                                    replacedLine = TextUtil.replace(replacedLine, "&", "§");
+                                    replacedLine = TextUtil.applyColor(replacedLine);
                                     line = TextUtil.replace(line, "{" + placeholder + "}", replacedLine);
                                 }
                             }

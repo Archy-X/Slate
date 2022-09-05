@@ -197,10 +197,6 @@ public class MenuManager {
             for (String key : optionSection.getKeys(true)) {
                 if (optionSection.isConfigurationSection(key)) continue; // Ignore config sections
                 Object value = optionSection.get(key);
-                // Apply color codes if String
-                if (value instanceof String) {
-                    value = TextUtil.applyColor((String) value);
-                }
                 options.put(key, value);
             }
         }
