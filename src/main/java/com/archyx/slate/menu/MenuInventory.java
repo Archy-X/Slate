@@ -189,7 +189,6 @@ public class MenuInventory implements InventoryProvider {
             String displayName = item.getDisplayName();
             if (displayName != null) {
                 // Replace display name placeholders
-                displayName = TextUtil.applyColor(displayName);
                 if (provider != null) {
                     String[] placeholders = StringUtils.substringsBetween(displayName, "{", "}");
                     if (placeholders != null) {
@@ -211,7 +210,6 @@ public class MenuInventory implements InventoryProvider {
 
                 List<String> replacedLore = new ArrayList<>();
                 for (String line : lore) {
-                    line = TextUtil.applyColor(line); // Apply color to original line
 
                     if (provider != null) { // Replace lore placeholders
                         String[] placeholders = StringUtils.substringsBetween(line, "{", "}");
@@ -232,6 +230,7 @@ public class MenuInventory implements InventoryProvider {
                 }
                 lore = replacedLore;
                 lore = TextUtil.applyNewLines(lore);
+                lore = applyColorToLore(lore);
                 meta.setLore(lore);
             }
             itemStack.setItemMeta(meta);
@@ -273,7 +272,6 @@ public class MenuInventory implements InventoryProvider {
                 String displayName = item.getDisplayName();
                 if (displayName != null) {
                     // Replace display name placeholders
-                    displayName = TextUtil.applyColor(displayName);
                     if (provider != null) {
                         String[] placeholders = StringUtils.substringsBetween(displayName, "{", "}");
                         if (placeholders != null) {
@@ -295,7 +293,6 @@ public class MenuInventory implements InventoryProvider {
 
                     List<String> replacedLore = new ArrayList<>();
                     for (String line : lore) {
-                        line = TextUtil.applyColor(line); // Apply color to original line
 
                         if (provider != null) { // Replace lore placeholders
                             String[] placeholders = StringUtils.substringsBetween(line, "{", "}");
@@ -316,6 +313,7 @@ public class MenuInventory implements InventoryProvider {
                     }
                     lore = replacedLore;
                     lore = TextUtil.applyNewLines(lore);
+                    lore = applyColorToLore(lore);
                     meta.setLore(lore);
                 }
                 itemStack.setItemMeta(meta);
@@ -332,6 +330,14 @@ public class MenuInventory implements InventoryProvider {
                 addTemplateItemToInventory(item, itemStack, pos, contents, player, provider, context);
             }
         }
+    }
+
+    private List<String> applyColorToLore(List<String> lore) {
+        List<String> appliedLore = new ArrayList<>();
+        for (String line : lore) {
+            appliedLore.add(TextUtil.applyColor(line));
+        }
+        return appliedLore;
     }
 
     /**

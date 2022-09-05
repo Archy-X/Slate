@@ -77,6 +77,10 @@ public class TextUtil {
         return lore;
     }
 
+    public static List<String> applyNewLines(String input) {
+        return new ArrayList<>(Arrays.asList(input.split("(\\u005C\\u006E)|(\\n)")));
+    }
+
     public static String applyColor(String message) {
         message = TextUtil.replace(message, "§", "&"); // Replace section symbols to allow MiniMessage parsing
         MiniMessage mm = MiniMessage.miniMessage();
