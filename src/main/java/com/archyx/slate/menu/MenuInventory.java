@@ -15,8 +15,8 @@ import com.archyx.slate.item.provider.PlaceholderData;
 import com.archyx.slate.item.provider.PlaceholderType;
 import com.archyx.slate.item.provider.SingleItemProvider;
 import com.archyx.slate.item.provider.TemplateItemProvider;
-import com.archyx.slate.util.TextUtil;
 import com.archyx.slate.util.LoreUtil;
+import com.archyx.slate.util.TextUtil;
 import com.cryptomorin.xseries.XMaterial;
 import fr.minuskube.inv.ClickableItem;
 import fr.minuskube.inv.ItemClickData;
@@ -37,7 +37,6 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.plaf.TextUI;
 import java.util.*;
 
 public class MenuInventory implements InventoryProvider {
@@ -190,12 +189,14 @@ public class MenuInventory implements InventoryProvider {
             String displayName = item.getDisplayName();
             if (displayName != null) {
                 // Replace display name placeholders
+                displayName = TextUtil.applyColor(displayName);
                 if (provider != null) {
                     String[] placeholders = StringUtils.substringsBetween(displayName, "{", "}");
                     if (placeholders != null) {
                         String style = LoreUtil.getStyle(displayName);
                         for (String placeholder : placeholders) {
                             String replacedText = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.DISPLAY_NAME, style));
+                            replacedText = TextUtil.applyColor(replacedText);
                             displayName = TextUtil.replace(displayName, "{" + placeholder + "}", replacedText);
                         }
                     }
@@ -203,36 +204,35 @@ public class MenuInventory implements InventoryProvider {
                 if (slate.isPlaceholderAPIEnabled()) {
                     displayName = PlaceholderAPI.setPlaceholders(player, displayName);
                 }
-                displayName = TextUtil.applyColor(displayName);
                 meta.setDisplayName(displayName);
             }
             List<String> lore = item.getLore();
             if (lore != null && lore.size() > 0) {
-                // Replace lore placeholders
-                if (provider != null) {
-                    List<String> replacedLore = new ArrayList<>();
-                    for (String line : lore) {
+
+                List<String> replacedLore = new ArrayList<>();
+                for (String line : lore) {
+                    line = TextUtil.applyColor(line); // Apply color to original line
+
+                    if (provider != null) { // Replace lore placeholders
                         String[] placeholders = StringUtils.substringsBetween(line, "{", "}");
                         if (placeholders != null) {
                             String style = LoreUtil.getStyle(line);
                             for (String placeholder : placeholders) {
                                 String replacedLine = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.LORE, style));
+                                replacedLine = TextUtil.applyColor(replacedLine); // Apply color to placeholder
                                 line = TextUtil.replace(line, "{" + placeholder + "}", replacedLine);
                             }
                         }
-                        if (slate.isPlaceholderAPIEnabled()) {
-                            line = PlaceholderAPI.setPlaceholders(player, line);
-                        }
-                        replacedLore.add(line);
                     }
-                    lore = replacedLore;
+
+                    if (slate.isPlaceholderAPIEnabled()) {
+                        line = PlaceholderAPI.setPlaceholders(player, line);
+                    }
+                    replacedLore.add(line);
                 }
+                lore = replacedLore;
                 lore = TextUtil.applyNewLines(lore);
-                List<String> formattedLore = new ArrayList<>();
-                for (String line : lore) {
-                    formattedLore.add(TextUtil.applyColor(line));
-                }
-                meta.setLore(formattedLore);
+                meta.setLore(lore);
             }
             itemStack.setItemMeta(meta);
         }
@@ -273,12 +273,14 @@ public class MenuInventory implements InventoryProvider {
                 String displayName = item.getDisplayName();
                 if (displayName != null) {
                     // Replace display name placeholders
+                    displayName = TextUtil.applyColor(displayName);
                     if (provider != null) {
                         String[] placeholders = StringUtils.substringsBetween(displayName, "{", "}");
                         if (placeholders != null) {
                             String style = LoreUtil.getStyle(displayName);
                             for (String placeholder : placeholders) {
                                 String replacedText = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.DISPLAY_NAME, style), context);
+                                replacedText = TextUtil.applyColor(replacedText);
                                 displayName = TextUtil.replace(displayName, "{" + placeholder + "}", replacedText);
                             }
                         }
@@ -286,36 +288,35 @@ public class MenuInventory implements InventoryProvider {
                     if (slate.isPlaceholderAPIEnabled()) {
                         displayName = PlaceholderAPI.setPlaceholders(player, displayName);
                     }
-                    displayName = TextUtil.applyColor(displayName);
                     meta.setDisplayName(displayName);
                 }
                 List<String> lore = item.getLore();
                 if (lore != null && lore.size() > 0) {
-                    // Replace lore placeholders
-                    if (provider != null) {
-                        List<String> replacedLore = new ArrayList<>();
-                        for (String line : lore) {
+
+                    List<String> replacedLore = new ArrayList<>();
+                    for (String line : lore) {
+                        line = TextUtil.applyColor(line); // Apply color to original line
+
+                        if (provider != null) { // Replace lore placeholders
                             String[] placeholders = StringUtils.substringsBetween(line, "{", "}");
                             if (placeholders != null) {
                                 String style = LoreUtil.getStyle(line);
                                 for (String placeholder : placeholders) {
                                     String replacedLine = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.LORE, style), context);
+                                    replacedLine = TextUtil.applyColor(replacedLine); // Apply color to placeholder
                                     line = TextUtil.replace(line, "{" + placeholder + "}", replacedLine);
                                 }
                             }
-                            if (slate.isPlaceholderAPIEnabled()) {
-                                line = PlaceholderAPI.setPlaceholders(player, line);
-                            }
-                            replacedLore.add(line);
                         }
-                        lore = replacedLore;
+
+                        if (slate.isPlaceholderAPIEnabled()) {
+                            line = PlaceholderAPI.setPlaceholders(player, line);
+                        }
+                        replacedLore.add(line);
                     }
+                    lore = replacedLore;
                     lore = TextUtil.applyNewLines(lore);
-                    List<String> formattedLore = new ArrayList<>();
-                    for (String line : lore) {
-                        formattedLore.add(TextUtil.applyColor(line));
-                    }
-                    meta.setLore(formattedLore);
+                    meta.setLore(lore);
                 }
                 itemStack.setItemMeta(meta);
             }
