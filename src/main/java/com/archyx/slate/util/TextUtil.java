@@ -2,8 +2,10 @@ package com.archyx.slate.util;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.ParsingException;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -77,8 +79,13 @@ public class TextUtil {
 
     public static String applyColor(String message) {
         MiniMessage mm = MiniMessage.miniMessage();
-        Component component = mm.deserialize(message);
-        message = LegacyComponentSerializer.legacySection().serialize(component);
+        try {
+            Component component = mm.deserialize(message);
+            message = LegacyComponentSerializer.legacySection().serialize(component);
+        } catch (ParsingException e) {
+            Bukkit.getLogger().info("[Slate] Error applying MiniMessage formatting to input message: " + message);
+            e.printStackTrace();
+        }
 
         Matcher matcher = hexPattern.matcher(message);
         StringBuffer buffer = new StringBuffer(message.length() + 4 * 8);
