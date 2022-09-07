@@ -22,6 +22,12 @@ public class ProviderManager {
         this.templateContextProviders = new HashMap<>();
     }
 
+    public void unregisterAll() {
+        singleItemConstructors.clear();
+        templateItemConstructors.clear();
+        templateContextProviders.clear();
+    }
+
     @Nullable
     public SingleItemProvider constructSingleItem(String itemName) {
         SingleItemConstructor<? extends SingleItemProvider> constructor = singleItemConstructors.get(itemName);

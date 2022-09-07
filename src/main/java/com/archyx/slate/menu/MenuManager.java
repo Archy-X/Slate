@@ -49,6 +49,14 @@ public class MenuManager {
         return menus.get(name);
     }
 
+    public void unregisterAllMenus() {
+        menus.clear();
+        globalProviderManager.unregisterAll();
+        menuProviderManagers.clear();
+        menuProviders.clear();
+        defaultOptions.clear();
+    }
+
     @Nullable
     public SingleItemProvider constructSingleItem(String itemName, String menuName) {
         // Use skill specific provider if exits
