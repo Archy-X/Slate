@@ -46,6 +46,10 @@ dependencies {
     compileOnly 'me.clip:placeholderapi:2.10.10'
 }
 
+shadowJar {
+    relocate 'net.kyori.adventure', 'com.archyx.slate.adventure'
+}
+
 processResources {
     from(sourceSets.main.resources.srcDirs) {
         filter ReplaceTokens, tokens: [version: version]
