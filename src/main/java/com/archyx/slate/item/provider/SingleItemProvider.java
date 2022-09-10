@@ -16,7 +16,9 @@ public interface SingleItemProvider {
      * @param player The player that is viewing the menu
      * @return The text to replace the placeholder with
      */
-    String onPlaceholderReplace(String placeholder, Player player, ActiveMenu menu, PlaceholderData data);
+    String onPlaceholderReplace(String placeholder, Player player, ActiveMenu activeMenu, PlaceholderData data);
+
+    default void onInitialize(Player player, ActiveMenu activeMenu) {}
 
     default void onClick(Player player, InventoryClickEvent event, ItemStack item, SlotPos pos, ActiveMenu activeMenu) {}
 

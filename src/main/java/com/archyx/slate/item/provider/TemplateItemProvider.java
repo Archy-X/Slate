@@ -26,7 +26,7 @@ public interface TemplateItemProvider<C> {
      * @param context The context for this item
      * @return The text to replace the placeholder with
      */
-    String onPlaceholderReplace(String placeholder, Player player, ActiveMenu menu, PlaceholderData data, C context);
+    String onPlaceholderReplace(String placeholder, Player player, ActiveMenu activeMenu, PlaceholderData data, C context);
 
     /**
      * Gets a set of defined contexts that are the only valid contexts for this template.
@@ -34,6 +34,8 @@ public interface TemplateItemProvider<C> {
      * @return The set of valid contexts, or null if any context is valid.
      */
     Set<C> getDefinedContexts(Player player, ActiveMenu activeMenu);
+
+    default void onInitialize(Player player, ActiveMenu activeMenu, C context) {}
 
     default void onClick(Player player, InventoryClickEvent event, ItemStack item, SlotPos pos, ActiveMenu activeMenu, C context) {}
 

@@ -3,7 +3,6 @@ package com.archyx.slate.item.builder;
 import com.archyx.slate.Slate;
 import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.TemplateItem;
-import com.archyx.slate.item.provider.TemplateItemProvider;
 import fr.minuskube.inv.content.SlotPos;
 import org.bukkit.inventory.ItemStack;
 
@@ -14,7 +13,6 @@ public class TemplateItemBuilder<C> extends MenuItemBuilder {
     private Map<C, SlotPos> positions;
     private Map<C, ItemStack> baseItems;
     private ItemStack defaultBaseItem;
-    private TemplateItemProvider<C> provider;
     private SlotPos defaultPosition;
 
     public TemplateItemBuilder(Slate slate) {
@@ -36,11 +34,6 @@ public class TemplateItemBuilder<C> extends MenuItemBuilder {
         return this;
     }
 
-    public TemplateItemBuilder<C> provider(TemplateItemProvider<C> provider) {
-        this.provider = provider;
-        return this;
-    }
-
     public TemplateItemBuilder<C> defaultPosition(SlotPos defaultPosition) {
         this.defaultPosition = defaultPosition;
         return this;
@@ -48,6 +41,6 @@ public class TemplateItemBuilder<C> extends MenuItemBuilder {
 
     @Override
     public MenuItem build() {
-        return new TemplateItem<>(slate, name, baseItems, defaultBaseItem, displayName, lore, actions, positions, defaultPosition, provider, options);
+        return new TemplateItem<>(slate, name, baseItems, defaultBaseItem, displayName, lore, actions, positions, defaultPosition, options);
     }
 }

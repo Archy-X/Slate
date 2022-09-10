@@ -15,8 +15,8 @@ import com.archyx.slate.item.provider.PlaceholderData;
 import com.archyx.slate.item.provider.PlaceholderType;
 import com.archyx.slate.item.provider.SingleItemProvider;
 import com.archyx.slate.item.provider.TemplateItemProvider;
-import com.archyx.slate.util.TextUtil;
 import com.archyx.slate.util.LoreUtil;
+import com.archyx.slate.util.TextUtil;
 import com.cryptomorin.xseries.XMaterial;
 import fr.minuskube.inv.ClickableItem;
 import fr.minuskube.inv.ItemClickData;
@@ -174,10 +174,11 @@ public class MenuInventory implements InventoryProvider {
 
     private void addSingleItem(ActiveSingleItem activeItem, InventoryContents contents, Player player) {
         SingleItem item = activeItem.getItem();
-        SingleItemProvider provider = item.getProvider();
+        SingleItemProvider provider = slate.getMenuManager().constructSingleItem(item.getName(), menu.getName());
 
         ItemStack itemStack = item.getBaseItem().clone();
         if (provider != null) {
+            provider.onInitialize(player, activeMenu);
             itemStack = modifyBaseItem(provider, itemStack, player, activeMenu); // Apply provider base item modifications
         }
         if (itemStack == null) {
@@ -194,7 +195,7 @@ public class MenuInventory implements InventoryProvider {
                         String style = LoreUtil.getStyle(displayName);
                         for (String placeholder : placeholders) {
                             String replacedText = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.DISPLAY_NAME, style));
-                            replacedText = TextUtil.replace(replacedText, "&", "§");
+                            replacedText = TextUtil.applyColor(replacedText);
                             displayName = TextUtil.replace(displayName, "{" + placeholder + "}", replacedText);
                         }
                     }
@@ -206,27 +207,29 @@ public class MenuInventory implements InventoryProvider {
             }
             List<String> lore = item.getLore();
             if (lore != null && lore.size() > 0) {
-                // Replace lore placeholders
-                if (provider != null) {
-                    List<String> replacedLore = new ArrayList<>();
-                    for (String line : lore) {
+
+                List<String> replacedLore = new ArrayList<>();
+                for (String line : lore) {
+
+                    if (provider != null) { // Replace lore placeholders
                         String[] placeholders = StringUtils.substringsBetween(line, "{", "}");
                         if (placeholders != null) {
                             String style = LoreUtil.getStyle(line);
                             for (String placeholder : placeholders) {
                                 String replacedLine = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.LORE, style));
-                                replacedLine = TextUtil.replace(replacedLine, "&", "§");
                                 line = TextUtil.replace(line, "{" + placeholder + "}", replacedLine);
                             }
                         }
-                        if (slate.isPlaceholderAPIEnabled()) {
-                            line = PlaceholderAPI.setPlaceholders(player, line);
-                        }
-                        replacedLore.add(line);
                     }
-                    lore = replacedLore;
+
+                    if (slate.isPlaceholderAPIEnabled()) {
+                        line = PlaceholderAPI.setPlaceholders(player, line);
+                    }
+                    replacedLore.add(line);
                 }
+                lore = replacedLore;
                 lore = TextUtil.applyNewLines(lore);
+                lore = applyColorToLore(lore);
                 meta.setLore(lore);
             }
             itemStack.setItemMeta(meta);
@@ -234,12 +237,12 @@ public class MenuInventory implements InventoryProvider {
 
         // Add item to inventory
         SlotPos pos = item.getPosition();
-        addSingleItemToInventory(item, itemStack, pos, contents, player);
+        addSingleItemToInventory(item, itemStack, pos, contents, player, provider);
     }
 
     private <C> void addTemplateItem(ActiveTemplateItem<C> activeItem, InventoryContents contents, Player player) {
         TemplateItem<C> item = activeItem.getItem();
-        TemplateItemProvider<C> provider = item.getProvider();
+        TemplateItemProvider<C> provider = slate.getMenuManager().constructTemplateItem(item.getName(), menu.getName());
 
         Set<C> contexts;
         if (provider != null) {
@@ -257,6 +260,7 @@ public class MenuInventory implements InventoryProvider {
                 itemStack = itemStack.clone();
             }
             if (provider != null) {
+                provider.onInitialize(player, activeMenu, context);
                 itemStack = modifyBaseItem(provider, itemStack, player, activeMenu, context); // Apply provider base item modifications
             }
             if (itemStack == null) {
@@ -273,7 +277,7 @@ public class MenuInventory implements InventoryProvider {
                             String style = LoreUtil.getStyle(displayName);
                             for (String placeholder : placeholders) {
                                 String replacedText = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.DISPLAY_NAME, style), context);
-                                replacedText = TextUtil.replace(replacedText, "&", "§");
+                                replacedText = TextUtil.applyColor(replacedText);
                                 displayName = TextUtil.replace(displayName, "{" + placeholder + "}", replacedText);
                             }
                         }
@@ -285,27 +289,29 @@ public class MenuInventory implements InventoryProvider {
                 }
                 List<String> lore = item.getLore();
                 if (lore != null && lore.size() > 0) {
-                    // Replace lore placeholders
-                    if (provider != null) {
-                        List<String> replacedLore = new ArrayList<>();
-                        for (String line : lore) {
+
+                    List<String> replacedLore = new ArrayList<>();
+                    for (String line : lore) {
+
+                        if (provider != null) { // Replace lore placeholders
                             String[] placeholders = StringUtils.substringsBetween(line, "{", "}");
                             if (placeholders != null) {
                                 String style = LoreUtil.getStyle(line);
                                 for (String placeholder : placeholders) {
                                     String replacedLine = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.LORE, style), context);
-                                    replacedLine = TextUtil.replace(replacedLine, "&", "§");
                                     line = TextUtil.replace(line, "{" + placeholder + "}", replacedLine);
                                 }
                             }
-                            if (slate.isPlaceholderAPIEnabled()) {
-                                line = PlaceholderAPI.setPlaceholders(player, line);
-                            }
-                            replacedLore.add(line);
                         }
-                        lore = replacedLore;
+
+                        if (slate.isPlaceholderAPIEnabled()) {
+                            line = PlaceholderAPI.setPlaceholders(player, line);
+                        }
+                        replacedLore.add(line);
                     }
+                    lore = replacedLore;
                     lore = TextUtil.applyNewLines(lore);
+                    lore = applyColorToLore(lore);
                     meta.setLore(lore);
                 }
                 itemStack.setItemMeta(meta);
@@ -319,15 +325,23 @@ public class MenuInventory implements InventoryProvider {
                 pos = item.getDefaultPosition();
             }
             if (pos != null) {
-                addTemplateItemToInventory(item, itemStack, pos, contents, player, context);
+                addTemplateItemToInventory(item, itemStack, pos, contents, player, provider, context);
             }
         }
+    }
+
+    private List<String> applyColorToLore(List<String> lore) {
+        List<String> appliedLore = new ArrayList<>();
+        for (String line : lore) {
+            appliedLore.add(TextUtil.applyColor(line));
+        }
+        return appliedLore;
     }
 
     /**
      * Adds the menu item itself to the inventory menu and registers click listeners, both listeners and actions
      */
-    private void addSingleItemToInventory(SingleItem singleItem, ItemStack itemStack, SlotPos pos, InventoryContents contents, Player player) {
+    private void addSingleItemToInventory(SingleItem singleItem, ItemStack itemStack, SlotPos pos, InventoryContents contents, Player player, SingleItemProvider provider) {
         contents.set(pos, ClickableItem.from(itemStack, c -> {
             if (!(c.getEvent() instanceof InventoryClickEvent)) return;
             InventoryClickEvent event = (InventoryClickEvent) c.getEvent();
@@ -338,7 +352,6 @@ public class MenuInventory implements InventoryProvider {
             }
 
             // Run coded click functionality
-            SingleItemProvider provider = singleItem.getProvider();
             if (provider != null) {
                 provider.onClick(player, event, c.getItem(), pos, activeMenu);
             }
@@ -347,7 +360,7 @@ public class MenuInventory implements InventoryProvider {
         }));
     }
 
-    private <C> void addTemplateItemToInventory(TemplateItem<C> templateItem, ItemStack itemStack, SlotPos pos, InventoryContents contents, Player player, C context) {
+    private <C> void addTemplateItemToInventory(TemplateItem<C> templateItem, ItemStack itemStack, SlotPos pos, InventoryContents contents, Player player, TemplateItemProvider<C> provider, C context) {
         contents.set(pos, ClickableItem.from(itemStack, c -> {
             if (!(c.getEvent() instanceof InventoryClickEvent)) return;
             InventoryClickEvent event = (InventoryClickEvent) c.getEvent();
@@ -358,7 +371,6 @@ public class MenuInventory implements InventoryProvider {
             }
 
             // Run coded click functionality
-            TemplateItemProvider<C> provider = templateItem.getProvider();
             if (provider != null) {
                 provider.onClick(player, event, c.getItem(), pos, activeMenu, context);
             }

@@ -3,7 +3,6 @@ package com.archyx.slate.item;
 import com.archyx.slate.Slate;
 import com.archyx.slate.action.Action;
 import com.archyx.slate.action.click.ClickAction;
-import com.archyx.slate.item.provider.TemplateItemProvider;
 import fr.minuskube.inv.content.SlotPos;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -18,13 +17,11 @@ public class TemplateItem<C> extends MenuItem {
     private final Map<C, ItemStack> baseItems;
     private final ItemStack defaultBaseItem;
     private final SlotPos defaultPosition;
-    private final TemplateItemProvider<C> provider;
 
-    public TemplateItem(Slate slate, String name, Map<C, ItemStack> baseItems, ItemStack defaultBaseItem, String displayName, List<String> lore, Map<ClickAction, List<Action>> actions, Map<C, SlotPos> positions, SlotPos defaultPosition, TemplateItemProvider<C> provider, Map<String, Object> options) {
+    public TemplateItem(Slate slate, String name, Map<C, ItemStack> baseItems, ItemStack defaultBaseItem, String displayName, List<String> lore, Map<ClickAction, List<Action>> actions, Map<C, SlotPos> positions, SlotPos defaultPosition, Map<String, Object> options) {
         super(slate, name, displayName, lore, actions, options);
         this.positions = positions;
         this.baseItems = baseItems;
-        this.provider = provider;
         this.defaultBaseItem = defaultBaseItem;
         this.defaultPosition = defaultPosition;
     }
@@ -52,11 +49,6 @@ public class TemplateItem<C> extends MenuItem {
     @Nullable
     public SlotPos getDefaultPosition() {
         return defaultPosition;
-    }
-
-    @Nullable
-    public TemplateItemProvider<C> getProvider() {
-        return provider;
     }
 
 }
