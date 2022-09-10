@@ -39,7 +39,9 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'com.github.Archy-X:SmartInvs:1.3.0'
+    implementation('com.github.Archy-X:SmartInvs:1.3.0') {
+        exclude group: 'org.spigotmc'
+    }
     compileOnly 'com.github.cryptomorin:XSeries:8.6.1'
     compileOnly 'de.tr7zw:item-nbt-api:2.8.0'
     compileOnly 'dev.dbassett:skullcreator:3.0.1'
