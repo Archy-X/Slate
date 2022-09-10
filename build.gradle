@@ -48,6 +48,7 @@ dependencies {
 
 shadowJar {
     relocate 'net.kyori.adventure', 'com.archyx.slate.adventure'
+    relocate 'net.kyori.examination', 'com.archyx.slate.examination'
 }
 
 processResources {
@@ -55,3 +56,5 @@ processResources {
         filter ReplaceTokens, tokens: [version: version]
     }
 }
+
+build.dependsOn shadowJar
