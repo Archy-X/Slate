@@ -15,8 +15,8 @@ import com.archyx.slate.item.provider.PlaceholderData;
 import com.archyx.slate.item.provider.PlaceholderType;
 import com.archyx.slate.item.provider.SingleItemProvider;
 import com.archyx.slate.item.provider.TemplateItemProvider;
-import com.archyx.slate.util.TextUtil;
 import com.archyx.slate.util.LoreUtil;
+import com.archyx.slate.util.TextUtil;
 import com.cryptomorin.xseries.XMaterial;
 import fr.minuskube.inv.ClickableItem;
 import fr.minuskube.inv.ItemClickData;
@@ -195,7 +195,7 @@ public class MenuInventory implements InventoryProvider {
                         String style = LoreUtil.getStyle(displayName);
                         for (String placeholder : placeholders) {
                             String replacedText = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.DISPLAY_NAME, style));
-                            replacedText = TextUtil.replace(replacedText, "&", "§");
+                            replacedText = TextUtil.applyColor(replacedText);
                             displayName = TextUtil.replace(displayName, "{" + placeholder + "}", replacedText);
                         }
                     }
@@ -207,27 +207,29 @@ public class MenuInventory implements InventoryProvider {
             }
             List<String> lore = item.getLore();
             if (lore != null && lore.size() > 0) {
-                // Replace lore placeholders
-                if (provider != null) {
-                    List<String> replacedLore = new ArrayList<>();
-                    for (String line : lore) {
+
+                List<String> replacedLore = new ArrayList<>();
+                for (String line : lore) {
+
+                    if (provider != null) { // Replace lore placeholders
                         String[] placeholders = StringUtils.substringsBetween(line, "{", "}");
                         if (placeholders != null) {
                             String style = LoreUtil.getStyle(line);
                             for (String placeholder : placeholders) {
                                 String replacedLine = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.LORE, style));
-                                replacedLine = TextUtil.replace(replacedLine, "&", "§");
                                 line = TextUtil.replace(line, "{" + placeholder + "}", replacedLine);
                             }
                         }
-                        if (slate.isPlaceholderAPIEnabled()) {
-                            line = PlaceholderAPI.setPlaceholders(player, line);
-                        }
-                        replacedLore.add(line);
                     }
-                    lore = replacedLore;
+
+                    if (slate.isPlaceholderAPIEnabled()) {
+                        line = PlaceholderAPI.setPlaceholders(player, line);
+                    }
+                    replacedLore.add(line);
                 }
+                lore = replacedLore;
                 lore = TextUtil.applyNewLines(lore);
+                lore = applyColorToLore(lore);
                 meta.setLore(lore);
             }
             itemStack.setItemMeta(meta);
@@ -275,7 +277,7 @@ public class MenuInventory implements InventoryProvider {
                             String style = LoreUtil.getStyle(displayName);
                             for (String placeholder : placeholders) {
                                 String replacedText = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.DISPLAY_NAME, style), context);
-                                replacedText = TextUtil.replace(replacedText, "&", "§");
+                                replacedText = TextUtil.applyColor(replacedText);
                                 displayName = TextUtil.replace(displayName, "{" + placeholder + "}", replacedText);
                             }
                         }
@@ -287,27 +289,29 @@ public class MenuInventory implements InventoryProvider {
                 }
                 List<String> lore = item.getLore();
                 if (lore != null && lore.size() > 0) {
-                    // Replace lore placeholders
-                    if (provider != null) {
-                        List<String> replacedLore = new ArrayList<>();
-                        for (String line : lore) {
+
+                    List<String> replacedLore = new ArrayList<>();
+                    for (String line : lore) {
+
+                        if (provider != null) { // Replace lore placeholders
                             String[] placeholders = StringUtils.substringsBetween(line, "{", "}");
                             if (placeholders != null) {
                                 String style = LoreUtil.getStyle(line);
                                 for (String placeholder : placeholders) {
                                     String replacedLine = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.LORE, style), context);
-                                    replacedLine = TextUtil.replace(replacedLine, "&", "§");
                                     line = TextUtil.replace(line, "{" + placeholder + "}", replacedLine);
                                 }
                             }
-                            if (slate.isPlaceholderAPIEnabled()) {
-                                line = PlaceholderAPI.setPlaceholders(player, line);
-                            }
-                            replacedLore.add(line);
                         }
-                        lore = replacedLore;
+
+                        if (slate.isPlaceholderAPIEnabled()) {
+                            line = PlaceholderAPI.setPlaceholders(player, line);
+                        }
+                        replacedLore.add(line);
                     }
+                    lore = replacedLore;
                     lore = TextUtil.applyNewLines(lore);
+                    lore = applyColorToLore(lore);
                     meta.setLore(lore);
                 }
                 itemStack.setItemMeta(meta);
@@ -324,6 +328,14 @@ public class MenuInventory implements InventoryProvider {
                 addTemplateItemToInventory(item, itemStack, pos, contents, player, provider, context);
             }
         }
+    }
+
+    private List<String> applyColorToLore(List<String> lore) {
+        List<String> appliedLore = new ArrayList<>();
+        for (String line : lore) {
+            appliedLore.add(TextUtil.applyColor(line));
+        }
+        return appliedLore;
     }
 
     /**

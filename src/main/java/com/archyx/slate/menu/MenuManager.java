@@ -49,6 +49,14 @@ public class MenuManager {
         return menus.get(name);
     }
 
+    public void unregisterAllMenus() {
+        menus.clear();
+        globalProviderManager.unregisterAll();
+        menuProviderManagers.clear();
+        menuProviders.clear();
+        defaultOptions.clear();
+    }
+
     @Nullable
     public SingleItemProvider constructSingleItem(String itemName, String menuName) {
         // Use skill specific provider if exits
@@ -194,8 +202,10 @@ public class MenuManager {
         Map<String, Object> options = new HashMap<>();
         ConfigurationSection optionSection = config.getConfigurationSection("options");
         if (optionSection != null) {
-            for (String key : optionSection.getKeys(false)) {
-                options.put(key, optionSection.get(key));
+            for (String key : optionSection.getKeys(true)) {
+                if (optionSection.isConfigurationSection(key)) continue; // Ignore config sections
+                Object value = optionSection.get(key);
+                options.put(key, value);
             }
         }
         return options;
