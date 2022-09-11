@@ -65,6 +65,7 @@ shadowJar {
     archiveName = "$baseName-$version.$extension"
     relocate 'net.kyori.adventure', 'com.archyx.slate.adventure'
     relocate 'net.kyori.examination', 'com.archyx.slate.examination'
+    relocate 'de.tr7zw.changeme.nbtapi', 'com.archyx.slate.nbtapi'
 }
 
 artifacts {
