@@ -204,7 +204,7 @@ public abstract class MenuItemParser extends MapParser {
             }
             Optional<XEnchantment> xEnchantment = XEnchantment.matchXEnchantment(enchantmentName.toUpperCase(Locale.ROOT));
             if (xEnchantment.isPresent()) {
-                Enchantment enchantment = xEnchantment.get().getEnchant();
+                Enchantment enchantment = xEnchantment.get().parseEnchantment();
                 if (enchantment != null) {
                     if (item.getType() == Material.ENCHANTED_BOOK && meta instanceof EnchantmentStorageMeta) {
                         EnchantmentStorageMeta esm = (EnchantmentStorageMeta) meta;
