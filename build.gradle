@@ -1,5 +1,3 @@
-import org.apache.tools.ant.filters.ReplaceTokens
-
 plugins {
     id 'com.github.johnrengelman.shadow' version '5.2.0'
     id 'java'
@@ -73,12 +71,6 @@ artifacts {
     archives sourcesJar
     archives javadocJar
     archives shadowJar
-}
-
-processResources {
-    from(sourceSets.main.resources.srcDirs) {
-        filter ReplaceTokens, tokens: [version: version]
-    }
 }
 
 build.dependsOn shadowJar
