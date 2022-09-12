@@ -255,14 +255,14 @@ public abstract class MenuItemParser extends MapParser {
     }
 
     @Nullable
-    protected String parseDisplayName(ConfigurationSection section) {
+    public String parseDisplayName(ConfigurationSection section) {
         if (section.contains("display_name")) {
             return TextUtil.applyColor(section.getString("display_name"));
         }
         return null;
     }
 
-    protected List<String> parseLore(ConfigurationSection section) {
+    public List<String> parseLore(ConfigurationSection section) {
         if (section.contains("lore")) {
             List<String> lore = section.getStringList("lore");
             List<String> formattedLore = new ArrayList<>();
