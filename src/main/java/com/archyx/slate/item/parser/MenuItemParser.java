@@ -114,6 +114,30 @@ public abstract class MenuItemParser extends MapParser {
         return item;
     }
 
+    /**
+     * Parses an ItemStack from a ConfigurationSection, including display name
+     * and lore
+     *
+     * @param section The ConfigurationSection to parse from
+     * @return The parsed ItemStack
+     */
+    public ItemStack parseItem(ConfigurationSection section) {
+        ItemStack item = parseBaseItem(section);
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            String displayName = parseDisplayName(section);
+            if (displayName != null) {
+                meta.setDisplayName(displayName);
+            }
+            List<String> lore = parseLore(section);
+            if (lore.size() > 0) {
+                meta.setLore(lore);
+            }
+            item.setItemMeta(meta);
+        }
+        return item;
+    }
+
     @Nullable
     private ItemStack parseItemKey(String key) {
         KeyedItemProvider provider = slate.getMenuManager().getGlobalProviderManager().getKeyedItemProvider();
@@ -262,6 +286,7 @@ public abstract class MenuItemParser extends MapParser {
         return null;
     }
 
+    @NotNull
     public List<String> parseLore(ConfigurationSection section) {
         if (section.contains("lore")) {
             List<String> lore = section.getStringList("lore");
