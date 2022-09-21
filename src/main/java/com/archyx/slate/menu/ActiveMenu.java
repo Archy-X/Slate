@@ -49,6 +49,23 @@ public class ActiveMenu {
         return menuInventory.getTotalPages();
     }
 
+    public MenuProvider getMenuProvider() {
+        return menuInventory.getMenuProvider();
+    }
+
+    public <T> T getMenuProvider(Class<T> menuProviderClass) {
+        MenuProvider menuProvider = getMenuProvider();
+        if (menuProviderClass.isInstance(menuProvider)) {
+            return menuProviderClass.cast(menuProvider);
+        } else {
+            throw new IllegalArgumentException("MenuProvider object cannot be casted to class " + menuProviderClass.getName());
+        }
+    }
+
+    public Map<String, Object> getProperties() {
+        return menuInventory.getProperties();
+    }
+
     public Object getProperty(String name) {
         return menuInventory.getProperties().get(name);
     }
@@ -60,10 +77,6 @@ public class ActiveMenu {
         } else {
             return def;
         }
-    }
-
-    public Map<String, Object> getProperties() {
-        return menuInventory.getProperties();
     }
 
     public void setProperty(String name, Object value) {

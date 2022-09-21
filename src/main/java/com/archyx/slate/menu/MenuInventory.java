@@ -35,6 +35,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -49,21 +50,18 @@ public class MenuInventory implements InventoryProvider {
     private final int totalPages;
     private final int currentPage;
     private final Player player;
+    private final MenuProvider menuProvider;
     private InventoryContents contents;
 
-    public MenuInventory(Slate slate, ConfigurableMenu menu, Player player, Map<String, Object> properties, int currentPage) {
+    public MenuInventory(Slate slate, ConfigurableMenu menu, @NotNull MenuProvider menuProvider, Player player, Map<String, Object> properties, int currentPage) {
         this.slate = slate;
         this.menu = menu;
         this.activeItems = new LinkedHashMap<>();
         this.activeMenu = new ActiveMenu(this);
         this.properties = properties;
         this.player = player;
-        MenuProvider provider = menu.getProvider();
-        if (provider != null) {
-            this.totalPages = provider.getPages(player, activeMenu);
-        } else {
-            this.totalPages = 1;
-        }
+        this.menuProvider = menuProvider;
+        this.totalPages = menuProvider.getPages(player, activeMenu);
         this.currentPage = currentPage;
     }
 
@@ -112,19 +110,14 @@ public class MenuInventory implements InventoryProvider {
             activeItems.put(menuItem.getName(), activeItem);
         }
         // Allow provider to add listeners and custom behavior
-        MenuProvider provider = menu.getProvider();
-        if (provider != null) {
-            provider.onOpen(player, activeMenu);
-        }
+        menuProvider.onOpen(player, activeMenu);
         // Place fill items
         FillData fillData = menu.getFillData();
         if (fillData.isEnabled()) {
             FillItem fillItem = fillData.getItem();
-            if (provider != null) { // Check for provided fill item
-                ItemStack providedFill = provider.getFillItem(player, activeMenu);
-                if (providedFill != null) {
-                    fillItem =  new FillItem(slate, providedFill);
-                }
+            ItemStack providedFill = menuProvider.getFillItem(player, activeMenu);
+            if (providedFill != null) {
+                fillItem =  new FillItem(slate, providedFill);
             }
             ItemStack itemStack = fillItem.getBaseItem();
             ItemMeta meta = itemStack.getItemMeta();
@@ -166,10 +159,7 @@ public class MenuInventory implements InventoryProvider {
                 activeItem.setCooldown(activeItem.getCooldown() - 1);
             }
         }
-        MenuProvider provider = menu.getProvider();
-        if (provider != null) {
-            provider.onUpdate(player, activeMenu);
-        }
+        menuProvider.onUpdate(player, activeMenu); // Update the menu
     }
 
     private void addSingleItem(ActiveSingleItem activeItem, InventoryContents contents, Player player) {
@@ -422,6 +412,10 @@ public class MenuInventory implements InventoryProvider {
                 break;
         }
         return clickActions;
+    }
+
+    public MenuProvider getMenuProvider() {
+        return menuProvider;
     }
 
     public Map<String, Object> getProperties() {

@@ -2,6 +2,10 @@ package com.archyx.slate.item.provider;
 
 import com.archyx.slate.Slate;
 import com.archyx.slate.context.ContextProvider;
+import com.archyx.slate.menu.DefaultMenuProvider;
+import com.archyx.slate.menu.MenuConstructor;
+import com.archyx.slate.menu.MenuProvider;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -10,6 +14,7 @@ import java.util.Map;
 public class ProviderManager {
 
     private final Slate slate;
+    private MenuConstructor<? extends MenuProvider> menuConstructor;
     private final Map<String, SingleItemConstructor<? extends SingleItemProvider>> singleItemConstructors;
     private final Map<String, TemplateItemConstructor<? extends TemplateItemProvider<?>>> templateItemConstructors;
     private final Map<String, ContextProvider<?>> templateContextProviders;
@@ -23,9 +28,18 @@ public class ProviderManager {
     }
 
     public void unregisterAll() {
+        menuConstructor = null;
         singleItemConstructors.clear();
         templateItemConstructors.clear();
         templateContextProviders.clear();
+    }
+
+    @NotNull
+    public MenuProvider constructMenu(Map<String, Object> properties) {
+        if (menuConstructor != null) {
+            return menuConstructor.construct(properties);
+        }
+        return new DefaultMenuProvider();
     }
 
     @Nullable
@@ -55,6 +69,10 @@ public class ProviderManager {
     @Nullable
     public KeyedItemProvider getKeyedItemProvider() {
         return keyedItemProvider;
+    }
+
+    public void registerMenu(MenuConstructor<? extends MenuProvider> constructor) {
+        this.menuConstructor = constructor;
     }
 
     /**

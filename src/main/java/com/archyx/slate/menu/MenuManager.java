@@ -32,7 +32,6 @@ public class MenuManager {
     private final Map<String, ConfigurableMenu> menus;
     private final ProviderManager globalProviderManager;
     private final Map<String, ProviderManager> menuProviderManagers;
-    private final Map<String, MenuProvider> menuProviders;
     private final Map<String, Map<String, Object>> defaultOptions;
 
     public MenuManager(Slate slate) {
@@ -40,7 +39,6 @@ public class MenuManager {
         this.menus = new LinkedHashMap<>();
         this.globalProviderManager = new ProviderManager(slate);
         this.menuProviderManagers = new HashMap<>();
-        this.menuProviders = new HashMap<>();
         this.defaultOptions = new HashMap<>();
     }
 
@@ -53,7 +51,6 @@ public class MenuManager {
         menus.clear();
         globalProviderManager.unregisterAll();
         menuProviderManagers.clear();
-        menuProviders.clear();
         defaultOptions.clear();
     }
 
@@ -101,16 +98,6 @@ public class MenuManager {
      */
     public <T> void registerTemplateItem(String name, Class<T> contextClass, TemplateItemConstructor<? extends TemplateItemProvider<T>> constructor) {
         globalProviderManager.registerTemplateItem(name, contextClass, constructor);
-    }
-
-    /**
-     * Registers a menu provider for a menu. Providers are used to define unique behavior for menus.
-     *
-     * @param name The name of the menu
-     * @param provider The provider instance
-     */
-    public void registerMenuProvider(String name, MenuProvider provider) {
-        menuProviders.put(name, provider);
     }
 
     public ProviderManager getProviderManager(String menuName) {
@@ -190,11 +177,10 @@ public class MenuManager {
             fillData = new FillData(FillItem.getDefault(slate), null, false);
         }
 
-        MenuProvider provider = menuProviders.get(menuName);
         generateDefaultOptions(menuName, file, config);
         Map<String, Object> options = loadOptions(config);
         // Add menu to map
-        ConfigurableMenu menu = new ConfigurableMenu(menuName, title, size, items, provider, fillData, options);
+        ConfigurableMenu menu = new ConfigurableMenu(menuName, title, size, items, fillData, options);
         menus.put(menuName, menu);
     }
 
@@ -245,24 +231,29 @@ public class MenuManager {
      *
      * @param player The player to display the menu to
      * @param name The name of the menu
-     * @param properties Map of menu properties
+     * @param properties Properties map
      * @param page The page number to open, 0 is the first page
      */
-    public void openMenu(Player player, String name, Map<String, Object> properties, int page) {
+    public void openMenu(Player player, String name, @Nullable MenuProvider menuProvider, Map<String, Object> properties, int page) {
         ConfigurableMenu menu = menus.get(name);
         if (menu == null) {
             throw new IllegalArgumentException("Menu with name " + name + " not registered");
         }
-        MenuInventory menuInventory = new MenuInventory(slate, menu, player, properties, page);
+        if (menuProvider == null) { // Construct if menu provider not specified
+            ProviderManager providerManager = getProviderManager(name);
+            if (providerManager == null) {
+                throw new IllegalArgumentException("Menu provider not registered for menu " + name);
+            }
+            menuProvider = providerManager.constructMenu(properties);
+        }
+        MenuInventory menuInventory = new MenuInventory(slate, menu, menuProvider, player, properties, page);
         String title = menu.getTitle();
         // Replace title placeholders
-        if (menu.getProvider() != null) {
-            String[] placeholders = StringUtils.substringsBetween(title, "{", "}");
-            if (placeholders != null) {
-                for (String placeholder : placeholders) {
-                    title = TextUtil.replace(title, "{" + placeholder + "}",
-                            menu.getProvider().onPlaceholderReplace(placeholder, player, menuInventory.getActiveMenu()));
-                }
+        String[] placeholders = StringUtils.substringsBetween(title, "{", "}");
+        if (placeholders != null) {
+            for (String placeholder : placeholders) {
+                title = TextUtil.replace(title, "{" + placeholder + "}",
+                        menuProvider.onPlaceholderReplace(placeholder, player, menuInventory.getActiveMenu()));
             }
         }
         // Build inventory and open
@@ -276,7 +267,7 @@ public class MenuManager {
     }
 
     public void openMenu(Player player, String name, Map<String, Object> properties) {
-        openMenu(player, name, properties, 0);
+        openMenu(player, name, null, properties, 0);
     }
 
     /**
@@ -287,7 +278,7 @@ public class MenuManager {
      * @param page The page number to open, 0 is the first page
      */
     public void openMenu(Player player, String name, int page) {
-        openMenu(player, name, new HashMap<>(), page);
+        openMenu(player, name, null, new HashMap<>(), page);
     }
 
     /**
@@ -298,11 +289,11 @@ public class MenuManager {
      * @param name The name of the menu
      */
     public void openMenu(Player player, String name) {
-        openMenu(player, name, new HashMap<>(), 0);
+        openMenu(player, name, null, new HashMap<>(), 0);
     }
 
-    public Set<String> getMenuProviderNames() {
-        return menuProviders.keySet();
+    public Set<String> getMenuNames() {
+        return menus.keySet();
     }
 
     public ProviderManager getGlobalProviderManager() {
