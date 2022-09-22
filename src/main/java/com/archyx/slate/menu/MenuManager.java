@@ -270,6 +270,10 @@ public class MenuManager {
         openMenu(player, name, null, properties, 0);
     }
 
+    public void openMenu(Player player, String name, Map<String, Object> properties, int page) {
+        openMenu(player, name, null, properties, page);
+    }
+
     /**
      * Opens a loaded menu for a player, will fail silently if the menu does not exist.
      *
