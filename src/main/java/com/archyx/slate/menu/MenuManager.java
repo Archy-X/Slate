@@ -266,6 +266,14 @@ public class MenuManager {
         smartInventory.open(player);
     }
 
+    public void openMenu(Player player, String name, MenuProvider menuProvider) {
+        openMenu(player, name, menuProvider, new HashMap<>(), 0);
+    }
+
+    public void openMenu(Player player, String name, MenuProvider menuProvider, int page) {
+        openMenu(player, name, menuProvider, new HashMap<>(), page);
+    }
+
     public void openMenu(Player player, String name, Map<String, Object> properties) {
         openMenu(player, name, null, properties, 0);
     }
