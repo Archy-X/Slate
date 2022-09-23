@@ -35,7 +35,7 @@ public interface TemplateItemProvider<C> {
      */
     Set<C> getDefinedContexts(Player player, ActiveMenu activeMenu);
 
-    default void onInitialize(Player player, ActiveMenu activeMenu, C context) {}
+    default void onInitialize(Player player, ActiveMenu activeMenu) {}
 
     default void onClick(Player player, InventoryClickEvent event, ItemStack item, SlotPos pos, ActiveMenu activeMenu, C context) {}
 

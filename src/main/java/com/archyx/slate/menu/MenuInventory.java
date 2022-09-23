@@ -236,6 +236,7 @@ public class MenuInventory implements InventoryProvider {
 
         Set<C> contexts;
         if (provider != null) {
+            provider.onInitialize(player, activeMenu);
             contexts = provider.getDefinedContexts(player, activeMenu);
         } else {
             contexts = item.getBaseItems().keySet();
@@ -250,7 +251,6 @@ public class MenuInventory implements InventoryProvider {
                 itemStack = itemStack.clone();
             }
             if (provider != null) {
-                provider.onInitialize(player, activeMenu, context);
                 itemStack = modifyBaseItem(provider, itemStack, player, activeMenu, context); // Apply provider base item modifications
             }
             if (itemStack == null) {
