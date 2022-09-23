@@ -3,7 +3,7 @@ package com.archyx.slate.item.parser;
 import com.archyx.slate.Slate;
 import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.builder.SingleItemBuilder;
-import org.apache.commons.lang.Validate;
+import com.archyx.slate.util.Validate;
 import org.bukkit.configuration.ConfigurationSection;
 
 public class SingleItemParser extends MenuItemParser {

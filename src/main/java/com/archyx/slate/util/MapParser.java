@@ -1,7 +1,5 @@
 package com.archyx.slate.util;
 
-import org.apache.commons.lang.Validate;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

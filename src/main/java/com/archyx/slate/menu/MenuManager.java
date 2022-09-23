@@ -12,7 +12,6 @@ import com.archyx.slate.item.parser.TemplateItemParser;
 import com.archyx.slate.item.provider.*;
 import com.archyx.slate.util.TextUtil;
 import fr.minuskube.inv.SmartInventory;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -249,7 +248,7 @@ public class MenuManager {
         MenuInventory menuInventory = new MenuInventory(slate, menu, menuProvider, player, properties, page);
         String title = menu.getTitle();
         // Replace title placeholders
-        String[] placeholders = StringUtils.substringsBetween(title, "{", "}");
+        String[] placeholders = TextUtil.substringsBetween(title, "{", "}");
         if (placeholders != null) {
             for (String placeholder : placeholders) {
                 title = TextUtil.replace(title, "{" + placeholder + "}",
