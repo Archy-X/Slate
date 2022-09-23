@@ -4,8 +4,6 @@ import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.active.ActiveItem;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
-
 public class ActiveMenu {
 
     private final MenuInventory menuInventory;
@@ -60,27 +58,6 @@ public class ActiveMenu {
         } else {
             throw new IllegalArgumentException("MenuProvider object cannot be casted to class " + menuProviderClass.getName());
         }
-    }
-
-    public Map<String, Object> getProperties() {
-        return menuInventory.getProperties();
-    }
-
-    public Object getProperty(String name) {
-        return menuInventory.getProperties().get(name);
-    }
-
-    public Object getProperty(String name, Object def) {
-        Object value = menuInventory.getProperties().get(name);
-        if (value != null) {
-            return value;
-        } else {
-            return def;
-        }
-    }
-
-    public void setProperty(String name, Object value) {
-        menuInventory.getProperties().put(name, value);
     }
 
     public void reload() {
