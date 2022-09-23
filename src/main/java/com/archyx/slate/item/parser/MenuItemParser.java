@@ -7,7 +7,9 @@ import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.builder.MenuItemBuilder;
 import com.archyx.slate.item.provider.KeyedItemProvider;
 import com.archyx.slate.util.MapParser;
+import com.archyx.slate.util.NumberUtil;
 import com.archyx.slate.util.TextUtil;
+import com.archyx.slate.util.Validate;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
 import de.tr7zw.changeme.nbtapi.NBTCompound;
@@ -15,8 +17,6 @@ import de.tr7zw.changeme.nbtapi.NBTContainer;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import dev.dbassett.skullcreator.SkullCreator;
 import fr.minuskube.inv.content.SlotPos;
-import org.apache.commons.lang.Validate;
-import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -224,7 +224,7 @@ public abstract class MenuItemParser extends MapParser {
             String enchantmentName = splitEntry[0];
             int level = 1;
             if (splitEntry.length > 1) {
-                level = NumberUtils.toInt(splitEntry[1], 1);
+                level = NumberUtil.toInt(splitEntry[1], 1);
             }
             Optional<XEnchantment> xEnchantment = XEnchantment.matchXEnchantment(enchantmentName.toUpperCase(Locale.ROOT));
             if (xEnchantment.isPresent()) {
@@ -265,7 +265,7 @@ public abstract class MenuItemParser extends MapParser {
                 if (material == null) {
                     throw new IllegalArgumentException("Unknown material " + materialName);
                 }
-                short data = NumberUtils.toShort(splitMaterial[1]);
+                short data = NumberUtil.toShort(splitMaterial[1]);
                 item = new ItemStack(material, 1, data);
             } else {
                 throw new IllegalArgumentException("Material with data value can only have one :");

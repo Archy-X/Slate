@@ -5,7 +5,7 @@ import com.archyx.slate.action.Action;
 import com.archyx.slate.action.MenuAction;
 import com.archyx.slate.action.builder.MenuActionBuilder;
 import com.archyx.slate.context.ContextProvider;
-import org.apache.commons.lang.StringUtils;
+import com.archyx.slate.util.TextUtil;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -37,8 +37,8 @@ public class MenuActionParser extends ActionParser {
                 if (valueObj instanceof String) {
                     String value = (String) valueObj;
                     if (value.contains(":")) { // Parse custom object
-                        String type = StringUtils.substringBefore(value, ":");
-                        value = StringUtils.substringAfter(value, ":");
+                        String type = TextUtil.substringBefore(value, ":");
+                        value = TextUtil.substringAfter(value, ":");
                         // Get context provider from type
                         ContextProvider<?> contextProvider = slate.getContextManager().getContextProvider(type);
                         if (contextProvider != null) {

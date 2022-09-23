@@ -24,7 +24,6 @@ import fr.minuskube.inv.content.InventoryContents;
 import fr.minuskube.inv.content.InventoryProvider;
 import fr.minuskube.inv.content.SlotPos;
 import me.clip.placeholderapi.PlaceholderAPI;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -190,7 +189,7 @@ public class MenuInventory implements InventoryProvider {
             if (displayName != null) {
                 // Replace display name placeholders
                 if (provider != null) {
-                    String[] placeholders = StringUtils.substringsBetween(displayName, "{", "}");
+                    String[] placeholders = TextUtil.substringsBetween(displayName, "{", "}");
                     if (placeholders != null) {
                         String style = LoreUtil.getStyle(displayName);
                         for (String placeholder : placeholders) {
@@ -212,7 +211,7 @@ public class MenuInventory implements InventoryProvider {
                 for (String line : lore) {
 
                     if (provider != null) { // Replace lore placeholders
-                        String[] placeholders = StringUtils.substringsBetween(line, "{", "}");
+                        String[] placeholders = TextUtil.substringsBetween(line, "{", "}");
                         if (placeholders != null) {
                             String style = LoreUtil.getStyle(line);
                             for (String placeholder : placeholders) {
@@ -272,7 +271,7 @@ public class MenuInventory implements InventoryProvider {
                 if (displayName != null) {
                     // Replace display name placeholders
                     if (provider != null) {
-                        String[] placeholders = StringUtils.substringsBetween(displayName, "{", "}");
+                        String[] placeholders = TextUtil.substringsBetween(displayName, "{", "}");
                         if (placeholders != null) {
                             String style = LoreUtil.getStyle(displayName);
                             for (String placeholder : placeholders) {
@@ -294,7 +293,7 @@ public class MenuInventory implements InventoryProvider {
                     for (String line : lore) {
 
                         if (provider != null) { // Replace lore placeholders
-                            String[] placeholders = StringUtils.substringsBetween(line, "{", "}");
+                            String[] placeholders = TextUtil.substringsBetween(line, "{", "}");
                             if (placeholders != null) {
                                 String style = LoreUtil.getStyle(line);
                                 for (String placeholder : placeholders) {
@@ -450,7 +449,7 @@ public class MenuInventory implements InventoryProvider {
             NamespacedKey key = new NamespacedKey(slate.getPlugin(), "skull_placeholder_uuid");
             String placeholder = container.get(key, PersistentDataType.STRING);
             if (placeholder != null) {
-                placeholder = StringUtils.replace(placeholder, "{player}", player.getUniqueId().toString());
+                placeholder = TextUtil.replace(placeholder, "{player}", player.getUniqueId().toString());
                 placeholder = PlaceholderAPI.setPlaceholders(player, placeholder);
                 try {
                     UUID uuid = UUID.fromString(placeholder);
