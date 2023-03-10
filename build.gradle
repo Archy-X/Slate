@@ -38,7 +38,7 @@ repositories {
 }
 
 dependencies {
-    implementation('com.github.Archy-X:SmartInvs:5f41e88cf7') {
+    implementation('com.github.Archy-X:SmartInvs:5e842f3108') {
         exclude group: 'org.spigotmc'
     }
     implementation 'com.github.Archy-X:XSeries:887fe61174'
