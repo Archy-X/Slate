@@ -12,6 +12,7 @@ import com.archyx.slate.item.parser.TemplateItemParser;
 import com.archyx.slate.item.provider.*;
 import com.archyx.slate.util.TextUtil;
 import fr.minuskube.inv.SmartInventory;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -262,6 +263,9 @@ public class MenuManager {
                     title = TextUtil.replace(title, "{" + placeholder + "}",
                             menu.getProvider().onPlaceholderReplace(placeholder, player, menuInventory.getActiveMenu()));
                 }
+            }
+            if (slate.isPlaceholderAPIEnabled()) {
+                title = PlaceholderAPI.setPlaceholders(player, title);
             }
         }
         // Build inventory and open
