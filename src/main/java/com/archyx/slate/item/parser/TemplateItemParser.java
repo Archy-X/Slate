@@ -9,6 +9,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class TemplateItemParser<C> extends MenuItemParser {
@@ -31,6 +32,9 @@ public class TemplateItemParser<C> extends MenuItemParser {
         Map<C, ItemStack> baseItems = new HashMap<>();
         Map<C, SlotPos> positions = new HashMap<>();
 
+        Map<C, String> contextualDisplayNames = new HashMap<>();
+        Map<C, List<String>> contextualLore = new HashMap<>();
+
         if (contextProvider != null) {
             for (String key : section.getKeys(false)) {
                 if (isKeyWord(key)) continue; // Skip for key words used for default item parsing
@@ -44,9 +48,21 @@ public class TemplateItemParser<C> extends MenuItemParser {
                     if (positionString != null) {
                         positions.put(context, parsePosition(positionString));
                     }
+                    // Parse contextual display name and lore
+                    String contextualDisplayName = parseDisplayName(contextSection);
+                    if (contextualDisplayName != null) {
+                        contextualDisplayNames.put(context, contextualDisplayName);
+                    }
+                    List<String> contextualLoreList = parseLore(contextSection);
+                    if (contextualLoreList.size() > 0) {
+                        contextualLore.put(context, contextualLoreList);
+                    }
                 }
             }
         }
+
+        builder.contextualDisplayNames(contextualDisplayNames);
+        builder.contextualLore(contextualLore);
 
         String defaultPos = section.getString("pos");
         if (positions.size() == 0 && defaultPos != null) {

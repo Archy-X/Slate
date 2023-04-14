@@ -6,12 +6,15 @@ import com.archyx.slate.item.TemplateItem;
 import fr.minuskube.inv.content.SlotPos;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
 import java.util.Map;
 
 public class TemplateItemBuilder<C> extends MenuItemBuilder {
 
     private Map<C, SlotPos> positions;
     private Map<C, ItemStack> baseItems;
+    private Map<C, String> contextualDisplayNames;
+    private Map<C, List<String>> contextualLore;
     private ItemStack defaultBaseItem;
     private SlotPos defaultPosition;
 
@@ -39,8 +42,18 @@ public class TemplateItemBuilder<C> extends MenuItemBuilder {
         return this;
     }
 
+    public TemplateItemBuilder<C> contextualDisplayNames(Map<C, String> contextualDisplayNames) {
+        this.contextualDisplayNames = contextualDisplayNames;
+        return this;
+    }
+
+    public TemplateItemBuilder<C> contextualLore(Map<C, List<String>> contextualLore) {
+        this.contextualLore = contextualLore;
+        return this;
+    }
+
     @Override
     public MenuItem build() {
-        return new TemplateItem<>(slate, name, baseItems, defaultBaseItem, displayName, lore, actions, positions, defaultPosition, options);
+        return new TemplateItem<>(slate, name, baseItems, defaultBaseItem, displayName, lore, contextualDisplayNames, contextualLore, actions, positions, defaultPosition, options);
     }
 }

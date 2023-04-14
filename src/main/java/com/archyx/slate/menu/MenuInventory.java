@@ -251,9 +251,9 @@ public class MenuInventory implements InventoryProvider {
         }
 
         for (C context : contexts) {
-            ItemStack itemStack = item.getBaseItems().get(context);
+            ItemStack itemStack = item.getBaseItems().get(context); // Get a context-specific base item
             if (itemStack == null) {
-                itemStack = item.getDefaultBaseItem();
+                itemStack = item.getDefaultBaseItem(); // Otherwise use default base item
             }
             if (itemStack != null) {
                 itemStack = itemStack.clone();
@@ -267,7 +267,7 @@ public class MenuInventory implements InventoryProvider {
             }
             ItemMeta meta = itemStack.getItemMeta();
             if (meta != null) {
-                String displayName = item.getDisplayName();
+                String displayName = item.getActiveDisplayName(context); // Get the context-specific display name, or default if not defined
                 if (displayName != null) {
                     // Replace display name placeholders
                     if (provider != null) {
@@ -286,7 +286,7 @@ public class MenuInventory implements InventoryProvider {
                     }
                     meta.setDisplayName(displayName);
                 }
-                List<String> lore = item.getLore();
+                List<String> lore = item.getActiveLore(context); // Get the context-specific lore, or default if not defined
                 if (lore != null && lore.size() > 0) {
 
                     List<String> replacedLore = new ArrayList<>();

@@ -15,13 +15,17 @@ public class TemplateItem<C> extends MenuItem {
 
     private final Map<C, SlotPos> positions;
     private final Map<C, ItemStack> baseItems;
+    private final Map<C, String> contextualDisplayNames;
+    private final Map<C, List<String>> contextualLore;
     private final ItemStack defaultBaseItem;
     private final SlotPos defaultPosition;
 
-    public TemplateItem(Slate slate, String name, Map<C, ItemStack> baseItems, ItemStack defaultBaseItem, String displayName, List<String> lore, Map<ClickAction, List<Action>> actions, Map<C, SlotPos> positions, SlotPos defaultPosition, Map<String, Object> options) {
+    public TemplateItem(Slate slate, String name, Map<C, ItemStack> baseItems, ItemStack defaultBaseItem, String displayName, List<String> lore, Map<C, String> contextualDisplayNames, Map<C, List<String>> contextualLore, Map<ClickAction, List<Action>> actions, Map<C, SlotPos> positions, SlotPos defaultPosition, Map<String, Object> options) {
         super(slate, name, displayName, lore, actions, options);
         this.positions = positions;
         this.baseItems = baseItems;
+        this.contextualDisplayNames = contextualDisplayNames;
+        this.contextualLore = contextualLore;
         this.defaultBaseItem = defaultBaseItem;
         this.defaultPosition = defaultPosition;
     }
@@ -49,6 +53,48 @@ public class TemplateItem<C> extends MenuItem {
     @Nullable
     public SlotPos getDefaultPosition() {
         return defaultPosition;
+    }
+
+    @Nullable
+    public String getContextualDisplayName(C context) {
+        return contextualDisplayNames.get(context);
+    }
+
+    /**
+     * Gets the active display name for the given context. If the context has a contextual display name, it will be returned.
+     * Otherwise, the default display name will be returned.
+     *
+     * @param context The context
+     * @return The active display name
+     */
+    @Nullable
+    public String getActiveDisplayName(C context) {
+        String contextualDisplayName = getContextualDisplayName(context);
+        if (contextualDisplayName != null) {
+            return contextualDisplayName;
+        }
+        return getDisplayName();
+    }
+
+    @Nullable
+    public List<String> getContextualLore(C context) {
+        return contextualLore.get(context);
+    }
+
+    /**
+     * Gets the active lore for the given context. If the context has contextual lore, it will be returned.
+     * Otherwise, the default lore will be returned.
+     *
+     * @param context The context
+     * @return The active lore
+     */
+    @Nullable
+    public List<String> getActiveLore(C context) {
+        List<String> contextualLore = getContextualLore(context);
+        if (contextualLore != null) {
+            return contextualLore;
+        }
+        return getLore();
     }
 
 }
