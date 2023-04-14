@@ -450,7 +450,9 @@ public class MenuInventory implements InventoryProvider {
             String placeholder = container.get(key, PersistentDataType.STRING);
             if (placeholder != null) {
                 placeholder = TextUtil.replace(placeholder, "{player}", player.getUniqueId().toString());
-                placeholder = PlaceholderAPI.setPlaceholders(player, placeholder);
+                if (slate.isPlaceholderAPIEnabled()) { // Replace PlaceholderAPI placeholders inside skull_placeholder_uuid
+                    placeholder = PlaceholderAPI.setPlaceholders(player, placeholder);
+                }
                 try {
                     UUID uuid = UUID.fromString(placeholder);
                     skullMeta.setOwningPlayer(Bukkit.getOfflinePlayer(uuid));
