@@ -41,7 +41,7 @@ public abstract class MenuItemParser extends MapParser {
 
     protected final Slate slate;
     private final String[] KEY_WORDS = new String[] {
-        "pos", "material", "display_name", "lore", "enchantments", "potion_data", "custom_effects", "glow", "nbt", "flags", "durability", "skull_meta"
+        "pos", "material", "display_name", "lore", "enchantments", "potion_data", "custom_effects", "glow", "nbt", "flags", "durability", "skull_meta", "key"
     };
     private final Pattern hexPattern = Pattern.compile("&#([A-Fa-f0-9]{6})");
 
