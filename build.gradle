@@ -42,10 +42,10 @@ dependencies {
         exclude group: 'org.spigotmc'
     }
     implementation 'com.github.Archy-X:XSeries:887fe61174'
-    implementation 'de.tr7zw:item-nbt-api:2.11.2'
     implementation 'dev.dbassett:skullcreator:3.0.1'
     implementation "net.kyori:adventure-text-minimessage:4.11.0"
     implementation "net.kyori:adventure-platform-bukkit:4.1.2"
+    compileOnly 'de.tr7zw:item-nbt-api:2.11.3'
     compileOnly 'org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT'
     compileOnly 'me.clip:placeholderapi:2.10.10'
 }
@@ -64,7 +64,6 @@ shadowJar {
     archiveName = "$baseName-$version.$extension"
     relocate 'net.kyori.adventure', 'com.archyx.slate.adventure'
     relocate 'net.kyori.examination', 'com.archyx.slate.examination'
-    relocate 'de.tr7zw.changeme.nbtapi', 'com.archyx.slate.nbtapi'
 }
 
 artifacts {
