@@ -1,6 +1,8 @@
 package com.archyx.slate.lore;
 
 import com.archyx.slate.Slate;
+import com.archyx.slate.component.ComponentProvider;
+import com.archyx.slate.component.MenuComponent;
 import com.archyx.slate.item.provider.PlaceholderData;
 import com.archyx.slate.item.provider.PlaceholderType;
 import com.archyx.slate.item.provider.SingleItemProvider;
@@ -34,7 +36,11 @@ public class LoreInterpreter {
                 TextLore textLore = (TextLore) line;
                 lore.add(interpretTextLore(textLore, provider, player, activeMenu));
             } else if (line instanceof ComponentLore) {
-                // TODO Interpret components
+                ComponentLore componentLore = (ComponentLore) line;
+                List<String> list = interpretComponent(componentLore, provider, player, activeMenu);
+                if (list != null) {
+                    lore.addAll(list);
+                }
             }
         }
         lore = TextUtil.applyNewLines(lore);
@@ -50,7 +56,11 @@ public class LoreInterpreter {
                 TextLore textLore = (TextLore) line;
                 lore.add(interpretTextLore(textLore, provider, player, activeMenu, context));
             } else if (line instanceof ComponentLore) {
-                // TODO Interpret components
+                ComponentLore componentLore = (ComponentLore) line;
+                List<String> list = interpretComponent(componentLore, provider, player, activeMenu, context);
+                if (list != null) {
+                    lore.addAll(list);
+                }
             }
         }
         lore = TextUtil.applyNewLines(lore);
@@ -72,17 +82,6 @@ public class LoreInterpreter {
         return replaceAndWrap(textLore, player, text);
     }
 
-    private String replaceAndWrap(TextLore textLore, Player player, String text) {
-        if (slate.isPlaceholderAPIEnabled()) {
-            text = PlaceholderAPI.setPlaceholders(player, text);
-        }
-        if (textLore.shouldWrap()) {
-            String style = textLore.getStyles().getStyle(textLore.getWrapStyle());
-            text = LoreUtil.wrapLore(text, slate.getLoreWrappingWidth(), "\n" + style);
-        }
-        return text;
-    }
-
     private <T> String interpretTextLore(TextLore textLore, @Nullable TemplateItemProvider<T> provider, Player player, ActiveMenu activeMenu, T context) {
         String text = textLore.getText();
         if (provider != null) { // Replace lore placeholders
@@ -95,6 +94,73 @@ public class LoreInterpreter {
             }
         }
         return replaceAndWrap(textLore, player, text);
+    }
+
+    private <T> List<String> interpretComponent(ComponentLore lore, @Nullable TemplateItemProvider<T> itemProvider, Player player, ActiveMenu activeMenu, T context) {
+        // Choose the component if multiple
+        String componentName;
+        if (itemProvider != null && lore.getComponents().length > 1) {
+            componentName = itemProvider.resolveComponent(lore.getComponents(), player, activeMenu, context);
+        } else {
+            componentName = lore.getComponents()[0];
+        }
+        MenuComponent component = activeMenu.getComponents().get(componentName);
+        if (component == null) {
+            return null;
+        }
+        ComponentProvider componentProvider = slate.getMenuManager().constructComponent(componentName, activeMenu.getName());
+        // Decide whether component should be visible
+        if (componentProvider != null && !componentProvider.shouldShow(player, context)) {
+            return null;
+        }
+        // Interpret each line
+        List<String> list = new ArrayList<>();
+        for (LoreLine line : component.getLore()) {
+            if (!(line instanceof TextLore)) { // Lines in a component must be TextLore
+                continue;
+            }
+            list.add(interpretTextLore((TextLore) line, itemProvider, player, activeMenu, context));
+        }
+        return list;
+    }
+
+    private List<String> interpretComponent(ComponentLore lore, @Nullable SingleItemProvider itemProvider, Player player, ActiveMenu activeMenu) {
+        // Choose the component if multiple
+        String componentName;
+        if (itemProvider != null && lore.getComponents().length > 1) {
+            componentName = itemProvider.resolveComponent(lore.getComponents(), player, activeMenu);
+        } else {
+            componentName = lore.getComponents()[0];
+        }
+        MenuComponent component = activeMenu.getComponents().get(componentName);
+        if (component == null) {
+            return null;
+        }
+        ComponentProvider componentProvider = slate.getMenuManager().constructComponent(componentName, activeMenu.getName());
+        // Decide whether component should be visible
+        if (componentProvider != null && !componentProvider.shouldShow(player, null)) {
+            return null;
+        }
+        // Interpret each line
+        List<String> list = new ArrayList<>();
+        for (LoreLine line : component.getLore()) {
+            if (!(line instanceof TextLore)) { // Lines in a component must be TextLore
+                continue;
+            }
+            list.add(interpretTextLore((TextLore) line, itemProvider, player, activeMenu));
+        }
+        return list;
+    }
+
+    private String replaceAndWrap(TextLore textLore, Player player, String text) {
+        if (slate.isPlaceholderAPIEnabled()) {
+            text = PlaceholderAPI.setPlaceholders(player, text);
+        }
+        if (textLore.shouldWrap()) {
+            String style = textLore.getStyles().getStyle(textLore.getWrapStyle());
+            text = LoreUtil.wrapLore(text, slate.getLoreWrappingWidth(), "\n" + style);
+        }
+        return text;
     }
 
     private List<String> applyColorToLore(List<String> lore) {

@@ -1,5 +1,6 @@
 package com.archyx.slate.menu;
 
+import com.archyx.slate.component.MenuComponent;
 import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.active.ActiveItem;
 import org.jetbrains.annotations.Nullable;
@@ -135,6 +136,10 @@ public class ActiveMenu {
             }
         }
         return def;
+    }
+
+    public Map<String, MenuComponent> getComponents() {
+        return menuInventory.getMenu().getComponents();
     }
 
 }

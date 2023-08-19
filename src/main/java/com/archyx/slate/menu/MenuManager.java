@@ -1,6 +1,9 @@
 package com.archyx.slate.menu;
 
 import com.archyx.slate.Slate;
+import com.archyx.slate.component.ComponentParser;
+import com.archyx.slate.component.ComponentProvider;
+import com.archyx.slate.component.MenuComponent;
 import com.archyx.slate.context.ContextProvider;
 import com.archyx.slate.fill.FillData;
 import com.archyx.slate.fill.FillItem;
@@ -79,6 +82,18 @@ public class MenuManager {
             }
         }
         return globalProviderManager.constructTemplateItem(itemName);
+    }
+
+    public ComponentProvider constructComponent(String componentName, String menuName) {
+        // Use skill specific provider if exits
+        ProviderManager menuProviderManager = menuProviderManagers.get(menuName);
+        if (menuProviderManager != null) {
+            ComponentProvider provider = menuProviderManager.constructComponent(componentName);
+            if (provider != null) {
+                return provider;
+            }
+        }
+        return globalProviderManager.constructComponent(componentName); // Otherwise use global provider
     }
 
     /**
@@ -187,19 +202,32 @@ public class MenuManager {
             // Load fill item
             ConfigurationNode fillSection = config.node("fill");
             FillData fillData;
-            if (fillSection != null) {
+            if (!fillSection.virtual()) {
                 boolean fillEnabled = fillSection.node("enabled").getBoolean(false);
                 FillItem fillItem = new FillItemParser(slate).parse(fillSection, menuName);
                 fillData = new FillData(fillItem, new SlotParser().parse(fillSection), fillEnabled);
             } else {
                 fillData = new FillData(FillItem.getDefault(slate), null, false);
             }
+            // Load components
+            Map<String, MenuComponent> components = new HashMap<>();
+
+            ConfigurationNode componentsSection = config.node("components");
+            if (!componentsSection.virtual()) {
+                for (Object keyObj : componentsSection.childrenMap().keySet()) {
+                    String name = (String) Objects.requireNonNull(keyObj);
+                    ConfigurationNode componentNode = componentsSection.node(keyObj);
+                    if (!componentNode.virtual()) {
+                        components.put(name, new ComponentParser(slate).parse(componentNode));
+                    }
+                }
+            }
 
             MenuProvider provider = menuProviders.get(menuName);
             generateDefaultOptions(menuName, config, loader);
             Map<String, Object> options = loadOptions(config);
             // Add menu to map
-            ConfigurableMenu menu = new ConfigurableMenu(menuName, title, size, items, provider, fillData, options);
+            ConfigurableMenu menu = new ConfigurableMenu(menuName, title, size, items, components, provider, fillData, options);
             menus.put(menuName, menu);
         } catch (ConfigurateException | RuntimeException e) {
             slate.getPlugin().getLogger().warning("Error loading menu " + menuName + ": " + e.getMessage());

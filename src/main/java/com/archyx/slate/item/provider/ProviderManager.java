@@ -1,6 +1,8 @@
 package com.archyx.slate.item.provider;
 
 import com.archyx.slate.Slate;
+import com.archyx.slate.component.ComponentConstructor;
+import com.archyx.slate.component.ComponentProvider;
 import com.archyx.slate.context.ContextProvider;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,6 +14,7 @@ public class ProviderManager {
     private final Slate slate;
     private final Map<String, SingleItemConstructor<? extends SingleItemProvider>> singleItemConstructors;
     private final Map<String, TemplateItemConstructor<? extends TemplateItemProvider<?>>> templateItemConstructors;
+    private final Map<String, ComponentConstructor<? extends ComponentProvider>> componentConstructors;
     private final Map<String, ContextProvider<?>> templateContextProviders;
     private KeyedItemProvider keyedItemProvider;
 
@@ -20,6 +23,7 @@ public class ProviderManager {
         this.singleItemConstructors = new HashMap<>();
         this.templateItemConstructors = new HashMap<>();
         this.templateContextProviders = new HashMap<>();
+        this.componentConstructors = new HashMap<>();
     }
 
     public void unregisterAll() {
@@ -41,6 +45,15 @@ public class ProviderManager {
     @SuppressWarnings("unchecked")
     public <C> TemplateItemProvider<C> constructTemplateItem(String itemName) {
         TemplateItemConstructor<? extends TemplateItemProvider<C>> constructor = (TemplateItemConstructor<? extends TemplateItemProvider<C>>) templateItemConstructors.get(itemName);
+        if (constructor != null) {
+            return constructor.construct();
+        }
+        return null;
+    }
+
+    @Nullable
+    public ComponentProvider constructComponent(String componentName) {
+        ComponentConstructor<? extends ComponentProvider> constructor = componentConstructors.get(componentName);
         if (constructor != null) {
             return constructor.construct();
         }
@@ -79,6 +92,10 @@ public class ProviderManager {
         if (contextProvider != null) {
             templateContextProviders.put(name, contextProvider);
         }
+    }
+
+    public void registerComponent(String name, ComponentConstructor<? extends ComponentProvider> constructor) {
+        componentConstructors.put(name, constructor);
     }
 
     public void registerKeyedItemProvider(KeyedItemProvider provider) {

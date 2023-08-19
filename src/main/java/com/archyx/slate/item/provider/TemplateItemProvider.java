@@ -53,4 +53,8 @@ public interface TemplateItemProvider<C> {
         return null;
     }
 
+    default <T> String resolveComponent(String[] components, Player player, ActiveMenu menu, T context) {
+        return null;
+    }
+
 }
