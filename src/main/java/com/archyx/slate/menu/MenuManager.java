@@ -13,18 +13,16 @@ import com.archyx.slate.item.provider.*;
 import com.archyx.slate.util.TextUtil;
 import fr.minuskube.inv.SmartInventory;
 import me.clip.placeholderapi.PlaceholderAPI;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.configurate.ConfigurateException;
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.serialize.SerializationException;
+import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class MenuManager {
 
@@ -147,85 +145,92 @@ public class MenuManager {
      * @param menuName The name of the menu to be used when opening
      */
     public void loadMenu(File file, String menuName) {
-        FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+        YamlConfigurationLoader loader = YamlConfigurationLoader.builder()
+                .file(file)
+                .indent(2)
+                .build();
+        try {
+            ConfigurationNode config = loader.load();
 
-        String title = config.getString("title", menuName);
-        int size = config.getInt("size", 6);
+            String title = config.node("title").getString(menuName);
+            int size = config.node("size").getInt(6);
 
-        Map<String, MenuItem> items = new LinkedHashMap<>();
-        // Load single items
-        ConfigurationSection itemsSection = config.getConfigurationSection("items");
-        if (itemsSection != null) {
-            for (String itemName : itemsSection.getKeys(false)) {
-                ConfigurationSection itemSection = itemsSection.getConfigurationSection(itemName);
-                if (itemSection != null) {
-                    MenuItem item = new SingleItemParser(slate).parse(itemSection, menuName);
-                    items.put(itemName, item);
-                }
-            }
-        }
-        // Load template items
-        ConfigurationSection templatesSection = config.getConfigurationSection("templates");
-        if (templatesSection != null) {
-            for (String templateName : templatesSection.getKeys(false)) {
-                ConfigurationSection templateSection = templatesSection.getConfigurationSection(templateName);
-                if (templateSection != null) {
-                    ProviderManager providerManager = menuProviderManagers.get(menuName);
-                    if (providerManager != null) {
-                        ContextProvider<?> contextProvider = providerManager.getContextProvider(templateName);
-                        MenuItem item = new TemplateItemParser<>(slate, contextProvider).parse(templateSection, menuName);
-                        items.put(templateName, item);
+            Map<String, MenuItem> items = new LinkedHashMap<>();
+            // Load single items
+            ConfigurationNode itemsSection = config.node("items");
+            if (!itemsSection.virtual()) {
+                for (Object keyObj: itemsSection.childrenMap().keySet()) {
+                    String itemName = (String) Objects.requireNonNull(keyObj);
+                    ConfigurationNode itemSection = itemsSection.node(keyObj);
+                    if (!itemSection.virtual()) {
+                        MenuItem item = new SingleItemParser(slate).parse(itemSection, menuName);
+                        items.put(itemName, item);
                     }
                 }
             }
-        }
-        // Load fill item
-        ConfigurationSection fillSection = config.getConfigurationSection("fill");
-        FillData fillData;
-        if (fillSection != null) {
-            boolean fillEnabled = fillSection.getBoolean("enabled", false);
-            FillItem fillItem = new FillItemParser(slate).parse(fillSection, menuName);
-            fillData = new FillData(fillItem, new SlotParser().parse(fillSection), fillEnabled);
-        } else {
-            fillData = new FillData(FillItem.getDefault(slate), null, false);
-        }
+            // Load template items
+            ConfigurationNode templatesSection = config.node("templates");
+            if (!templatesSection.virtual()) {
+                for (Object keyObj : templatesSection.childrenMap().keySet()) {
+                    String templateName = (String) Objects.requireNonNull(keyObj);
+                    ConfigurationNode templateSection = templatesSection.node(keyObj);
+                    if (!templateSection.virtual()) {
+                        ProviderManager providerManager = menuProviderManagers.get(menuName);
+                        if (providerManager != null) {
+                            ContextProvider<?> contextProvider = providerManager.getContextProvider(templateName);
+                            MenuItem item = new TemplateItemParser<>(slate, contextProvider).parse(templateSection, menuName);
+                            items.put(templateName, item);
+                        }
+                    }
+                }
+            }
+            // Load fill item
+            ConfigurationNode fillSection = config.node("fill");
+            FillData fillData;
+            if (fillSection != null) {
+                boolean fillEnabled = fillSection.node("enabled").getBoolean(false);
+                FillItem fillItem = new FillItemParser(slate).parse(fillSection, menuName);
+                fillData = new FillData(fillItem, new SlotParser().parse(fillSection), fillEnabled);
+            } else {
+                fillData = new FillData(FillItem.getDefault(slate), null, false);
+            }
 
-        MenuProvider provider = menuProviders.get(menuName);
-        generateDefaultOptions(menuName, file, config);
-        Map<String, Object> options = loadOptions(config);
-        // Add menu to map
-        ConfigurableMenu menu = new ConfigurableMenu(menuName, title, size, items, provider, fillData, options);
-        menus.put(menuName, menu);
+            MenuProvider provider = menuProviders.get(menuName);
+            generateDefaultOptions(menuName, config, loader);
+            Map<String, Object> options = loadOptions(config);
+            // Add menu to map
+            ConfigurableMenu menu = new ConfigurableMenu(menuName, title, size, items, provider, fillData, options);
+            menus.put(menuName, menu);
+        } catch (ConfigurateException | RuntimeException e) {
+            slate.getPlugin().getLogger().warning("Error loading menu " + menuName + ": " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
-    public Map<String, Object> loadOptions(ConfigurationSection config) {
+    public Map<String, Object> loadOptions(ConfigurationNode config) {
         Map<String, Object> options = new HashMap<>();
-        ConfigurationSection optionSection = config.getConfigurationSection("options");
-        if (optionSection != null) {
-            for (String key : optionSection.getKeys(true)) {
-                if (optionSection.isConfigurationSection(key)) continue; // Ignore config sections
-                Object value = optionSection.get(key);
-                options.put(key, value);
-            }
+        ConfigurationNode optionSection = config.node("options");
+        for (Object keyObj : optionSection.childrenMap().keySet()) {
+            String key = (String) keyObj;
+            if (optionSection.node(keyObj).isMap()) continue;
+            Object value = optionSection.node(key).raw();
+            options.put(key, value);
         }
         return options;
     }
 
-    private void generateDefaultOptions(String menuName, File file, FileConfiguration mainConfig) {
+    private void generateDefaultOptions(String menuName, ConfigurationNode mainConfig, YamlConfigurationLoader loader) throws SerializationException {
         Map<String, Object> defaultOptions = getDefaultOptions(menuName);
         if (defaultOptions == null) {
             return;
         }
         // Create options section if it does not exist
-        ConfigurationSection config = mainConfig.getConfigurationSection("options");
-        if (config == null) {
-            config = mainConfig.createSection("options");
-        }
+        ConfigurationNode config = mainConfig.node("options");
         // Loop through each option and set default if option does not exist
         boolean changed = false;
         for (Map.Entry<String, Object> entry : defaultOptions.entrySet()) {
-            if (!config.contains(entry.getKey())) {
-                config.set(entry.getKey(), entry.getValue());
+            if (config.node(entry.getKey()).virtual()) {
+                config.node(entry.getKey()).set(entry.getValue());
                 if (!changed) {
                     changed = true;
                 }
@@ -233,7 +238,7 @@ public class MenuManager {
         }
         if (changed) { // Save file if modified
             try {
-                mainConfig.save(file);
+                loader.save(mainConfig);
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -3,6 +3,7 @@ package com.archyx.slate.item.builder;
 import com.archyx.slate.Slate;
 import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.TemplateItem;
+import com.archyx.slate.lore.LoreLine;
 import fr.minuskube.inv.content.SlotPos;
 import org.bukkit.inventory.ItemStack;
 
@@ -14,7 +15,7 @@ public class TemplateItemBuilder<C> extends MenuItemBuilder {
     private Map<C, SlotPos> positions;
     private Map<C, ItemStack> baseItems;
     private Map<C, String> contextualDisplayNames;
-    private Map<C, List<String>> contextualLore;
+    private Map<C, List<LoreLine>> contextualLore;
     private ItemStack defaultBaseItem;
     private SlotPos defaultPosition;
 
@@ -47,7 +48,7 @@ public class TemplateItemBuilder<C> extends MenuItemBuilder {
         return this;
     }
 
-    public TemplateItemBuilder<C> contextualLore(Map<C, List<String>> contextualLore) {
+    public TemplateItemBuilder<C> contextualLore(Map<C, List<LoreLine>> contextualLore) {
         this.contextualLore = contextualLore;
         return this;
     }

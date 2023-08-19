@@ -1,14 +1,14 @@
 package com.archyx.slate.fill;
 
 import fr.minuskube.inv.content.SlotPos;
-import org.bukkit.configuration.ConfigurationSection;
+import org.spongepowered.configurate.ConfigurationNode;
 
 import java.util.List;
 
 public class SlotParser {
 
-    public SlotPos[] parse(ConfigurationSection section) {
-        List<?> slotList = section.getList("slots");
+    public SlotPos[] parse(ConfigurationNode section) {
+        List<?> slotList = (List<?>) section.node("slots").raw();
         if (slotList != null) {
             SlotPos[] slots = new SlotPos[slotList.size()];
             int index = 0;

@@ -4,13 +4,15 @@ import com.archyx.slate.Slate;
 import com.archyx.slate.context.ContextProvider;
 import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.builder.TemplateItemBuilder;
+import com.archyx.slate.lore.LoreLine;
 import fr.minuskube.inv.content.SlotPos;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
+import org.spongepowered.configurate.ConfigurationNode;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class TemplateItemParser<C> extends MenuItemParser {
 
@@ -22,10 +24,10 @@ public class TemplateItemParser<C> extends MenuItemParser {
     }
 
     @Override
-    public MenuItem parse(ConfigurationSection section, String menuName) {
+    public MenuItem parse(ConfigurationNode section, String menuName) {
         TemplateItemBuilder<C> builder = new TemplateItemBuilder<>(slate);
 
-        String name = section.getName();
+        String name = (String) Objects.requireNonNull(section.key());
         builder.name(name);
 
         // Look through keys for contexts
@@ -33,28 +35,28 @@ public class TemplateItemParser<C> extends MenuItemParser {
         Map<C, SlotPos> positions = new HashMap<>();
 
         Map<C, String> contextualDisplayNames = new HashMap<>();
-        Map<C, List<String>> contextualLore = new HashMap<>();
+        Map<C, List<LoreLine>> contextualLore = new HashMap<>();
 
         if (contextProvider != null) {
-            for (String key : section.getKeys(false)) {
-                if (isKeyWord(key)) continue; // Skip for key words used for default item parsing
+            for (ConfigurationNode contextNode : section.node("contexts").childrenMap().values()) {
+                String key = (String) Objects.requireNonNull(contextNode.key());
                 C context = contextProvider.parse(menuName, key);
-                ConfigurationSection contextSection = section.getConfigurationSection(key);
-                if (context != null && contextSection != null) { // Context parse found a match
-                    if (contextSection.contains("material") || contextSection.contains("key")) {
-                        baseItems.put(context, parseBaseItem(contextSection));
+
+                if (context != null) { // Context parse found a match
+                    if (!contextNode.node("material").virtual() || !contextNode.node("key").virtual()) {
+                        baseItems.put(context, itemParser.parseBaseItem(contextNode));
                     }
-                    String positionString = contextSection.getString("pos");
+                    String positionString = contextNode.node("pos").getString();
                     if (positionString != null) {
                         positions.put(context, parsePosition(positionString));
                     }
                     // Parse contextual display name and lore
-                    String contextualDisplayName = parseDisplayName(contextSection);
+                    String contextualDisplayName = itemParser.parseDisplayName(contextNode);
                     if (contextualDisplayName != null) {
                         contextualDisplayNames.put(context, contextualDisplayName);
                     }
-                    List<String> contextualLoreList = parseLore(contextSection);
-                    if (contextualLoreList.size() > 0) {
+                    List<LoreLine> contextualLoreList = itemParser.parseLore(contextNode);
+                    if (!contextualLoreList.isEmpty()) {
                         contextualLore.put(context, contextualLoreList);
                     }
                 }
@@ -65,7 +67,7 @@ public class TemplateItemParser<C> extends MenuItemParser {
         builder.contextualLore(contextualLore);
 
         String defaultPos = section.getString("pos");
-        if (positions.size() == 0 && defaultPos != null) {
+        if (positions.isEmpty() && defaultPos != null) {
             SlotPos pos = parsePosition(defaultPos);
             builder.defaultPosition(pos);
         }
@@ -74,14 +76,14 @@ public class TemplateItemParser<C> extends MenuItemParser {
         builder.positions(positions);
 
         // Parse default base item if exists
-        if (section.contains("material") || section.contains("key")) {
-            builder.defaultBaseItem(parseBaseItem(section));
+        if (!section.node("material").virtual() || !section.node("key").virtual()) {
+            builder.defaultBaseItem(itemParser.parseBaseItem(section));
         }
 
-        builder.displayName(parseDisplayName(section));
-        builder.lore(parseLore(section));
+        builder.displayName(itemParser.parseDisplayName(section));
+        builder.lore(itemParser.parseLore(section));
 
-        parseActions(builder, section.getValues(false), menuName, name);
+        parseActions(builder, section, menuName, name);
 
         builder.options(slate.getMenuManager().loadOptions(section));
 

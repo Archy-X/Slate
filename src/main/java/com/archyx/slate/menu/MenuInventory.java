@@ -15,6 +15,8 @@ import com.archyx.slate.item.provider.PlaceholderData;
 import com.archyx.slate.item.provider.PlaceholderType;
 import com.archyx.slate.item.provider.SingleItemProvider;
 import com.archyx.slate.item.provider.TemplateItemProvider;
+import com.archyx.slate.lore.LoreInterpreter;
+import com.archyx.slate.lore.LoreLine;
 import com.archyx.slate.util.LoreUtil;
 import com.archyx.slate.util.TextUtil;
 import com.cryptomorin.xseries.XMaterial;
@@ -41,6 +43,7 @@ import java.util.*;
 public class MenuInventory implements InventoryProvider {
 
     private final Slate slate;
+    private final LoreInterpreter loreInterpreter;
     private final ConfigurableMenu menu;
     private final ActiveMenu activeMenu;
     private final Map<String, ActiveItem> activeItems;
@@ -52,6 +55,7 @@ public class MenuInventory implements InventoryProvider {
 
     public MenuInventory(Slate slate, ConfigurableMenu menu, Player player, Map<String, Object> properties, int currentPage) {
         this.slate = slate;
+        this.loreInterpreter = new LoreInterpreter(slate);
         this.menu = menu;
         this.activeItems = new LinkedHashMap<>();
         this.activeMenu = new ActiveMenu(this);
@@ -132,9 +136,9 @@ public class MenuInventory implements InventoryProvider {
                 if (displayName != null) {
                     meta.setDisplayName(displayName);
                 }
-                List<String> lore = fillItem.getLore();
-                if (lore != null) {
-                    lore = TextUtil.applyNewLines(lore);
+                List<LoreLine> loreLines = fillItem.getLore();
+                if (loreLines != null) {
+                    List<String> lore = loreInterpreter.interpretLore(loreLines, null, player, activeMenu);
                     meta.setLore(lore);
                 }
                 itemStack.setItemMeta(meta);
@@ -204,32 +208,12 @@ public class MenuInventory implements InventoryProvider {
                 }
                 meta.setDisplayName(displayName);
             }
-            List<String> lore = item.getLore();
-            if (lore != null && lore.size() > 0) {
-
-                List<String> replacedLore = new ArrayList<>();
-                for (String line : lore) {
-
-                    if (provider != null) { // Replace lore placeholders
-                        String[] placeholders = TextUtil.substringsBetween(line, "{", "}");
-                        if (placeholders != null) {
-                            String style = LoreUtil.getStyle(line);
-                            for (String placeholder : placeholders) {
-                                String replacedLine = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.LORE, style));
-                                line = TextUtil.replace(line, "{" + placeholder + "}", replacedLine);
-                            }
-                        }
-                    }
-
-                    if (slate.isPlaceholderAPIEnabled()) {
-                        line = PlaceholderAPI.setPlaceholders(player, line);
-                    }
-                    replacedLore.add(line);
+            List<LoreLine> loreLines = item.getLore();
+            if (loreLines != null) {
+                List<String> lore = loreInterpreter.interpretLore(loreLines, provider, player, activeMenu);
+                if (!lore.isEmpty()) {
+                    meta.setLore(lore);
                 }
-                lore = replacedLore;
-                lore = TextUtil.applyNewLines(lore);
-                lore = applyColorToLore(lore);
-                meta.setLore(lore);
             }
             itemStack.setItemMeta(meta);
         }
@@ -286,32 +270,12 @@ public class MenuInventory implements InventoryProvider {
                     }
                     meta.setDisplayName(displayName);
                 }
-                List<String> lore = item.getActiveLore(context); // Get the context-specific lore, or default if not defined
-                if (lore != null && lore.size() > 0) {
-
-                    List<String> replacedLore = new ArrayList<>();
-                    for (String line : lore) {
-
-                        if (provider != null) { // Replace lore placeholders
-                            String[] placeholders = TextUtil.substringsBetween(line, "{", "}");
-                            if (placeholders != null) {
-                                String style = LoreUtil.getStyle(line);
-                                for (String placeholder : placeholders) {
-                                    String replacedLine = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.LORE, style), context);
-                                    line = TextUtil.replace(line, "{" + placeholder + "}", replacedLine);
-                                }
-                            }
-                        }
-
-                        if (slate.isPlaceholderAPIEnabled()) {
-                            line = PlaceholderAPI.setPlaceholders(player, line);
-                        }
-                        replacedLore.add(line);
+                List<LoreLine> loreLines = item.getActiveLore(context);
+                if (loreLines != null) {
+                    List<String> lore = loreInterpreter.interpretLore(loreLines, provider, player, activeMenu, context);
+                    if (!lore.isEmpty()) {
+                        meta.setLore(lore);
                     }
-                    lore = replacedLore;
-                    lore = TextUtil.applyNewLines(lore);
-                    lore = applyColorToLore(lore);
-                    meta.setLore(lore);
                 }
                 itemStack.setItemMeta(meta);
             }

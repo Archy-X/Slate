@@ -1,5 +1,8 @@
 package com.archyx.slate.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class LoreUtil {
 
     public static String getStyle(String input) {
@@ -13,6 +16,60 @@ public class LoreUtil {
         } else {
             return "";
         }
+    }
+
+    public static String wrapLore(String input, int maxLength) {
+        return wrapLore(input, maxLength, "\n");
+    }
+
+    public static String wrapLore(String input, int maxLength, String insertion) {
+        StringBuilder sb = new StringBuilder(input);
+
+        int i = 0;
+        List<String> lines = new ArrayList<>();
+        while (i < input.length()) {
+            String sub = sb.substring(i, Math.min(i + maxLength, input.length()));
+            int addedLength = 0;
+            if (!sub.equals(" ")) {
+                String added = sub.substring(0, Math.min(maxLength, sub.length()));
+                int lastSpace = added.lastIndexOf(" ");
+                if (lastSpace != -1) { // Check if section contains spaces
+                    if (sb.charAt(Math.min(i + added.length(), sb.length() - 1)) == ' ' || i + added.length() == sb.length()) { // Complete word or last word
+                        lines.add(added);
+                        addedLength = added.length();
+                    } else { // Cut off word
+                        String addedCutOff = added.substring(0, lastSpace);
+                        addedLength = addedCutOff.length();
+                        lines.add(addedCutOff);
+                    }
+                } else { // Add the max number of characters and cut off word
+                    lines.add(added);
+                    addedLength = added.length();
+                }
+            }
+            i = i + addedLength;
+            if (i < sb.length()) {
+                if (sb.charAt(i) == ' ') {
+                    i++;
+                }
+            }
+        }
+        StringBuilder output = new StringBuilder();
+        for (String line : lines) {
+            output.append(line).append(insertion);
+        }
+        output.replace(output.length() - insertion.length(), output.length(), "");
+        return output.toString();
+    }
+
+    public static String toNewlineString(List<String> lore) {
+        StringBuilder sb = new StringBuilder();
+        for (String line : lore) {
+            sb.append(line);
+            sb.append("\n");
+        }
+        sb.delete(sb.length() - 2, sb.length());
+        return sb.toString();
     }
 
 }

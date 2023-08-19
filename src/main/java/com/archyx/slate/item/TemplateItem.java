@@ -3,6 +3,7 @@ package com.archyx.slate.item;
 import com.archyx.slate.Slate;
 import com.archyx.slate.action.Action;
 import com.archyx.slate.action.click.ClickAction;
+import com.archyx.slate.lore.LoreLine;
 import fr.minuskube.inv.content.SlotPos;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -16,11 +17,11 @@ public class TemplateItem<C> extends MenuItem {
     private final Map<C, SlotPos> positions;
     private final Map<C, ItemStack> baseItems;
     private final Map<C, String> contextualDisplayNames;
-    private final Map<C, List<String>> contextualLore;
+    private final Map<C, List<LoreLine>> contextualLore;
     private final ItemStack defaultBaseItem;
     private final SlotPos defaultPosition;
 
-    public TemplateItem(Slate slate, String name, Map<C, ItemStack> baseItems, ItemStack defaultBaseItem, String displayName, List<String> lore, Map<C, String> contextualDisplayNames, Map<C, List<String>> contextualLore, Map<ClickAction, List<Action>> actions, Map<C, SlotPos> positions, SlotPos defaultPosition, Map<String, Object> options) {
+    public TemplateItem(Slate slate, String name, Map<C, ItemStack> baseItems, ItemStack defaultBaseItem, String displayName, List<LoreLine> lore, Map<C, String> contextualDisplayNames, Map<C, List<LoreLine>> contextualLore, Map<ClickAction, List<Action>> actions, Map<C, SlotPos> positions, SlotPos defaultPosition, Map<String, Object> options) {
         super(slate, name, displayName, lore, actions, options);
         this.positions = positions;
         this.baseItems = baseItems;
@@ -77,7 +78,7 @@ public class TemplateItem<C> extends MenuItem {
     }
 
     @Nullable
-    public List<String> getContextualLore(C context) {
+    public List<LoreLine> getContextualLore(C context) {
         return contextualLore.get(context);
     }
 
@@ -89,8 +90,8 @@ public class TemplateItem<C> extends MenuItem {
      * @return The active lore
      */
     @Nullable
-    public List<String> getActiveLore(C context) {
-        List<String> contextualLore = getContextualLore(context);
+    public List<LoreLine> getActiveLore(C context) {
+        List<LoreLine> contextualLore = getContextualLore(context);
         if (contextualLore != null) {
             return contextualLore;
         }

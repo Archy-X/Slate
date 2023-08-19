@@ -4,6 +4,7 @@ import com.archyx.slate.Slate;
 import com.archyx.slate.action.Action;
 import com.archyx.slate.action.click.ClickAction;
 import com.archyx.slate.item.MenuItem;
+import com.archyx.slate.lore.LoreLine;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -14,7 +15,7 @@ public abstract class MenuItemBuilder {
     protected final Slate slate;
     protected String name;
     protected String displayName;
-    protected List<String> lore;
+    protected List<LoreLine> lore;
     protected Map<ClickAction, List<Action>> actions;
     protected Map<String, Object> options;
 
@@ -35,7 +36,7 @@ public abstract class MenuItemBuilder {
         return this;
     }
 
-    public MenuItemBuilder lore(List<String> lore) {
+    public MenuItemBuilder lore(List<LoreLine> lore) {
         this.lore = lore;
         return this;
     }

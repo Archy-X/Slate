@@ -15,6 +15,7 @@ public class Slate {
     private final InventoryManager inventoryManager;
     private final ActionManager actionManager;
     private final boolean placeholderAPIEnabled;
+    private int loreWrappingWidth = 40;
 
     public Slate(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -50,4 +51,11 @@ public class Slate {
         return placeholderAPIEnabled;
     }
 
+    public int getLoreWrappingWidth() {
+        return loreWrappingWidth;
+    }
+
+    public void setLoreWrappingWidth(int loreWrappingWidth) {
+        this.loreWrappingWidth = loreWrappingWidth;
+    }
 }
