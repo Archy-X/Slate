@@ -96,6 +96,20 @@ public class LoreInterpreter {
         return replaceAndWrap(textLore, player, text);
     }
 
+    private <T> String interpretTextLore(TextLore textLore, @Nullable ComponentProvider provider, Player player, ActiveMenu activeMenu, T context) {
+        String text = textLore.getText();
+        if (provider != null) { // Replace lore placeholders
+            String[] placeholders = TextUtil.substringsBetween(text, "{", "}");
+            if (placeholders != null) {
+                for (String placeholder : placeholders) {
+                    String replacedLine = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.LORE, textLore.getStyles().getStyle(0)), context);
+                    text = TextUtil.replace(text, "{" + placeholder + "}", replacedLine);
+                }
+            }
+        }
+        return replaceAndWrap(textLore, player, text);
+    }
+
     private <T> List<String> interpretComponent(ComponentLore lore, @Nullable TemplateItemProvider<T> itemProvider, Player player, ActiveMenu activeMenu, T context) {
         // Choose the component if multiple
         String componentName;
@@ -110,7 +124,7 @@ public class LoreInterpreter {
         }
         ComponentProvider componentProvider = slate.getMenuManager().constructComponent(componentName, activeMenu.getName());
         // Decide whether component should be visible
-        if (componentProvider != null && !componentProvider.shouldShow(player, context)) {
+        if (componentProvider != null && !componentProvider.shouldShow(player, activeMenu, context)) {
             return null;
         }
         // Interpret each line
@@ -119,7 +133,7 @@ public class LoreInterpreter {
             if (!(line instanceof TextLore)) { // Lines in a component must be TextLore
                 continue;
             }
-            list.add(interpretTextLore((TextLore) line, itemProvider, player, activeMenu, context));
+            list.add(interpretTextLore((TextLore) line, componentProvider, player, activeMenu, context));
         }
         return list;
     }
@@ -138,7 +152,7 @@ public class LoreInterpreter {
         }
         ComponentProvider componentProvider = slate.getMenuManager().constructComponent(componentName, activeMenu.getName());
         // Decide whether component should be visible
-        if (componentProvider != null && !componentProvider.shouldShow(player, null)) {
+        if (componentProvider != null && !componentProvider.shouldShow(player, activeMenu, null)) {
             return null;
         }
         // Interpret each line
@@ -147,7 +161,7 @@ public class LoreInterpreter {
             if (!(line instanceof TextLore)) { // Lines in a component must be TextLore
                 continue;
             }
-            list.add(interpretTextLore((TextLore) line, itemProvider, player, activeMenu));
+            list.add(interpretTextLore((TextLore) line, componentProvider, player, activeMenu, null));
         }
         return list;
     }
