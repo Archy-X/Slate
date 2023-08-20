@@ -256,10 +256,20 @@ public class TextUtil {
                 break;
             }
             start += openLen;
-            final int end = str.indexOf(close, start);
+            int end = str.indexOf(close, start);
             if (end < 0) {
                 break;
             }
+
+            // Check if the substring is actually a double placeholder
+            boolean isDoublePlaceholder = str.startsWith(open, start);
+            if (isDoublePlaceholder) {
+                end = str.indexOf(close, end + closeLen);
+                if (end < 0) {
+                    break;
+                }
+            }
+
             list.add(str.substring(start, end));
             pos = end + closeLen;
         }
