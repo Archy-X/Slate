@@ -222,12 +222,21 @@ public class MenuManager {
                     }
                 }
             }
+            // Load formats
+            Map<String, String> formats = new HashMap<>();
+            for (Object keyObj : config.node("formats").childrenMap().keySet()) {
+                String key = (String) keyObj;
+                String value = config.node("formats").node(keyObj).getString();
+                if (value != null) {
+                    formats.put(key, value);
+                }
+            }
 
             MenuProvider provider = menuProviders.get(menuName);
             generateDefaultOptions(menuName, config, loader);
             Map<String, Object> options = loadOptions(config);
             // Add menu to map
-            ConfigurableMenu menu = new ConfigurableMenu(menuName, title, size, items, components, provider, fillData, options);
+            ConfigurableMenu menu = new ConfigurableMenu(menuName, title, size, items, components, formats, provider, fillData, options);
             menus.put(menuName, menu);
         } catch (ConfigurateException | RuntimeException e) {
             slate.getPlugin().getLogger().warning("Error loading menu " + menuName + ": " + e.getMessage());

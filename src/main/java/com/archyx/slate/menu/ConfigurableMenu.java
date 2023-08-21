@@ -14,16 +14,18 @@ public class ConfigurableMenu {
     private final int size;
     private final Map<String, MenuItem> items;
     private final Map<String, MenuComponent> components;
+    private final Map<String, String> formats;
     private final MenuProvider provider;
     private final FillData fillData;
     private final Map<String, Object> options;
 
-    public ConfigurableMenu(String name, String title, int size, Map<String, MenuItem> items, Map<String, MenuComponent> components, MenuProvider provider, FillData fillData, Map<String, Object> options) {
+    public ConfigurableMenu(String name, String title, int size, Map<String, MenuItem> items, Map<String, MenuComponent> components, Map<String, String> formats, MenuProvider provider, FillData fillData, Map<String, Object> options) {
         this.name = name;
         this.title = title;
         this.size = size;
         this.items = items;
         this.components = components;
+        this.formats = formats;
         this.provider = provider;
         this.fillData = fillData;
         this.options = options;
@@ -47,6 +49,10 @@ public class ConfigurableMenu {
 
     public Map<String, MenuComponent> getComponents() {
         return components;
+    }
+
+    public Map<String, String> getFormats() {
+        return formats;
     }
 
     @Nullable

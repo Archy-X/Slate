@@ -142,4 +142,8 @@ public class ActiveMenu {
         return menuInventory.getMenu().getComponents();
     }
 
+    public Map<String, String> getFormats() {
+        return menuInventory.getMenu().getFormats();
+    }
+
 }
