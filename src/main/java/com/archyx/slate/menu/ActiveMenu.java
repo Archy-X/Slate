@@ -3,6 +3,7 @@ package com.archyx.slate.menu;
 import com.archyx.slate.component.MenuComponent;
 import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.active.ActiveItem;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -144,6 +145,17 @@ public class ActiveMenu {
 
     public Map<String, String> getFormats() {
         return menuInventory.getMenu().getFormats();
+    }
+
+    /**
+     * Gets a format from the menu's formats, returns the key if the format does not exist
+     *
+     * @param key The key of the format
+     * @return The format, or the key if the format does not exist
+     */
+    @NotNull
+    public String getFormat(String key) {
+        return menuInventory.getMenu().getFormats().getOrDefault(key, key);
     }
 
 }
