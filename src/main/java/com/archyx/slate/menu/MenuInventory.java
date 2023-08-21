@@ -197,7 +197,7 @@ public class MenuInventory implements InventoryProvider {
                     if (placeholders != null) {
                         String style = LoreUtil.getStyle(displayName);
                         for (String placeholder : placeholders) {
-                            String replacedText = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.DISPLAY_NAME, style));
+                            String replacedText = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.DISPLAY_NAME, style, null));
                             replacedText = TextUtil.applyColor(replacedText);
                             displayName = TextUtil.replace(displayName, "{" + placeholder + "}", replacedText);
                         }
@@ -259,7 +259,7 @@ public class MenuInventory implements InventoryProvider {
                         if (placeholders != null) {
                             String style = LoreUtil.getStyle(displayName);
                             for (String placeholder : placeholders) {
-                                String replacedText = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.DISPLAY_NAME, style), context);
+                                String replacedText = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.DISPLAY_NAME, style, null), context);
                                 replacedText = TextUtil.applyColor(replacedText);
                                 displayName = TextUtil.replace(displayName, "{" + placeholder + "}", replacedText);
                             }

@@ -3,14 +3,12 @@ package com.archyx.slate.lore;
 import com.archyx.slate.Slate;
 import com.archyx.slate.component.ComponentProvider;
 import com.archyx.slate.component.MenuComponent;
-import com.archyx.slate.item.provider.PlaceholderData;
-import com.archyx.slate.item.provider.PlaceholderType;
-import com.archyx.slate.item.provider.SingleItemProvider;
-import com.archyx.slate.item.provider.TemplateItemProvider;
+import com.archyx.slate.item.provider.*;
 import com.archyx.slate.lore.type.ComponentLore;
 import com.archyx.slate.lore.type.TextLore;
 import com.archyx.slate.menu.ActiveMenu;
 import com.archyx.slate.util.LoreUtil;
+import com.archyx.slate.util.Pair;
 import com.archyx.slate.util.TextUtil;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
@@ -74,7 +72,9 @@ public class LoreInterpreter {
             String[] placeholders = TextUtil.substringsBetween(text, "{", "}");
             if (placeholders != null) {
                 for (String placeholder : placeholders) {
-                    String replacedLine = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.LORE, textLore.getStyles().getStyle(0)));
+                    Pair<String, ListInsertion> pair = detectListPlaceholder(placeholder);
+
+                    String replacedLine = provider.onPlaceholderReplace(pair.first(), player, activeMenu, new PlaceholderData(PlaceholderType.LORE, textLore.getStyles().getStyle(0), pair.second()));
                     text = TextUtil.replace(text, "{" + placeholder + "}", replacedLine);
                 }
             }
@@ -88,7 +88,9 @@ public class LoreInterpreter {
             String[] placeholders = TextUtil.substringsBetween(text, "{", "}");
             if (placeholders != null) {
                 for (String placeholder : placeholders) {
-                    String replacedLine = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.LORE, textLore.getStyles().getStyle(0)), context);
+                    Pair<String, ListInsertion> pair = detectListPlaceholder(placeholder);
+
+                    String replacedLine = provider.onPlaceholderReplace(pair.first(), player, activeMenu, new PlaceholderData(PlaceholderType.LORE, textLore.getStyles().getStyle(0), pair.second()), context);
                     text = TextUtil.replace(text, "{" + placeholder + "}", replacedLine);
                 }
             }
@@ -102,12 +104,29 @@ public class LoreInterpreter {
             String[] placeholders = TextUtil.substringsBetween(text, "{", "}");
             if (placeholders != null) {
                 for (String placeholder : placeholders) {
-                    String replacedLine = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.LORE, textLore.getStyles().getStyle(0)), context);
+                    Pair<String, ListInsertion> pair = detectListPlaceholder(placeholder);
+
+                    String replacedLine = provider.onPlaceholderReplace(pair.first(), player, activeMenu, new PlaceholderData(PlaceholderType.LORE, textLore.getStyles().getStyle(0), pair.second()), context);
                     text = TextUtil.replace(text, "{" + placeholder + "}", replacedLine);
                 }
             }
         }
         return replaceAndWrap(textLore, player, text);
+    }
+
+    private Pair<String, ListInsertion> detectListPlaceholder(String placeholder) {
+        if (!placeholder.endsWith("]")) return new Pair<>(placeholder, null);
+        // Find the index of the opening bracket closest to the end of the placeholder
+        int openIndex = placeholder.lastIndexOf("[");
+        // No matching opening bracket
+        if (openIndex == -1) {
+            return new Pair<>(placeholder, null);
+        }
+        // Get the substring between the brackets
+        String insert = placeholder.substring(openIndex + 1, placeholder.length() - 1);
+        ListInsertion listInsertion = ListInsertion.parseFromInsert(insert);
+
+        return new Pair<>(placeholder.substring(0, openIndex), listInsertion);
     }
 
     private <T> List<String> interpretComponent(ComponentLore lore, @Nullable TemplateItemProvider<T> itemProvider, Player player, ActiveMenu activeMenu, T context) {
