@@ -1,18 +1,20 @@
 package com.archyx.slate.item.parser;
 
 import com.archyx.slate.Slate;
+import com.archyx.slate.context.ContextGroup;
 import com.archyx.slate.context.ContextProvider;
+import com.archyx.slate.context.GroupAlign;
 import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.builder.TemplateItemBuilder;
 import com.archyx.slate.lore.LoreLine;
+import com.archyx.slate.position.FixedPosition;
+import com.archyx.slate.position.GroupPosition;
+import com.archyx.slate.position.PositionProvider;
 import fr.minuskube.inv.content.SlotPos;
 import org.bukkit.inventory.ItemStack;
 import org.spongepowered.configurate.ConfigurationNode;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class TemplateItemParser<C> extends MenuItemParser {
 
@@ -30,9 +32,11 @@ public class TemplateItemParser<C> extends MenuItemParser {
         String name = (String) Objects.requireNonNull(section.key());
         builder.name(name);
 
+        Map<String, ContextGroup> groups = loadGroups(section);
+
         // Look through keys for contexts
         Map<C, ItemStack> baseItems = new HashMap<>();
-        Map<C, SlotPos> positions = new HashMap<>();
+        Map<C, PositionProvider> positions = new HashMap<>();
 
         Map<C, String> contextualDisplayNames = new HashMap<>();
         Map<C, List<LoreLine>> contextualLore = new HashMap<>();
@@ -48,7 +52,16 @@ public class TemplateItemParser<C> extends MenuItemParser {
                     }
                     String positionString = contextNode.node("pos").getString();
                     if (positionString != null) {
-                        positions.put(context, parsePosition(positionString));
+                        positions.put(context, new FixedPosition(parsePosition(positionString)));
+                    } else if (!contextNode.node("group").virtual()) {
+                        String groupName = contextNode.node("group").getString();
+                        ContextGroup group = groups.get(groupName);
+                        if (group == null) {
+                            positions.put(context, new FixedPosition(parsePosition("0,0")));
+                        } else {
+                            int order = contextNode.node("order").getInt(1);
+                            positions.put(context, new GroupPosition(group, order));
+                        }
                     }
                     // Parse contextual display name and lore
                     String contextualDisplayName = itemParser.parseDisplayName(contextNode);
@@ -89,4 +102,21 @@ public class TemplateItemParser<C> extends MenuItemParser {
 
         return builder.build();
     }
+
+    private Map<String, ContextGroup> loadGroups(ConfigurationNode section) {
+        // Load groups
+        Map<String, ContextGroup> groups = new HashMap<>();
+        for (ConfigurationNode groupNode : section.node("groups").childrenMap().values()) {
+            String groupName = (String) groupNode.key();
+            if (groupName == null) continue;
+
+            SlotPos start = parsePosition(groupNode.node("start").getString("0,0"));
+            SlotPos end = parsePosition(groupNode.node("end").getString("0,0"));
+            GroupAlign align = GroupAlign.valueOf(groupNode.node("align").getString("CENTER").toUpperCase(Locale.ROOT));
+
+            groups.put(groupName, new ContextGroup(start, end, align));
+        }
+        return groups;
+    }
+
 }

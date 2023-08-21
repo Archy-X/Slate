@@ -17,6 +17,7 @@ import com.archyx.slate.item.provider.SingleItemProvider;
 import com.archyx.slate.item.provider.TemplateItemProvider;
 import com.archyx.slate.lore.LoreInterpreter;
 import com.archyx.slate.lore.LoreLine;
+import com.archyx.slate.position.PositionProvider;
 import com.archyx.slate.util.LoreUtil;
 import com.archyx.slate.util.TextUtil;
 import com.cryptomorin.xseries.XMaterial;
@@ -280,14 +281,22 @@ public class MenuInventory implements InventoryProvider {
                 itemStack.setItemMeta(meta);
             }
             // Add item to inventory
-            SlotPos pos = item.getPosition(context);
-            if (pos == null && provider != null) {
+            PositionProvider posProvider = item.getPosition(context);
+            SlotPos pos = null;
+            if (posProvider == null && provider != null) {
                 pos = provider.getSlotPos(player, activeMenu, context); // Use provider position if config pos is not defined
+            } else if (posProvider != null) {
+                List<PositionProvider> providers = new ArrayList<>();
+                for (C cont : contexts) {
+                    providers.add(item.getPosition(cont));
+                }
+                // Parse the fixed or group position from providers
+                pos = posProvider.getPosition(providers);
             }
             if (pos == null) {
                 pos = item.getDefaultPosition();
             }
-            if (pos != null) {
+            if (posProvider != null) {
                 addTemplateItemToInventory(item, itemStack, pos, contents, player, provider, context);
             }
         }

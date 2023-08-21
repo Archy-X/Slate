@@ -4,6 +4,7 @@ import com.archyx.slate.Slate;
 import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.TemplateItem;
 import com.archyx.slate.lore.LoreLine;
+import com.archyx.slate.position.PositionProvider;
 import fr.minuskube.inv.content.SlotPos;
 import org.bukkit.inventory.ItemStack;
 
@@ -12,7 +13,7 @@ import java.util.Map;
 
 public class TemplateItemBuilder<C> extends MenuItemBuilder {
 
-    private Map<C, SlotPos> positions;
+    private Map<C, PositionProvider> positions;
     private Map<C, ItemStack> baseItems;
     private Map<C, String> contextualDisplayNames;
     private Map<C, List<LoreLine>> contextualLore;
@@ -23,7 +24,7 @@ public class TemplateItemBuilder<C> extends MenuItemBuilder {
         super(slate);
     }
 
-    public TemplateItemBuilder<C> positions(Map<C, SlotPos> positions) {
+    public TemplateItemBuilder<C> positions(Map<C, PositionProvider> positions) {
         this.positions = positions;
         return this;
     }

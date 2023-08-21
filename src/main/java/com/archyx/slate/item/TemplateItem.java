@@ -4,6 +4,7 @@ import com.archyx.slate.Slate;
 import com.archyx.slate.action.Action;
 import com.archyx.slate.action.click.ClickAction;
 import com.archyx.slate.lore.LoreLine;
+import com.archyx.slate.position.PositionProvider;
 import fr.minuskube.inv.content.SlotPos;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -14,14 +15,14 @@ import java.util.Map;
 
 public class TemplateItem<C> extends MenuItem {
 
-    private final Map<C, SlotPos> positions;
+    private final Map<C, PositionProvider> positions;
     private final Map<C, ItemStack> baseItems;
     private final Map<C, String> contextualDisplayNames;
     private final Map<C, List<LoreLine>> contextualLore;
     private final ItemStack defaultBaseItem;
     private final SlotPos defaultPosition;
 
-    public TemplateItem(Slate slate, String name, Map<C, ItemStack> baseItems, ItemStack defaultBaseItem, String displayName, List<LoreLine> lore, Map<C, String> contextualDisplayNames, Map<C, List<LoreLine>> contextualLore, Map<ClickAction, List<Action>> actions, Map<C, SlotPos> positions, SlotPos defaultPosition, Map<String, Object> options) {
+    public TemplateItem(Slate slate, String name, Map<C, ItemStack> baseItems, ItemStack defaultBaseItem, String displayName, List<LoreLine> lore, Map<C, String> contextualDisplayNames, Map<C, List<LoreLine>> contextualLore, Map<ClickAction, List<Action>> actions, Map<C, PositionProvider> positions, SlotPos defaultPosition, Map<String, Object> options) {
         super(slate, name, displayName, lore, actions, options);
         this.positions = positions;
         this.baseItems = baseItems;
@@ -31,7 +32,7 @@ public class TemplateItem<C> extends MenuItem {
         this.defaultPosition = defaultPosition;
     }
 
-    public SlotPos getPosition(C context) {
+    public PositionProvider getPosition(C context) {
         return positions.get(context);
     }
 
