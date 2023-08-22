@@ -79,7 +79,7 @@ public class TemplateItemParser<C> extends MenuItemParser {
         builder.contextualDisplayNames(contextualDisplayNames);
         builder.contextualLore(contextualLore);
 
-        String defaultPos = section.getString("pos");
+        String defaultPos = section.node("pos").getString();
         if (positions.isEmpty() && defaultPos != null) {
             SlotPos pos = parsePosition(defaultPos);
             builder.defaultPosition(pos);
