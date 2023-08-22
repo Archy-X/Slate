@@ -22,7 +22,7 @@ public class SingleItemParser extends MenuItemParser {
         builder.name(name);
         builder.baseItem(itemParser.parseBaseItem(section));
 
-        String positionString = section.getString("pos");
+        String positionString = section.node("pos").getString();
         Validate.notNull(positionString, "Item must specify pos");
         builder.position(parsePosition(positionString));
 
