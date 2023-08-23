@@ -85,7 +85,8 @@ public class TextUtil {
         MiniMessage mm = MiniMessage.miniMessage();
         try {
             Component component = mm.deserialize(message);
-            message = LegacyComponentSerializer.legacySection().serialize(component);
+            message = LegacyComponentSerializer.builder().hexColors().build()
+                    .serialize(component);
         } catch (ParsingException e) {
             Bukkit.getLogger().info("[Slate] Error applying MiniMessage formatting to input message: " + message);
             e.printStackTrace();
