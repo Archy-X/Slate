@@ -86,7 +86,7 @@ public class TextUtil {
         MiniMessage mm = MiniMessage.miniMessage();
         try {
             Component component = mm.deserialize(message);
-            message = LegacyComponentSerializer.builder().hexColors().character('§').hexCharacter('§').build()
+            message = LegacyComponentSerializer.builder().hexColors().useUnusualXRepeatedCharacterHexFormat().build()
                     .serialize(component);
         } catch (ParsingException e) {
             Bukkit.getLogger().info("[Slate] Error applying MiniMessage formatting to input message: " + message);
