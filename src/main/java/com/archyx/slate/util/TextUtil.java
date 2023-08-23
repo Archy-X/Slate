@@ -81,6 +81,7 @@ public class TextUtil {
     }
 
     public static String applyColor(String message) {
+        Bukkit.getLogger().info("Applying color to: " + message);
         message = TextUtil.replace(message, "§", "&"); // Replace section symbols to allow MiniMessage parsing
         MiniMessage mm = MiniMessage.miniMessage();
         try {
