@@ -4,10 +4,10 @@ import com.archyx.slate.util.TextUtil;
 
 public class ListBuilder {
 
-    private final ListInsertion insertion;
+    private final String insertion;
     private String list;
 
-    public ListBuilder(ListInsertion insertion) {
+    public ListBuilder(String insertion) {
         this.insertion = insertion;
     }
 
@@ -18,7 +18,7 @@ public class ListBuilder {
         if (list == null) {
             list = text;
         } else {
-            list += insertion.getInsert() + text;
+            list += insertion + text;
         }
         return this;
     }

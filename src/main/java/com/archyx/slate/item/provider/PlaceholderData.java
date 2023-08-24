@@ -6,9 +6,9 @@ public class PlaceholderData {
 
     private final PlaceholderType type;
     private final String style;
-    private final ListInsertion listInsertion;
+    private final String listInsertion;
 
-    public PlaceholderData(PlaceholderType type, String style, @Nullable ListInsertion listInsertion) {
+    public PlaceholderData(PlaceholderType type, String style, @Nullable String listInsertion) {
         this.type = type;
         this.style = style;
         this.listInsertion = listInsertion;
@@ -26,11 +26,11 @@ public class PlaceholderData {
         return listInsertion != null;
     }
 
-    public ListInsertion getListInsertion() {
+    public String getListInsertion() {
         if (isList()) {
             return listInsertion;
         } else {
-            return ListInsertion.NOTHING;
+            return "";
         }
     }
 }
