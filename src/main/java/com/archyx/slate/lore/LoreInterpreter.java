@@ -191,7 +191,7 @@ public class LoreInterpreter {
         }
         if (textLore.shouldWrap()) {
             String style = textLore.getStyles().getStyle(textLore.getWrapStyle());
-            text = LoreUtil.wrapLore(text, slate.getLoreWrappingWidth(), "\n" + style);
+            text = style + LoreUtil.wrapLore(text, slate.getLoreWrappingWidth(), "\n" + style);
         }
         return text;
     }
