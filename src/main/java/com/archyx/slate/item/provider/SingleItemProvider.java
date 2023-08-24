@@ -32,8 +32,4 @@ public interface SingleItemProvider {
         return baseItem;
     }
 
-    default String resolveComponent(String[] components, Player player, ActiveMenu menu) {
-        return null;
-    }
-
 }

@@ -5,14 +5,14 @@ import com.archyx.slate.lore.LoreType;
 
 public class ComponentLore extends LoreLine {
 
-    private final String[] components;
+    private final String component;
 
-    public ComponentLore(String[] components) {
+    public ComponentLore(String component) {
         super(LoreType.COMPONENT);
-        this.components = components;
+        this.component = component;
     }
 
-    public String[] getComponents() {
-        return components;
+    public String getComponent() {
+        return component;
     }
 }

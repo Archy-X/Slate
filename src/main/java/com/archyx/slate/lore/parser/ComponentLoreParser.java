@@ -5,7 +5,6 @@ import com.archyx.slate.lore.type.ComponentLore;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.serialize.SerializationException;
 
-import java.util.List;
 import java.util.Objects;
 
 public class ComponentLoreParser implements LoreParser {
@@ -15,12 +14,8 @@ public class ComponentLoreParser implements LoreParser {
         // Single component
         if (!config.node("component").virtual()) {
             String component = Objects.requireNonNull(config.node("component").getString());
-            return new ComponentLore(new String[] {component});
-        } else if (config.node("components").isList()) {
-            List<String> components = config.node("components").getList(String.class);
-            Objects.requireNonNull(components);
-            return new ComponentLore(components.toArray(new String[0]));
+            return new ComponentLore(component);
         }
-        throw new IllegalArgumentException("No key named component or components was found!");
+        throw new IllegalArgumentException("No key named component was found!");
     }
 }

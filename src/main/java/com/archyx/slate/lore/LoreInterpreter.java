@@ -35,7 +35,7 @@ public class LoreInterpreter {
                 lore.add(interpretTextLore(textLore, provider, player, activeMenu));
             } else if (line instanceof ComponentLore) {
                 ComponentLore componentLore = (ComponentLore) line;
-                List<String> list = interpretComponent(componentLore, provider, player, activeMenu);
+                List<String> list = interpretComponent(componentLore, player, activeMenu);
                 if (list != null) {
                     lore.addAll(list);
                 }
@@ -55,7 +55,7 @@ public class LoreInterpreter {
                 lore.add(interpretTextLore(textLore, provider, player, activeMenu, context));
             } else if (line instanceof ComponentLore) {
                 ComponentLore componentLore = (ComponentLore) line;
-                List<String> list = interpretComponent(componentLore, provider, player, activeMenu, context);
+                List<String> list = interpretComponent(componentLore, player, activeMenu, context);
                 if (list != null) {
                     lore.addAll(list);
                 }
@@ -129,14 +129,9 @@ public class LoreInterpreter {
         return new Pair<>(placeholder.substring(0, openIndex), listInsertion);
     }
 
-    private <T> List<String> interpretComponent(ComponentLore lore, @Nullable TemplateItemProvider<T> itemProvider, Player player, ActiveMenu activeMenu, T context) {
+    private <T> List<String> interpretComponent(ComponentLore lore, Player player, ActiveMenu activeMenu, T context) {
         // Choose the component if multiple
-        String componentName;
-        if (itemProvider != null && lore.getComponents().length > 1) {
-            componentName = itemProvider.resolveComponent(lore.getComponents(), player, activeMenu, context);
-        } else {
-            componentName = lore.getComponents()[0];
-        }
+        String componentName = lore.getComponent();
         MenuComponent component = activeMenu.getComponents().get(componentName);
         if (component == null) {
             return null;
@@ -157,14 +152,9 @@ public class LoreInterpreter {
         return list;
     }
 
-    private List<String> interpretComponent(ComponentLore lore, @Nullable SingleItemProvider itemProvider, Player player, ActiveMenu activeMenu) {
+    private List<String> interpretComponent(ComponentLore lore, Player player, ActiveMenu activeMenu) {
         // Choose the component if multiple
-        String componentName;
-        if (itemProvider != null && lore.getComponents().length > 1) {
-            componentName = itemProvider.resolveComponent(lore.getComponents(), player, activeMenu);
-        } else {
-            componentName = lore.getComponents()[0];
-        }
+        String componentName = lore.getComponent();
         MenuComponent component = activeMenu.getComponents().get(componentName);
         if (component == null) {
             return null;
