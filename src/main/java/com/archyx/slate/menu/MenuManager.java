@@ -228,6 +228,7 @@ public class MenuManager {
                 String key = (String) keyObj;
                 String value = config.node("formats").node(keyObj).getString();
                 if (value != null) {
+                    slate.getPlugin().getLogger().info("Loaded format " + key + ": " + value);
                     formats.put(key, value);
                 }
             }
