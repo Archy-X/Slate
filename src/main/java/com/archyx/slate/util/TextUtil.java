@@ -81,11 +81,13 @@ public class TextUtil {
     }
 
     public static String applyColor(String message) {
+        Bukkit.getLogger().info("Applying color to: " + message);
         message = TextUtil.replace(message, "§", "&"); // Replace section symbols to allow MiniMessage parsing
         MiniMessage mm = MiniMessage.miniMessage();
         try {
             Component component = mm.deserialize(message);
-            message = LegacyComponentSerializer.legacySection().serialize(component);
+            message = LegacyComponentSerializer.builder().hexColors().useUnusualXRepeatedCharacterHexFormat().build()
+                    .serialize(component);
         } catch (ParsingException e) {
             Bukkit.getLogger().info("[Slate] Error applying MiniMessage formatting to input message: " + message);
             e.printStackTrace();
