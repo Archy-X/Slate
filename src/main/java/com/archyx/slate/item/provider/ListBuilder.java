@@ -19,7 +19,7 @@ public class ListBuilder {
         }
         if (list == null) {
             list = text;
-        } else if (index % listData.getInterval() == 0) {
+        } else if (index % (listData.getInterval() > 0 ? listData.getInterval() : 1) == 0) {
             list += listData.getInsertion() + text;
         }
         index++;

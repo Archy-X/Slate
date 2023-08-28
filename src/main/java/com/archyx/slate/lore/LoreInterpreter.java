@@ -140,7 +140,7 @@ public class LoreInterpreter {
                 interval = Integer.parseInt(intervalString);
             } catch (NumberFormatException ignored) {}
         }
-        System.out.println("Returning placeholder with interval " + interval);
+        System.out.println("Returning placeholder " + placeholder + " with interval " + interval);
 
         return new Pair<>(placeholder.substring(0, openBracket), new ListData(insert, interval));
     }
