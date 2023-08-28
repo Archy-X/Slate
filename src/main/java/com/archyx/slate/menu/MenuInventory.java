@@ -296,7 +296,7 @@ public class MenuInventory implements InventoryProvider {
             if (pos == null) {
                 pos = item.getDefaultPosition();
             }
-            if (posProvider != null) {
+            if (pos != null) {
                 addTemplateItemToInventory(item, itemStack, pos, contents, player, provider, context);
             }
         }
