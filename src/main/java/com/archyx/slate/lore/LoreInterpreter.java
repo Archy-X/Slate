@@ -72,7 +72,7 @@ public class LoreInterpreter {
             String[] placeholders = TextUtil.substringsBetween(text, "{", "}");
             if (placeholders != null) {
                 for (String placeholder : placeholders) {
-                    Pair<String, String> pair = detectListPlaceholder(placeholder);
+                    Pair<String, ListData> pair = detectListPlaceholder(placeholder);
 
                     String replacedLine = provider.onPlaceholderReplace(pair.first(), player, activeMenu, new PlaceholderData(PlaceholderType.LORE, textLore.getStyles().getStyle(0), pair.second()));
                     text = TextUtil.replace(text, "{" + placeholder + "}", replacedLine);
@@ -88,7 +88,7 @@ public class LoreInterpreter {
             String[] placeholders = TextUtil.substringsBetween(text, "{", "}");
             if (placeholders != null) {
                 for (String placeholder : placeholders) {
-                    Pair<String, String> pair = detectListPlaceholder(placeholder);
+                    Pair<String, ListData> pair = detectListPlaceholder(placeholder);
 
                     String replacedLine = provider.onPlaceholderReplace(pair.first(), player, activeMenu, new PlaceholderData(PlaceholderType.LORE, textLore.getStyles().getStyle(0), pair.second()), context);
                     text = TextUtil.replace(text, "{" + placeholder + "}", replacedLine);
@@ -104,7 +104,7 @@ public class LoreInterpreter {
             String[] placeholders = TextUtil.substringsBetween(text, "{", "}");
             if (placeholders != null) {
                 for (String placeholder : placeholders) {
-                    Pair<String, String> pair = detectListPlaceholder(placeholder);
+                    Pair<String, ListData> pair = detectListPlaceholder(placeholder);
 
                     String replacedLine = provider.onPlaceholderReplace(pair.first(), player, activeMenu, new PlaceholderData(PlaceholderType.LORE, textLore.getStyles().getStyle(0), pair.second()), context);
                     text = TextUtil.replace(text, "{" + placeholder + "}", replacedLine);
@@ -114,18 +114,30 @@ public class LoreInterpreter {
         return replaceAndWrap(textLore, player, text);
     }
 
-    private Pair<String, String> detectListPlaceholder(String placeholder) {
-        if (!placeholder.endsWith("]")) return new Pair<>(placeholder, null);
+    private Pair<String, ListData> detectListPlaceholder(String placeholder) {
+        if (!placeholder.endsWith("]") || !placeholder.endsWith(")")) return new Pair<>(placeholder, new ListData(null, 0));
         // Find the index of the opening bracket closest to the end of the placeholder
-        int openIndex = placeholder.lastIndexOf("[");
+        int openBracket = placeholder.lastIndexOf("[");
+        int closeBracket = placeholder.lastIndexOf("]");
         // No matching opening bracket
-        if (openIndex == -1) {
-            return new Pair<>(placeholder, null);
+        if (openBracket == -1 || closeBracket == -1 || openBracket > closeBracket) {
+            return new Pair<>(placeholder, new ListData(null, 0));
         }
         // Get the substring between the brackets
-        String insert = placeholder.substring(openIndex + 1, placeholder.length() - 1);
+        String insert = placeholder.substring(openBracket + 1, closeBracket);
+        // Find the index of the opening parenthesis closest to the end of the placeholder
+        int openParen = placeholder.lastIndexOf("(");
+        int closeParen = placeholder.lastIndexOf(")");
+        // Find the interval between parenthesis
+        int interval = 1;
+        if (openParen != -1 && closeParen != -1 && openParen < closeParen) {
+            String intervalString = placeholder.substring(openParen + 1, closeParen);
+            try {
+                interval = Integer.parseInt(intervalString);
+            } catch (NumberFormatException ignored) {}
+        }
 
-        return new Pair<>(placeholder.substring(0, openIndex), insert);
+        return new Pair<>(placeholder.substring(0, openBracket), new ListData(insert, interval));
     }
 
     private <T> List<String> interpretComponent(ComponentLore lore, Player player, ActiveMenu activeMenu, T context) {

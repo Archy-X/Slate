@@ -1,14 +1,16 @@
 package com.archyx.slate.item.provider;
 
+import com.archyx.slate.lore.ListData;
 import com.archyx.slate.util.TextUtil;
 
 public class ListBuilder {
 
-    private final String insertion;
+    private final ListData listData;
     private String list;
+    private int index = 0;
 
-    public ListBuilder(String insertion) {
-        this.insertion = insertion;
+    public ListBuilder(ListData listData) {
+        this.listData = listData;
     }
 
     public ListBuilder append(String text, String... rep) {
@@ -17,9 +19,10 @@ public class ListBuilder {
         }
         if (list == null) {
             list = text;
-        } else {
-            list += insertion + text;
+        } else if (index % listData.getInterval() == 0) {
+            list += listData.getInsertion() + text;
         }
+        index++;
         return this;
     }
 

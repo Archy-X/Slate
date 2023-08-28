@@ -1,17 +1,18 @@
 package com.archyx.slate.item.provider;
 
+import com.archyx.slate.lore.ListData;
 import org.jetbrains.annotations.Nullable;
 
 public class PlaceholderData {
 
     private final PlaceholderType type;
     private final String style;
-    private final String listInsertion;
+    private final ListData listData;
 
-    public PlaceholderData(PlaceholderType type, String style, @Nullable String listInsertion) {
+    public PlaceholderData(PlaceholderType type, String style, @Nullable ListData listData) {
         this.type = type;
         this.style = style;
-        this.listInsertion = listInsertion;
+        this.listData = listData;
     }
 
     public PlaceholderType getType() {
@@ -23,14 +24,14 @@ public class PlaceholderData {
     }
 
     public boolean isList() {
-        return listInsertion != null;
+        return listData == null || listData.getInterval() == 0;
     }
 
-    public String getListInsertion() {
+    public ListData getListData() {
         if (isList()) {
-            return listInsertion;
+            return listData;
         } else {
-            return "";
+            return new ListData("", 0);
         }
     }
 }
