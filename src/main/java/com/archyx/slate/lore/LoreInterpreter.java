@@ -115,12 +115,16 @@ public class LoreInterpreter {
     }
 
     private Pair<String, ListData> detectListPlaceholder(String placeholder) {
-        if (!placeholder.endsWith("]") && !placeholder.endsWith(")")) return new Pair<>(placeholder, new ListData(null, 0));
+        if (!placeholder.endsWith("]") && !placeholder.endsWith(")")) {
+            System.out.println("No closing bracket or paren for placeholder " + placeholder);
+            return new Pair<>(placeholder, new ListData(null, 0));
+        }
         // Find the index of the opening bracket closest to the end of the placeholder
         int openBracket = placeholder.lastIndexOf("[");
         int closeBracket = placeholder.lastIndexOf("]");
         // No matching opening bracket
         if (openBracket == -1 || closeBracket == -1 || openBracket > closeBracket) {
+            System.out.println("No matching opening bracket for placeholder " + placeholder);
             return new Pair<>(placeholder, new ListData(null, 0));
         }
         // Get the substring between the brackets
@@ -136,6 +140,7 @@ public class LoreInterpreter {
                 interval = Integer.parseInt(intervalString);
             } catch (NumberFormatException ignored) {}
         }
+        System.out.println("Returning placeholder with interval " + interval);
 
         return new Pair<>(placeholder.substring(0, openBracket), new ListData(insert, interval));
     }
