@@ -10,6 +10,8 @@ public interface ComponentProvider {
 
     <T> boolean shouldShow(Player player, ActiveMenu activeMenu, T context);
 
-    <T> int getInstances(Player player, ActiveMenu activeMenu, T context);
+    default <T> int getInstances(Player player, ActiveMenu activeMenu, T context) {
+        return 1;
+    }
 
 }
