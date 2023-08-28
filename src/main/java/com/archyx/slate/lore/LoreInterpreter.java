@@ -115,7 +115,7 @@ public class LoreInterpreter {
     }
 
     private Pair<String, ListData> detectListPlaceholder(String placeholder) {
-        if (!placeholder.endsWith("]") || !placeholder.endsWith(")")) return new Pair<>(placeholder, new ListData(null, 0));
+        if (!placeholder.endsWith("]") && !placeholder.endsWith(")")) return new Pair<>(placeholder, new ListData(null, 0));
         // Find the index of the opening bracket closest to the end of the placeholder
         int openBracket = placeholder.lastIndexOf("[");
         int closeBracket = placeholder.lastIndexOf("]");
