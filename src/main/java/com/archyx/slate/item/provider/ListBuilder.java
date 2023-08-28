@@ -21,6 +21,8 @@ public class ListBuilder {
             list = text;
         } else if (index % (listData.getInterval() > 0 ? listData.getInterval() : 1) == 0) {
             list += listData.getInsertion() + text;
+        } else {
+            list += text;
         }
         index++;
         return this;
