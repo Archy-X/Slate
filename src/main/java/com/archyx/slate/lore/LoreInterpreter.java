@@ -1,6 +1,7 @@
 package com.archyx.slate.lore;
 
 import com.archyx.slate.Slate;
+import com.archyx.slate.component.ComponentData;
 import com.archyx.slate.component.ComponentProvider;
 import com.archyx.slate.component.MenuComponent;
 import com.archyx.slate.item.provider.*;
@@ -98,7 +99,7 @@ public class LoreInterpreter {
         return replaceAndWrap(textLore, player, text);
     }
 
-    private <T> String interpretTextLore(TextLore textLore, @Nullable ComponentProvider provider, Player player, ActiveMenu activeMenu, T context) {
+    private <T> String interpretTextLore(TextLore textLore, @Nullable ComponentProvider provider, Player player, ActiveMenu activeMenu, ComponentData componentData, T context) {
         String text = textLore.getText();
         if (provider != null) { // Replace lore placeholders
             String[] placeholders = TextUtil.substringsBetween(text, "{", "}");
@@ -106,7 +107,7 @@ public class LoreInterpreter {
                 for (String placeholder : placeholders) {
                     Pair<String, ListData> pair = detectListPlaceholder(placeholder);
 
-                    String replacedLine = provider.onPlaceholderReplace(pair.first(), player, activeMenu, new PlaceholderData(PlaceholderType.LORE, textLore.getStyles().getStyle(0), pair.second()), context);
+                    String replacedLine = provider.onPlaceholderReplace(pair.first(), player, activeMenu, new PlaceholderData(PlaceholderType.LORE, textLore.getStyles().getStyle(0), pair.second()), componentData, context);
                     text = TextUtil.replace(text, "{" + placeholder + "}", replacedLine);
                 }
             }
@@ -154,13 +155,17 @@ public class LoreInterpreter {
         if (componentProvider != null && !componentProvider.shouldShow(player, activeMenu, context)) {
             return null;
         }
-        // Interpret each line
+        int instances = componentProvider != null ? componentProvider.getInstances(player, activeMenu, context) : 1;
         List<String> list = new ArrayList<>();
-        for (LoreLine line : component.getLore()) {
-            if (!(line instanceof TextLore)) { // Lines in a component must be TextLore
-                continue;
+        for (int i = 0; i < instances; i++) {
+            ComponentData componentData = new ComponentData(i);
+            // Interpret each line
+            for (LoreLine line : component.getLore()) {
+                if (!(line instanceof TextLore)) { // Lines in a component must be TextLore
+                    continue;
+                }
+                list.add(interpretTextLore((TextLore) line, componentProvider, player, activeMenu, componentData, context));
             }
-            list.add(interpretTextLore((TextLore) line, componentProvider, player, activeMenu, context));
         }
         return list;
     }
@@ -177,13 +182,17 @@ public class LoreInterpreter {
         if (componentProvider != null && !componentProvider.shouldShow(player, activeMenu, null)) {
             return null;
         }
-        // Interpret each line
+        int instances = componentProvider != null ? componentProvider.getInstances(player, activeMenu, null) : 1;
         List<String> list = new ArrayList<>();
-        for (LoreLine line : component.getLore()) {
-            if (!(line instanceof TextLore)) { // Lines in a component must be TextLore
-                continue;
+        for (int i = 0; i < instances; i++) {
+            ComponentData componentData = new ComponentData(i);
+            // Interpret each line
+            for (LoreLine line : component.getLore()) {
+                if (!(line instanceof TextLore)) { // Lines in a component must be TextLore
+                    continue;
+                }
+                list.add(interpretTextLore((TextLore) line, componentProvider, player, activeMenu, componentData, null));
             }
-            list.add(interpretTextLore((TextLore) line, componentProvider, player, activeMenu, null));
         }
         return list;
     }

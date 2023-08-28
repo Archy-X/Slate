@@ -6,8 +6,10 @@ import org.bukkit.entity.Player;
 
 public interface ComponentProvider {
 
-    <T> String onPlaceholderReplace(String placeholder, Player player, ActiveMenu activeMenu, PlaceholderData data, T context);
+    <T> String onPlaceholderReplace(String placeholder, Player player, ActiveMenu activeMenu, PlaceholderData data, ComponentData componentData, T context);
 
     <T> boolean shouldShow(Player player, ActiveMenu activeMenu, T context);
+
+    <T> int getInstances(Player player, ActiveMenu activeMenu, T context);
 
 }
