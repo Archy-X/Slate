@@ -24,7 +24,7 @@ public class PlaceholderData {
     }
 
     public boolean isList() {
-        return listData == null || listData.getInterval() == 0;
+        return listData != null && listData.getInterval() > 0;
     }
 
     public ListData getListData() {
