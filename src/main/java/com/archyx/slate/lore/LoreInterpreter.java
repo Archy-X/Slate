@@ -208,7 +208,7 @@ public class LoreInterpreter {
         if (textLore.shouldWrap()) {
             if (textLore.isSmartWrap()) { // Detect tags inside string to use as insertions
                 String firstStyle = textLore.getStyles().getStyle(textLore.getWrapStyle());
-                text = firstStyle + LoreUtil.wrapLore(text, slate.getLoreWrappingWidth(), textLore, (line, lore) -> {
+                text = firstStyle + textLore.getWrapIndent() + LoreUtil.wrapLore(text, slate.getLoreWrappingWidth(), textLore, (line, lore) -> {
                     // Find the last style tag in the line
                     int lastStartIndex = 0;
                     int tagLength = 0;
@@ -226,11 +226,11 @@ public class LoreInterpreter {
                     } else {
                         style = firstStyle;
                     }
-                    return "\n" + style;
+                    return "\n" + lore.getWrapIndent() + style;
                 });
             } else { // Use the same string for all insertions
                 String style = textLore.getStyles().getStyle(textLore.getWrapStyle());
-                text = style + LoreUtil.wrapLore(text, slate.getLoreWrappingWidth(), "\n" + style);
+                text = style + textLore.getWrapIndent() + LoreUtil.wrapLore(text, slate.getLoreWrappingWidth(), "\n" + textLore.getWrapIndent() + style);
             }
         }
         return applyStyleTags(textLore, text);

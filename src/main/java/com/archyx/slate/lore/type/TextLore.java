@@ -11,14 +11,16 @@ public class TextLore extends LoreLine {
     private final boolean wrap;
     private final int wrapStyle;
     private final boolean smartWrap;
+    private final String wrapIndent;
 
-    public TextLore(String text, LoreStyles styles, boolean wrap, int wrapStyle, boolean smartWrap) {
+    public TextLore(String text, LoreStyles styles, boolean wrap, int wrapStyle, boolean smartWrap, String wrapIndent) {
         super(LoreType.TEXT);
         this.text = text;
         this.styles = styles;
         this.wrap = wrap;
         this.wrapStyle = wrapStyle;
         this.smartWrap = smartWrap;
+        this.wrapIndent = wrapIndent;
     }
 
     public String getText() {
@@ -39,5 +41,9 @@ public class TextLore extends LoreLine {
 
     public boolean isSmartWrap() {
         return smartWrap;
+    }
+
+    public String getWrapIndent() {
+        return wrapIndent;
     }
 }
