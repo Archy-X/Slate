@@ -15,9 +15,11 @@ import com.archyx.slate.util.LoreUtil;
 import com.archyx.slate.util.Pair;
 import com.archyx.slate.util.TextUtil;
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -212,8 +214,12 @@ public class LoreInterpreter {
             String style = textLore.getStyles().getStyle(textLore.getWrapStyle());
             text = style + LoreUtil.wrapLore(text, slate.getLoreWrappingWidth(), "\n" + style);
         }
+        // Apply style tags
         MiniMessage miniMessage = MiniMessage.miniMessage();
-        text = miniMessage.serialize(miniMessage.deserialize(text, getTagResolvers(textLore)));
+        text = TextUtil.replace(text, "§", "&");
+        Component component = miniMessage.deserialize(text, getTagResolvers(textLore));
+        text = LegacyComponentSerializer.builder().hexColors().useUnusualXRepeatedCharacterHexFormat().build()
+                .serialize(component);
         return text;
     }
 
