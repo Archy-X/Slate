@@ -90,6 +90,7 @@ public class LoreUtil {
                 break;
             }
         }
+
         return result.toString();
     }
 
