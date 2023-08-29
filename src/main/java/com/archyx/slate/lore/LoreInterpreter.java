@@ -15,11 +15,6 @@ import com.archyx.slate.util.LoreUtil;
 import com.archyx.slate.util.Pair;
 import com.archyx.slate.util.TextUtil;
 import me.clip.placeholderapi.PlaceholderAPI;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -214,24 +209,20 @@ public class LoreInterpreter {
             String style = textLore.getStyles().getStyle(textLore.getWrapStyle());
             text = style + LoreUtil.wrapLore(text, slate.getLoreWrappingWidth(), "\n" + style);
         }
-        // Apply style tags
-        MiniMessage miniMessage = MiniMessage.miniMessage();
-        text = TextUtil.replace(text, "§", "&");
-        Component component = miniMessage.deserialize(text, getTagResolvers(textLore));
-        text = LegacyComponentSerializer.builder().hexColors().useUnusualXRepeatedCharacterHexFormat().build()
-                .serialize(component);
-        return text;
+        return applyStyleTags(textLore, text);
     }
 
-    private TagResolver[] getTagResolvers(TextLore textLore) {
-        List<TagResolver> resolvers = new ArrayList<>();
+    private String applyStyleTags(TextLore textLore, String text) {
         // Create a TagResolver for each style
         for (Map.Entry<Integer, String> entry : textLore.getStyles().getStyleMap().entrySet()) {
+            String target = String.valueOf(entry.getKey());
             String style = entry.getValue();
+            String styleClose = TextUtil.replace(entry.getValue(), "<", "</"); // Convert style to closing tags
 
-            resolvers.add(TagResolver.resolver(String.valueOf(entry.getKey()), Tag.preProcessParsed(style)));
+            text = TextUtil.replace(text, "<" + target + ">", style); // Replace opening tag
+            text = TextUtil.replace(text, "</" + target + ">", styleClose);
         }
-        return resolvers.toArray(new TagResolver[0]);
+        return text;
     }
 
     private List<String> applyColorToLore(List<String> lore) {
