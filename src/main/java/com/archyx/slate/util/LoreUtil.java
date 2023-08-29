@@ -1,7 +1,10 @@
 package com.archyx.slate.util;
 
+import com.archyx.slate.lore.type.TextLore;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
 
 public class LoreUtil {
 
@@ -23,6 +26,10 @@ public class LoreUtil {
     }
 
     public static String wrapLore(String input, int maxLength, String insertion) {
+        return wrapLore(input, maxLength, null, (line, lore) -> insertion);
+    }
+
+    public static String wrapLore(String input, int maxLength, TextLore textLore, BiFunction<String, TextLore, String> insertionFunction) {
         StringBuilder sb = new StringBuilder(input);
 
         int i = 0;
@@ -55,10 +62,13 @@ public class LoreUtil {
             }
         }
         StringBuilder output = new StringBuilder();
+        String lastInsertion = "";
         for (String line : lines) {
+            String insertion = insertionFunction.apply(line, textLore);
+            lastInsertion = insertion;
             output.append(line).append(insertion);
         }
-        output.replace(output.length() - insertion.length(), output.length(), "");
+        output.replace(output.length() - lastInsertion.length(), output.length(), "");
         return output.toString();
     }
 

@@ -206,8 +206,32 @@ public class LoreInterpreter {
             text = PlaceholderAPI.setPlaceholders(player, text);
         }
         if (textLore.shouldWrap()) {
-            String style = textLore.getStyles().getStyle(textLore.getWrapStyle());
-            text = style + LoreUtil.wrapLore(text, slate.getLoreWrappingWidth(), "\n" + style);
+            if (textLore.isSmartWrap()) { // Detect tags inside string to use as insertions
+                String firstStyle = textLore.getStyles().getStyle(textLore.getWrapStyle());
+                text = firstStyle + LoreUtil.wrapLore(text, slate.getLoreWrappingWidth(), textLore, (line, lore) -> {
+                    // Find the last style tag in the line
+                    int lastStartIndex = 0;
+                    int tagLength = 0;
+                    for (int index : lore.getStyles().getStyleMap().keySet()) {
+                        String tag = "<" + index + ">";
+                        int startIndex = line.lastIndexOf(tag);
+                        if (startIndex >= lastStartIndex) {
+                            lastStartIndex = startIndex;
+                            tagLength = tag.length();
+                        }
+                    }
+                    String style;
+                    if (tagLength > 0) {
+                        style = line.substring(lastStartIndex, lastStartIndex + tagLength);
+                    } else {
+                        style = firstStyle;
+                    }
+                    return "\n" + style;
+                });
+            } else { // Use the same string for all insertions
+                String style = textLore.getStyles().getStyle(textLore.getWrapStyle());
+                text = style + LoreUtil.wrapLore(text, slate.getLoreWrappingWidth(), "\n" + style);
+            }
         }
         return applyStyleTags(textLore, text);
     }
