@@ -28,10 +28,10 @@ public class LoreUtil {
         int i = 0;
         List<String> lines = new ArrayList<>();
         while (i < input.length()) {
-            String sub = sb.substring(i, Math.min(i + maxLength, input.length()));
+            String sub = substringIgnoreFormatting(sb.toString(), i, Math.min(i + maxLength, input.length()));
             int addedLength = 0;
             if (!sub.equals(" ")) {
-                String added = sub.substring(0, Math.min(maxLength, sub.length()));
+                String added = substringIgnoreFormatting(sub, 0, Math.min(maxLength, sub.length()));
                 int lastSpace = added.lastIndexOf(" ");
                 if (lastSpace != -1) { // Check if section contains spaces
                     if (sb.charAt(Math.min(i + added.length(), sb.length() - 1)) == ' ' || i + added.length() == sb.length()) { // Complete word or last word
@@ -60,6 +60,37 @@ public class LoreUtil {
         }
         output.replace(output.length() - insertion.length(), output.length(), "");
         return output.toString();
+    }
+
+    private static String substringIgnoreFormatting(String input, int start, int end) {
+        if (input == null || input.isEmpty()) {
+            return "";
+        }
+        if (start < 0 || end > input.length() || start > end) {
+            return "";
+        }
+        StringBuilder result = new StringBuilder();
+        boolean insideBrackets = false;
+        int count = 0;
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+            if (c == '<') {
+                insideBrackets = true;
+            }
+            if (c == '>') {
+                insideBrackets = false;
+            }
+            if (!insideBrackets || count <= start) {
+                count++;
+            }
+            if (count > start && count <= end) {
+                result.append(c);
+            }
+            if (count > end) {
+                break;
+            }
+        }
+        return result.toString();
     }
 
     public static String toNewlineString(List<String> lore) {
