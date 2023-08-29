@@ -37,9 +37,14 @@ public class TextLoreParser implements LoreParser {
             Map<Integer, String> styleMap = new HashMap<>();
             for (ConfigurationNode styleNode : config.node("styles").childrenMap().values()) {
                 Object key = styleNode.key();
-                if (!(key instanceof String)) continue;
-
-                int index = Integer.parseInt((String) key);
+                int index;
+                if (key instanceof String) {
+                    index = Integer.parseInt((String) key);
+                } else if (key instanceof Integer) {
+                    index = (int) key;
+                } else {
+                    continue;
+                }
                 String style = styleNode.getString();
                 if (style == null) continue;
 

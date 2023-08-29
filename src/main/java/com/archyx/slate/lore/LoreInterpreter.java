@@ -220,7 +220,7 @@ public class LoreInterpreter {
             String styleClose = TextUtil.replace(entry.getValue(), "<", "</"); // Convert style to closing tags
 
             text = TextUtil.replace(text, "<" + target + ">", style); // Replace opening tag
-            text = TextUtil.replace(text, "</" + target + ">", styleClose);
+            text = TextUtil.replace(text, "</" + target + ">", styleClose); // Replacing closing tag
         }
         return text;
     }
