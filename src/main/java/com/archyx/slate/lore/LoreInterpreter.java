@@ -4,7 +4,10 @@ import com.archyx.slate.Slate;
 import com.archyx.slate.component.ComponentData;
 import com.archyx.slate.component.ComponentProvider;
 import com.archyx.slate.component.MenuComponent;
-import com.archyx.slate.item.provider.*;
+import com.archyx.slate.item.provider.PlaceholderData;
+import com.archyx.slate.item.provider.PlaceholderType;
+import com.archyx.slate.item.provider.SingleItemProvider;
+import com.archyx.slate.item.provider.TemplateItemProvider;
 import com.archyx.slate.lore.type.ComponentLore;
 import com.archyx.slate.lore.type.TextLore;
 import com.archyx.slate.menu.ActiveMenu;
@@ -12,12 +15,16 @@ import com.archyx.slate.util.LoreUtil;
 import com.archyx.slate.util.Pair;
 import com.archyx.slate.util.TextUtil;
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class LoreInterpreter {
 
@@ -205,7 +212,20 @@ public class LoreInterpreter {
             String style = textLore.getStyles().getStyle(textLore.getWrapStyle());
             text = style + LoreUtil.wrapLore(text, slate.getLoreWrappingWidth(), "\n" + style);
         }
+        MiniMessage miniMessage = MiniMessage.miniMessage();
+        text = miniMessage.serialize(miniMessage.deserialize(text, getTagResolvers(textLore)));
         return text;
+    }
+
+    private TagResolver[] getTagResolvers(TextLore textLore) {
+        List<TagResolver> resolvers = new ArrayList<>();
+        // Create a TagResolver for each style
+        for (Map.Entry<Integer, String> entry : textLore.getStyles().getStyleMap().entrySet()) {
+            String style = entry.getValue();
+
+            resolvers.add(TagResolver.resolver(String.valueOf(entry.getKey()), Tag.preProcessParsed(style)));
+        }
+        return resolvers.toArray(new TagResolver[0]);
     }
 
     private List<String> applyColorToLore(List<String> lore) {
