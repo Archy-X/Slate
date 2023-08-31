@@ -8,7 +8,6 @@ import org.spongepowered.configurate.ConfigurationNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 public class LoreFactory {
 
@@ -52,10 +51,20 @@ public class LoreFactory {
         if (!config.isMap()) {
             return LoreType.TEXT;
         }
-        String type = config.node("type").getString();
-        Objects.requireNonNull(type);
+        LoreType type;
+        // Check for an explicit type
+        String typeExplicit = config.node("type").getString();
+        if (typeExplicit != null) {
+            type = LoreType.valueOf(typeExplicit.toUpperCase(Locale.ROOT));
+        } else if (!config.node("text").virtual()) { // Auto-detect type
+            type = LoreType.TEXT;
+        } else if (!config.node("component").virtual()) {
+            type = LoreType.COMPONENT;
+        } else {
+            throw new IllegalArgumentException("Line does not define an explicit type or contain auto-detectable keys");
+        }
 
-        return LoreType.valueOf(type.toUpperCase(Locale.ROOT));
+        return type;
     }
 
 }
