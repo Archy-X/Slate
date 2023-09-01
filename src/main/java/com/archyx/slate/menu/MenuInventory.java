@@ -199,7 +199,6 @@ public class MenuInventory implements InventoryProvider {
                         String style = LoreUtil.getStyle(displayName);
                         for (String placeholder : placeholders) {
                             String replacedText = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.DISPLAY_NAME, style, null));
-                            replacedText = TextUtil.applyColor(replacedText);
                             displayName = TextUtil.replace(displayName, "{" + placeholder + "}", replacedText);
                         }
                     }
@@ -207,6 +206,7 @@ public class MenuInventory implements InventoryProvider {
                 if (slate.isPlaceholderAPIEnabled()) {
                     displayName = PlaceholderAPI.setPlaceholders(player, displayName);
                 }
+                displayName = TextUtil.applyColor(displayName);
                 meta.setDisplayName(displayName);
             }
             List<LoreLine> loreLines = item.getLore();
@@ -261,7 +261,6 @@ public class MenuInventory implements InventoryProvider {
                             String style = LoreUtil.getStyle(displayName);
                             for (String placeholder : placeholders) {
                                 String replacedText = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.DISPLAY_NAME, style, null), context);
-                                replacedText = TextUtil.applyColor(replacedText);
                                 displayName = TextUtil.replace(displayName, "{" + placeholder + "}", replacedText);
                             }
                         }
@@ -269,6 +268,7 @@ public class MenuInventory implements InventoryProvider {
                     if (slate.isPlaceholderAPIEnabled()) {
                         displayName = PlaceholderAPI.setPlaceholders(player, displayName);
                     }
+                    displayName = TextUtil.applyColor(displayName);
                     meta.setDisplayName(displayName);
                 }
                 List<LoreLine> loreLines = item.getActiveLore(context);
@@ -300,14 +300,6 @@ public class MenuInventory implements InventoryProvider {
                 addTemplateItemToInventory(item, itemStack, pos, contents, player, provider, context);
             }
         }
-    }
-
-    private List<String> applyColorToLore(List<String> lore) {
-        List<String> appliedLore = new ArrayList<>();
-        for (String line : lore) {
-            appliedLore.add(TextUtil.applyColor(line));
-        }
-        return appliedLore;
     }
 
     /**
