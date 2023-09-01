@@ -43,7 +43,13 @@ public class TemplateItemParser<C> extends MenuItemParser {
 
         if (contextProvider != null) {
             for (ConfigurationNode contextNode : section.node("contexts").childrenMap().values()) {
-                String key = (String) Objects.requireNonNull(contextNode.key());
+                String key;
+                if (contextNode.key() instanceof String) {
+                    key = (String) Objects.requireNonNull(contextNode.key());
+                } else {
+                    key = String.valueOf(contextNode.key());
+                }
+
                 C context = contextProvider.parse(menuName, key);
 
                 if (context != null) { // Context parse found a match
