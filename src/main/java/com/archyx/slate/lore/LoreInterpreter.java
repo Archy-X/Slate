@@ -238,6 +238,7 @@ public class LoreInterpreter {
 
     private String applyStyleTags(TextLore textLore, String text) {
         // Create a TagResolver for each style
+        boolean[] usedTags = new boolean[10];
         for (Map.Entry<Integer, String> entry : textLore.getStyles().getStyleMap().entrySet()) {
             String target = String.valueOf(entry.getKey());
             String style = entry.getValue();
@@ -245,6 +246,18 @@ public class LoreInterpreter {
 
             text = TextUtil.replace(text, "<" + target + ">", style); // Replace opening tag
             text = TextUtil.replace(text, "</" + target + ">", styleClose); // Replacing closing tag
+
+            // Mark as used
+            int index = entry.getKey();
+            if (index < 10) {
+                usedTags[index] = true;
+            }
+        }
+        // Remove unused tags
+        for (int i = 0; i < usedTags.length; i++) {
+            if (usedTags[i]) continue; // Ignore used tags
+            text = TextUtil.replace(text, "<" + i + ">", "");
+            text = TextUtil.replace(text, "</" + i + ">", "");
         }
         return text;
     }
