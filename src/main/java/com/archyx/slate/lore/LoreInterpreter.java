@@ -80,7 +80,9 @@ public class LoreInterpreter {
                     Pair<String, ListData> pair = detectListPlaceholder(placeholder);
 
                     String replacedLine = provider.onPlaceholderReplace(pair.first(), player, activeMenu, new PlaceholderData(PlaceholderType.LORE, textLore.getStyles().getStyle(0), pair.second()));
-                    text = TextUtil.replace(text, "{" + placeholder + "}", replacedLine);
+                    if (replacedLine != null) {
+                        text = TextUtil.replace(text, "{" + placeholder + "}", replacedLine);
+                    }
                 }
             }
         }
@@ -96,7 +98,9 @@ public class LoreInterpreter {
                     Pair<String, ListData> pair = detectListPlaceholder(placeholder);
 
                     String replacedLine = provider.onPlaceholderReplace(pair.first(), player, activeMenu, new PlaceholderData(PlaceholderType.LORE, textLore.getStyles().getStyle(0), pair.second()), context);
-                    text = TextUtil.replace(text, "{" + placeholder + "}", replacedLine);
+                    if (replacedLine != null) {
+                        text = TextUtil.replace(text, "{" + placeholder + "}", replacedLine);
+                    }
                 }
             }
         }
@@ -112,7 +116,9 @@ public class LoreInterpreter {
                     Pair<String, ListData> pair = detectListPlaceholder(placeholder);
 
                     String replacedLine = provider.onPlaceholderReplace(pair.first(), player, activeMenu, new PlaceholderData(PlaceholderType.LORE, textLore.getStyles().getStyle(0), pair.second()), componentData, context);
-                    text = TextUtil.replace(text, "{" + placeholder + "}", replacedLine);
+                    if (replacedLine != null) {
+                        text = TextUtil.replace(text, "{" + placeholder + "}", replacedLine);
+                    }
                 }
             }
         }
