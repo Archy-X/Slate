@@ -11,6 +11,7 @@ public class ListBuilder {
 
     public ListBuilder(ListData listData) {
         this.listData = listData;
+        this.list = "";
     }
 
     public ListBuilder append(String text, String... rep) {
