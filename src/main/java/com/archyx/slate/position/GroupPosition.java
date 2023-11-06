@@ -57,6 +57,16 @@ public class GroupPosition implements PositionProvider {
             if (index < slots.size()) {
                 return slots.get(index);
             }
+        } else if (group.getAlign() == GroupAlign.LEFT) {
+            List<SlotPos> slots = groupUtil.getLeftSlots();
+            if (index < slots.size()) {
+                return slots.get(index);
+            }
+        } else if (group.getAlign() == GroupAlign.RIGHT) {
+            List<SlotPos> slots = groupUtil.getRightSlots();
+            if (index < slots.size()) {
+                return slots.get(index);
+            }
         }
 
         return SlotPos.of(startRow, startCol);

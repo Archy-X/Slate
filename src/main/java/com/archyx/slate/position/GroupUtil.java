@@ -45,4 +45,36 @@ public class GroupUtil {
         return result;
     }
 
+    public List<SlotPos> getLeftSlots() {
+        List<SlotPos> result = new ArrayList<>();
+        int count = 0;
+        for (int i = startRow; i <= endRow; i++) {
+            for (int j = startCol; j <= endCol; j++) {
+                if (count < size) {
+                    result.add(SlotPos.of(i, j));
+                    count++;
+                } else {
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
+    public List<SlotPos> getRightSlots() {
+        List<SlotPos> result = new ArrayList<>();
+        int count = 0;
+        for (int i = endRow; i >= startRow; i--) {
+            for (int j = endCol; j > startCol; j--) {
+                if (count < size) {
+                    result.add(SlotPos.of(i, j));
+                    count++;
+                } else {
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
 }
