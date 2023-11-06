@@ -18,7 +18,7 @@ public class ListBuilder {
         if (rep != null) {
             text = replace(text, rep);
         }
-        if (list == null) {
+        if (list == null || list.isEmpty()) {
             list = text;
         } else if (index % (listData.getInterval() > 0 ? listData.getInterval() : 1) == 0) {
             list += listData.getInsertion() + text;
