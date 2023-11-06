@@ -1,13 +1,16 @@
 package com.archyx.slate.menu;
 
 import com.archyx.slate.component.MenuComponent;
+import com.archyx.slate.context.ContextGroup;
 import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.TemplateItem;
 import com.archyx.slate.item.active.ActiveItem;
 import com.archyx.slate.position.PositionProvider;
+import org.checkerframework.checker.units.qual.C;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class ActiveMenu {
@@ -161,12 +164,22 @@ public class ActiveMenu {
     }
 
     @SuppressWarnings("unchecked")
-    public <C> void setPositionProvider(String itemName, C context, PositionProvider provider) {
-        MenuItem menuItem = menuInventory.getMenu().getItems().get(itemName);
+    public <C> void setPositionProvider(String templateName, C context, PositionProvider provider) {
+        MenuItem menuItem = menuInventory.getMenu().getItems().get(templateName);
         if (menuItem instanceof TemplateItem) {
             TemplateItem<C> templateItem = (TemplateItem<C>) menuItem;
             templateItem.getPositionsMap().put(context, provider);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, ContextGroup> getContextGroups(String templateName) {
+        MenuItem menuItem = menuInventory.getMenu().getItems().get(templateName);
+        if (menuItem instanceof TemplateItem) {
+            TemplateItem<C> templateItem = (TemplateItem<C>) menuItem;
+            return templateItem.getContextGroups();
+        }
+        return new HashMap<>();
     }
 
 }

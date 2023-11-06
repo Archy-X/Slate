@@ -3,6 +3,7 @@ package com.archyx.slate.item;
 import com.archyx.slate.Slate;
 import com.archyx.slate.action.Action;
 import com.archyx.slate.action.click.ClickAction;
+import com.archyx.slate.context.ContextGroup;
 import com.archyx.slate.lore.LoreLine;
 import com.archyx.slate.position.PositionProvider;
 import fr.minuskube.inv.content.SlotPos;
@@ -21,8 +22,9 @@ public class TemplateItem<C> extends MenuItem {
     private final Map<C, List<LoreLine>> contextualLore;
     private final ItemStack defaultBaseItem;
     private final SlotPos defaultPosition;
+    private final Map<String, ContextGroup> contextGroups;
 
-    public TemplateItem(Slate slate, String name, Map<C, ItemStack> baseItems, ItemStack defaultBaseItem, String displayName, List<LoreLine> lore, Map<C, String> contextualDisplayNames, Map<C, List<LoreLine>> contextualLore, Map<ClickAction, List<Action>> actions, Map<C, PositionProvider> positions, SlotPos defaultPosition, Map<String, Object> options) {
+    public TemplateItem(Slate slate, String name, Map<C, ItemStack> baseItems, ItemStack defaultBaseItem, String displayName, List<LoreLine> lore, Map<C, String> contextualDisplayNames, Map<C, List<LoreLine>> contextualLore, Map<ClickAction, List<Action>> actions, Map<C, PositionProvider> positions, SlotPos defaultPosition, Map<String, Object> options, Map<String, ContextGroup> contextGroups) {
         super(slate, name, displayName, lore, actions, options);
         this.positions = positions;
         this.baseItems = baseItems;
@@ -30,6 +32,7 @@ public class TemplateItem<C> extends MenuItem {
         this.contextualLore = contextualLore;
         this.defaultBaseItem = defaultBaseItem;
         this.defaultPosition = defaultPosition;
+        this.contextGroups = new HashMap<>();
     }
 
     public PositionProvider getPosition(C context) {
@@ -103,4 +106,7 @@ public class TemplateItem<C> extends MenuItem {
         return getLore();
     }
 
+    public Map<String, ContextGroup> getContextGroups() {
+        return contextGroups;
+    }
 }

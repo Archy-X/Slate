@@ -33,6 +33,7 @@ public class TemplateItemParser<C> extends MenuItemParser {
         builder.name(name);
 
         Map<String, ContextGroup> groups = loadGroups(section);
+        builder.contextGroups(groups);
 
         // Look through keys for contexts
         Map<C, ItemStack> baseItems = new HashMap<>();
