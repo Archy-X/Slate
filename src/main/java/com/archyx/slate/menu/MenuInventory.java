@@ -244,7 +244,6 @@ public class MenuInventory implements InventoryProvider {
                 itemStack = itemStack.clone();
             }
             if (provider != null) {
-                slate.getPlugin().getLogger().info("Initializing provider for context " + context);
                 provider.onInitialize(player, activeMenu, context);
                 itemStack = modifyBaseItem(provider, itemStack, player, activeMenu, context); // Apply provider base item modifications
             }
