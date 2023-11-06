@@ -36,6 +36,10 @@ public class TemplateItem<C> extends MenuItem {
         return positions.get(context);
     }
 
+    public Map<C, PositionProvider> getPositionsMap() {
+        return positions;
+    }
+
     public Map<C, ItemStack> getBaseItems() {
         Map<C, ItemStack> clonedItems = new HashMap<>();
         for (Map.Entry<C, ItemStack> entry : baseItems.entrySet()) {

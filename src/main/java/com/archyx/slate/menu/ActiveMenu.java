@@ -2,7 +2,9 @@ package com.archyx.slate.menu;
 
 import com.archyx.slate.component.MenuComponent;
 import com.archyx.slate.item.MenuItem;
+import com.archyx.slate.item.TemplateItem;
 import com.archyx.slate.item.active.ActiveItem;
+import com.archyx.slate.position.PositionProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -156,6 +158,15 @@ public class ActiveMenu {
     @NotNull
     public String getFormat(String key) {
         return menuInventory.getMenu().getFormats().getOrDefault(key, key);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <C> void setPositionProvider(String itemName, C context, PositionProvider provider) {
+        MenuItem menuItem = menuInventory.getMenu().getItems().get(itemName);
+        if (menuItem instanceof TemplateItem) {
+            TemplateItem<C> templateItem = (TemplateItem<C>) menuItem;
+            templateItem.getPositionsMap().put(context, provider);
+        }
     }
 
 }
