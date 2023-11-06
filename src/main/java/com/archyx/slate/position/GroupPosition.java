@@ -3,6 +3,7 @@ package com.archyx.slate.position;
 import com.archyx.slate.context.ContextGroup;
 import com.archyx.slate.context.GroupAlign;
 import fr.minuskube.inv.content.SlotPos;
+import org.bukkit.Bukkit;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -33,11 +34,15 @@ public class GroupPosition implements PositionProvider {
         List<GroupPosition> providers = positionData.stream()
                 .filter(p -> p instanceof GroupPosition)
                 .map(p -> (GroupPosition) p)
-                .filter(p -> p.getGroup().equals(group))
+                .filter(p -> {
+                    Bukkit.getLogger().info("Checking if group " + p.getGroup().hashCode() + " equals " + group.hashCode());
+                    return p.getGroup().equals(group);
+                })
                 .sorted(Comparator.comparingInt(GroupPosition::getOrder)) // Sort by ascending order
                 .collect(Collectors.toList());
 
         int size = providers.size();
+        Bukkit.getLogger().info("Filtered provider size: " + size);
         int startRow = group.getStart().getRow();
         int startCol = group.getStart().getColumn();
         int endRow = group.getEnd().getRow();
@@ -45,7 +50,7 @@ public class GroupPosition implements PositionProvider {
 
         // Get the index of the current group in the list of providers
         int index = providers.size();
-        for (int i = 0; i <  providers.size(); i ++) {
+        for (int i = 0; i < providers.size(); i ++) {
             if (providers.get(i).getOrder() == order) {
                 index = i;
             }
@@ -55,6 +60,7 @@ public class GroupPosition implements PositionProvider {
         if (group.getAlign() == GroupAlign.CENTER) {
             List<SlotPos> slots = groupUtil.getCenterSlots();
             if (index < slots.size()) {
+                Bukkit.getLogger().info("Returning with index " + index);
                 return slots.get(index);
             }
         } else if (group.getAlign() == GroupAlign.LEFT) {

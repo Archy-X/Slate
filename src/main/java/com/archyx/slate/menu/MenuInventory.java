@@ -244,7 +244,7 @@ public class MenuInventory implements InventoryProvider {
                 itemStack = itemStack.clone();
             }
             if (provider != null) {
-                slate.getPlugin().getLogger().info("Initializing provider for context" + context);
+                slate.getPlugin().getLogger().info("Initializing provider for context " + context);
                 provider.onInitialize(player, activeMenu, context);
                 itemStack = modifyBaseItem(provider, itemStack, player, activeMenu, context); // Apply provider base item modifications
             }
@@ -287,12 +287,10 @@ public class MenuInventory implements InventoryProvider {
             if (posProvider == null && provider != null) {
                 pos = provider.getSlotPos(player, activeMenu, context); // Use provider position if config pos is not defined
             } else if (posProvider != null) {
-                slate.getPlugin().getLogger().info("Nonnull posProvider");
                 List<PositionProvider> providers = new ArrayList<>();
                 for (C cont : contexts) {
                     providers.add(item.getPosition(cont));
                 }
-                slate.getPlugin().getLogger().info("providers size: " + providers.size());
                 // Parse the fixed or group position from providers
                 pos = posProvider.getPosition(providers);
             }
