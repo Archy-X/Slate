@@ -68,7 +68,6 @@ public class GroupPosition implements PositionProvider {
                 return slots.get(index);
             }
         }
-
         return SlotPos.of(startRow, startCol);
     }
 
