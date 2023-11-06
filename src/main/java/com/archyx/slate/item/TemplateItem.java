@@ -32,7 +32,7 @@ public class TemplateItem<C> extends MenuItem {
         this.contextualLore = contextualLore;
         this.defaultBaseItem = defaultBaseItem;
         this.defaultPosition = defaultPosition;
-        this.contextGroups = new HashMap<>();
+        this.contextGroups = contextGroups;
     }
 
     public PositionProvider getPosition(C context) {
