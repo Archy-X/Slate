@@ -6,7 +6,6 @@ import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.TemplateItem;
 import com.archyx.slate.item.active.ActiveItem;
 import com.archyx.slate.position.PositionProvider;
-import org.checkerframework.checker.units.qual.C;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -164,19 +163,18 @@ public class ActiveMenu {
     }
 
     @SuppressWarnings("unchecked")
-    public <C> void setPositionProvider(String templateName, C context, PositionProvider provider) {
+    public <T> void setPositionProvider(String templateName, T context, PositionProvider provider) {
         MenuItem menuItem = menuInventory.getMenu().getItems().get(templateName);
         if (menuItem instanceof TemplateItem) {
-            TemplateItem<C> templateItem = (TemplateItem<C>) menuItem;
+            TemplateItem<T> templateItem = (TemplateItem<T>) menuItem;
             templateItem.getPositionsMap().put(context, provider);
         }
     }
 
-    @SuppressWarnings("unchecked")
     public Map<String, ContextGroup> getContextGroups(String templateName) {
         MenuItem menuItem = menuInventory.getMenu().getItems().get(templateName);
         if (menuItem instanceof TemplateItem) {
-            TemplateItem<C> templateItem = (TemplateItem<C>) menuItem;
+            TemplateItem<?> templateItem = (TemplateItem<?>) menuItem;
             return templateItem.getContextGroups();
         }
         return new HashMap<>();
