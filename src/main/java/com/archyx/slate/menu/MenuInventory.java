@@ -236,14 +236,18 @@ public class MenuInventory implements InventoryProvider {
         }
 
         for (C context : contexts) {
+            Bukkit.getLogger().info("Handling context " + context);
             ItemStack itemStack = item.getBaseItems().get(context); // Get a context-specific base item
             if (itemStack == null) {
+                Bukkit.getLogger().info("Null base item, using default");
                 itemStack = item.getDefaultBaseItem(); // Otherwise use default base item
             }
             if (itemStack != null) {
+                Bukkit.getLogger().info("Nonnull item, cloning");
                 itemStack = itemStack.clone();
             }
             if (provider != null) {
+                Bukkit.getLogger().info("Nonnull provider, initializing and modifying");
                 provider.onInitialize(player, activeMenu, context);
                 itemStack = modifyBaseItem(provider, itemStack, player, activeMenu, context); // Apply provider base item modifications
             }
@@ -284,8 +288,10 @@ public class MenuInventory implements InventoryProvider {
             PositionProvider posProvider = item.getPosition(context);
             SlotPos pos = null;
             if (posProvider == null && provider != null) {
+                Bukkit.getLogger().info("Getting SlotPos");
                 pos = provider.getSlotPos(player, activeMenu, context); // Use provider position if config pos is not defined
             } else if (posProvider != null) {
+                Bukkit.getLogger().info("Using PositionProvider");
                 List<PositionProvider> providers = new ArrayList<>();
                 for (C cont : contexts) {
                     providers.add(item.getPosition(cont));
@@ -294,9 +300,11 @@ public class MenuInventory implements InventoryProvider {
                 pos = posProvider.getPosition(providers);
             }
             if (pos == null) {
+                Bukkit.getLogger().info("Null position, getting default positon");
                 pos = item.getDefaultPosition();
             }
             if (pos != null) {
+                Bukkit.getLogger().info("Adding to inventory");
                 addTemplateItemToInventory(item, itemStack, pos, contents, player, provider, context);
             }
         }
