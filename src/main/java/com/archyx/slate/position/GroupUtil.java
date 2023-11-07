@@ -3,6 +3,7 @@ package com.archyx.slate.position;
 import fr.minuskube.inv.content.SlotPos;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class GroupUtil {
@@ -65,7 +66,7 @@ public class GroupUtil {
         List<SlotPos> result = new ArrayList<>();
         int count = 0;
         for (int i = endRow; i >= startRow; i--) {
-            for (int j = endCol; j > startCol; j--) {
+            for (int j = endCol; j >= startCol; j--) {
                 if (count < size) {
                     result.add(SlotPos.of(i, j));
                     count++;
@@ -74,6 +75,7 @@ public class GroupUtil {
                 }
             }
         }
+        Collections.reverse(result);
         return result;
     }
 
