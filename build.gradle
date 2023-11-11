@@ -40,7 +40,7 @@ repositories {
 dependencies {
     implementation("org.spongepowered:configurate-yaml:4.1.2")
     implementation('com.github.Archy-X:SmartInvs:5e842f3108') {
-        exclude group: 'org.spigotmc'
+        exclude group: 'org.spigotmc', module: 'spigot-api'
     }
     implementation 'com.github.Archy-X:XSeries:887fe61174'
     implementation 'dev.dbassett:skullcreator:3.0.1'
