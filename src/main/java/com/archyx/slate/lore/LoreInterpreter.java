@@ -22,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class LoreInterpreter {
 
@@ -214,6 +215,7 @@ public class LoreInterpreter {
         if (textLore.shouldWrap()) {
             if (textLore.isSmartWrap()) { // Detect tags inside string to use as insertions
                 String firstStyle = textLore.getStyles().getStyle(textLore.getWrapStyle());
+                AtomicReference<String> prevStyle = new AtomicReference<>(firstStyle);
                 text = firstStyle + textLore.getWrapIndent() + LoreUtil.wrapLore(text, slate.getLoreWrappingWidth(), textLore, (line, lore) -> {
                     // Find the last style tag in the line
                     int lastStartIndex = 0;
@@ -229,8 +231,9 @@ public class LoreInterpreter {
                     String style;
                     if (tagLength > 0) {
                         style = line.substring(lastStartIndex, lastStartIndex + tagLength);
+                        prevStyle.set(style);
                     } else {
-                        style = firstStyle;
+                        style = prevStyle.get();
                     }
                     return "\n" + lore.getWrapIndent() + style;
                 });
