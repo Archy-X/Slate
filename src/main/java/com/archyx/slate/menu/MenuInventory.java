@@ -29,7 +29,6 @@ import fr.minuskube.inv.content.InventoryProvider;
 import fr.minuskube.inv.content.SlotPos;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TranslatableComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import org.bukkit.Bukkit;
@@ -307,14 +306,15 @@ public class MenuInventory implements InventoryProvider {
 
     @SuppressWarnings("deprecation")
     private void setDisplayName(ItemMeta meta, Component component) {
-        String serialized = TextUtil.toString(component);
-        if (serialized.contains("!!REMOVE!!")) {
+        String displayName = TextUtil.toString(component);
+        if (displayName.contains("!!REMOVE!!")) {
             return;
         }
-        if (PaperUtil.IS_PAPER && component instanceof TranslatableComponent) {
-            PaperUtil.setDisplayName(meta, component.style(Style.style(NamedTextColor.WHITE)));
+        if (PaperUtil.IS_PAPER && displayName.contains("{lang:")) {
+            String key = TextUtil.substringsBetween(displayName, "{lang:", "}")[0];
+            PaperUtil.setDisplayName(meta, Component.translatable(key, Style.style(NamedTextColor.WHITE)));
         } else {
-            meta.setDisplayName(serialized);
+            meta.setDisplayName(displayName);
         }
     }
 
