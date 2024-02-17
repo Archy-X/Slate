@@ -19,6 +19,7 @@ import com.archyx.slate.lore.LoreInterpreter;
 import com.archyx.slate.lore.LoreLine;
 import com.archyx.slate.position.PositionProvider;
 import com.archyx.slate.util.LoreUtil;
+import com.archyx.slate.util.PaperUtil;
 import com.archyx.slate.util.TextUtil;
 import com.cryptomorin.xseries.XMaterial;
 import fr.minuskube.inv.ClickableItem;
@@ -27,6 +28,8 @@ import fr.minuskube.inv.content.InventoryContents;
 import fr.minuskube.inv.content.InventoryProvider;
 import fr.minuskube.inv.content.SlotPos;
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TranslatableComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -207,9 +210,7 @@ public class MenuInventory implements InventoryProvider {
                     displayName = PlaceholderAPI.setPlaceholders(player, displayName);
                 }
                 displayName = TextUtil.applyColor(displayName);
-                if (!displayName.contains("!!REMOVE!!")) {
-                    meta.setDisplayName(displayName);
-                }
+                setDisplayName(meta, displayName);
             }
             List<LoreLine> loreLines = item.getLore();
             if (loreLines != null) {
@@ -271,9 +272,7 @@ public class MenuInventory implements InventoryProvider {
                         displayName = PlaceholderAPI.setPlaceholders(player, displayName);
                     }
                     displayName = TextUtil.applyColor(displayName);
-                    if (!displayName.contains("!!REMOVE!!")) {
-                        meta.setDisplayName(displayName);
-                    }
+                    setDisplayName(meta, displayName);
                 }
                 List<LoreLine> loreLines = item.getActiveLore(context);
                 if (loreLines != null) {
@@ -303,6 +302,20 @@ public class MenuInventory implements InventoryProvider {
             if (pos != null) {
                 addTemplateItemToInventory(item, itemStack, pos, contents, player, provider, context);
             }
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private void setDisplayName(ItemMeta meta, String displayName) {
+        if (displayName.contains("!!REMOVE!!")) {
+            return;
+        }
+        if (displayName.contains("{translatable:")) {
+            String key = TextUtil.substringsBetween(displayName, "{translatable:", "}")[0];
+            TranslatableComponent component = Component.translatable(key);
+            PaperUtil.setDisplayName(meta, component);
+        } else {
+            meta.setDisplayName(displayName);
         }
     }
 
