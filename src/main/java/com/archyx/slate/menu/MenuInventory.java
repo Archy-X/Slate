@@ -31,6 +31,7 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -312,7 +313,9 @@ public class MenuInventory implements InventoryProvider {
         }
         if (PaperUtil.IS_PAPER && displayName.contains("{lang:")) {
             String key = TextUtil.substringsBetween(displayName, "{lang:", "}")[0];
-            PaperUtil.setDisplayName(meta, Component.translatable(key, Style.style(NamedTextColor.WHITE)));
+            PaperUtil.setDisplayName(meta, Component.translatable(key, Style.style(
+                    NamedTextColor.WHITE,
+                    TextDecoration.ITALIC.withState(false))));
         } else {
             meta.setDisplayName(displayName);
         }
