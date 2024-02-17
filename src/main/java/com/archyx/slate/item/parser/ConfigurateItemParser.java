@@ -236,7 +236,7 @@ public class ConfigurateItemParser {
     @Nullable
     public String parseDisplayName(ConfigurationNode section) {
         if (!section.node("display_name").virtual()) {
-            return TextUtil.applyColor(section.node("display_name").getString());
+            return TextUtil.toString(TextUtil.toComponent(section.node("display_name").getString()));
         }
         return null;
     }

@@ -6,7 +6,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class PaperUtil {
 
-    private static final boolean isPaper = init();
+    public static final boolean IS_PAPER = init();
 
     private static boolean init() {
         return hasClass("com.destroystokyo.paper.PaperConfig") || hasClass("io.papermc.paper.configuration.Configuration");
@@ -23,7 +23,7 @@ public class PaperUtil {
 
     @SuppressWarnings("deprecation")
     public static void setDisplayName(ItemMeta meta, Component component) {
-        if (isPaper) {
+        if (IS_PAPER) {
             meta.displayName(component);
         } else {
             meta.setDisplayName(LegacyComponentSerializer.legacySection().serialize(component));

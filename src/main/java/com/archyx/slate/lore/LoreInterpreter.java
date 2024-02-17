@@ -274,7 +274,7 @@ public class LoreInterpreter {
     private List<String> applyColorToLore(List<String> lore) {
         List<String> appliedLore = new ArrayList<>();
         for (String line : lore) {
-            appliedLore.add(TextUtil.applyColor(line));
+            appliedLore.add(TextUtil.toString(TextUtil.toComponent(line)));
         }
         return appliedLore;
     }

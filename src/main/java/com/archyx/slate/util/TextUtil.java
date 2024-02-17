@@ -4,11 +4,9 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.ParsingException;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 
 import java.util.*;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TextUtil {
@@ -80,32 +78,23 @@ public class TextUtil {
         return new ArrayList<>(Arrays.asList(input.split("(\\u005C\\u006E)|(\\n)")));
     }
 
-    public static String applyColor(String message) {
+    public static Component toComponent(String message) {
         message = TextUtil.replace(message, "§", "&"); // Replace section symbols to allow MiniMessage parsing
         MiniMessage mm = MiniMessage.miniMessage();
         try {
-            Component component = mm.deserialize(message);
-            message = LegacyComponentSerializer.builder().hexColors().useUnusualXRepeatedCharacterHexFormat().build()
-                    .serialize(component);
+            return mm.deserialize(message);
         } catch (ParsingException e) {
             Bukkit.getLogger().info("[Slate] Error applying MiniMessage formatting to input message: " + message);
             e.printStackTrace();
         }
-
-        Matcher matcher = hexPattern.matcher(message);
-        StringBuffer buffer = new StringBuffer(message.length() + 4 * 8);
-        while (matcher.find()) {
-            String group = matcher.group(1);
-            char COLOR_CHAR = ChatColor.COLOR_CHAR;
-            matcher.appendReplacement(buffer, COLOR_CHAR + "x"
-                    + COLOR_CHAR + group.charAt(0) + COLOR_CHAR + group.charAt(1)
-                    + COLOR_CHAR + group.charAt(2) + COLOR_CHAR + group.charAt(3)
-                    + COLOR_CHAR + group.charAt(4) + COLOR_CHAR + group.charAt(5)
-            );
-        }
-        message = matcher.appendTail(buffer).toString();
-        message = TextUtil.replaceNonEscaped(message, "&", "§");
         // MiniMessage parsing
+        return Component.text(message);
+    }
+
+    public static String toString(Component component) {
+        String message = LegacyComponentSerializer.builder().hexColors().useUnusualXRepeatedCharacterHexFormat().build()
+                .serialize(component);
+        message = TextUtil.replaceNonEscaped(message, "&", "§");
         return message;
     }
 

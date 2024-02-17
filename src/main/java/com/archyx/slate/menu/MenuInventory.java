@@ -29,7 +29,6 @@ import fr.minuskube.inv.content.InventoryProvider;
 import fr.minuskube.inv.content.SlotPos;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TranslatableComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -209,8 +208,7 @@ public class MenuInventory implements InventoryProvider {
                 if (slate.isPlaceholderAPIEnabled()) {
                     displayName = PlaceholderAPI.setPlaceholders(player, displayName);
                 }
-                displayName = TextUtil.applyColor(displayName);
-                setDisplayName(meta, displayName);
+                setDisplayName(meta, TextUtil.toComponent(displayName));
             }
             List<LoreLine> loreLines = item.getLore();
             if (loreLines != null) {
@@ -271,8 +269,7 @@ public class MenuInventory implements InventoryProvider {
                     if (slate.isPlaceholderAPIEnabled()) {
                         displayName = PlaceholderAPI.setPlaceholders(player, displayName);
                     }
-                    displayName = TextUtil.applyColor(displayName);
-                    setDisplayName(meta, displayName);
+                    setDisplayName(meta, TextUtil.toComponent(displayName));
                 }
                 List<LoreLine> loreLines = item.getActiveLore(context);
                 if (loreLines != null) {
@@ -306,16 +303,15 @@ public class MenuInventory implements InventoryProvider {
     }
 
     @SuppressWarnings("deprecation")
-    private void setDisplayName(ItemMeta meta, String displayName) {
-        if (displayName.contains("!!REMOVE!!")) {
+    private void setDisplayName(ItemMeta meta, Component component) {
+        String serialized = TextUtil.toString(component);
+        if (serialized.contains("!!REMOVE!!")) {
             return;
         }
-        if (displayName.contains("{translatable:")) {
-            String key = TextUtil.substringsBetween(displayName, "{translatable:", "}")[0];
-            TranslatableComponent component = Component.translatable(key);
+        if (PaperUtil.IS_PAPER) {
             PaperUtil.setDisplayName(meta, component);
         } else {
-            meta.setDisplayName(displayName);
+            meta.setDisplayName(serialized);
         }
     }
 
