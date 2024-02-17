@@ -29,6 +29,9 @@ import fr.minuskube.inv.content.InventoryProvider;
 import fr.minuskube.inv.content.SlotPos;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TranslatableComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -308,8 +311,8 @@ public class MenuInventory implements InventoryProvider {
         if (serialized.contains("!!REMOVE!!")) {
             return;
         }
-        if (PaperUtil.IS_PAPER) {
-            PaperUtil.setDisplayName(meta, component);
+        if (PaperUtil.IS_PAPER && component instanceof TranslatableComponent) {
+            PaperUtil.setDisplayName(meta, component.style(Style.style(NamedTextColor.WHITE)));
         } else {
             meta.setDisplayName(serialized);
         }
