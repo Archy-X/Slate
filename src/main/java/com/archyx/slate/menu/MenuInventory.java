@@ -207,7 +207,9 @@ public class MenuInventory implements InventoryProvider {
                     displayName = PlaceholderAPI.setPlaceholders(player, displayName);
                 }
                 displayName = TextUtil.applyColor(displayName);
-                meta.setDisplayName(displayName);
+                if (!displayName.contains("!!REMOVE!!")) {
+                    meta.setDisplayName(displayName);
+                }
             }
             List<LoreLine> loreLines = item.getLore();
             if (loreLines != null) {
@@ -269,7 +271,9 @@ public class MenuInventory implements InventoryProvider {
                         displayName = PlaceholderAPI.setPlaceholders(player, displayName);
                     }
                     displayName = TextUtil.applyColor(displayName);
-                    meta.setDisplayName(displayName);
+                    if (!displayName.contains("!!REMOVE!!")) {
+                        meta.setDisplayName(displayName);
+                    }
                 }
                 List<LoreLine> loreLines = item.getActiveLore(context);
                 if (loreLines != null) {
