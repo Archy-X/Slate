@@ -19,6 +19,7 @@ import com.archyx.slate.lore.LoreInterpreter;
 import com.archyx.slate.lore.LoreLine;
 import com.archyx.slate.position.PositionProvider;
 import com.archyx.slate.util.LoreUtil;
+import com.archyx.slate.util.PaperUtil;
 import com.archyx.slate.util.TextUtil;
 import com.cryptomorin.xseries.XMaterial;
 import fr.minuskube.inv.ClickableItem;
@@ -31,7 +32,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -305,7 +305,6 @@ public class MenuInventory implements InventoryProvider {
         }
     }
 
-    @SuppressWarnings("deprecation")
     private void setDisplayName(ItemMeta meta, Component component) {
         String displayName = TextUtil.toString(component);
         if (displayName.contains("!!REMOVE!!")) {
@@ -316,7 +315,7 @@ public class MenuInventory implements InventoryProvider {
             Component lang = Component.translatable(key, Style.style(
                     NamedTextColor.WHITE,
                     TextDecoration.ITALIC.withState(false)));
-            meta.setDisplayName(LegacyComponentSerializer.legacySection().serialize(lang));
+            PaperUtil.setDisplayName(meta, lang);
         }
     }
 
