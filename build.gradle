@@ -47,6 +47,8 @@ dependencies {
 
 shadowJar {
     archiveFileName.set("slate-${projectVersion}.jar")
+
+    relocate("net.kyori", "com.archyx.slate.kyori")
 }
 
 artifacts {
