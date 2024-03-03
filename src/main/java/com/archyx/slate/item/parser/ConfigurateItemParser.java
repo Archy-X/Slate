@@ -5,7 +5,6 @@ import com.archyx.slate.item.provider.KeyedItemProvider;
 import com.archyx.slate.lore.LoreFactory;
 import com.archyx.slate.lore.LoreLine;
 import com.archyx.slate.util.NumberUtil;
-import com.archyx.slate.util.TextUtil;
 import com.archyx.slate.util.Validate;
 import com.cryptomorin.xseries.XEnchantment;
 import com.cryptomorin.xseries.XMaterial;
@@ -236,7 +235,7 @@ public class ConfigurateItemParser {
     @Nullable
     public String parseDisplayName(ConfigurationNode section) {
         if (!section.node("display_name").virtual()) {
-            return TextUtil.toString(TextUtil.toComponent(section.node("display_name").getString()));
+            return section.node("display_name").getString();
         }
         return null;
     }

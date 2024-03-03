@@ -1,9 +1,13 @@
 package com.archyx.slate.util;
 
+import com.archyx.slate.text.TextFormatter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PaperUtil {
 
@@ -27,7 +31,26 @@ public class PaperUtil {
         if (IS_PAPER) {
             meta.setDisplayNameComponent(BungeeComponentSerializer.get().serialize(component));
         } else {
-            meta.setDisplayName(LegacyComponentSerializer.legacySection().serialize(component));
+            meta.setDisplayName(new TextFormatter().toString(component));
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    public static void setLore(ItemMeta meta, List<Component> components) {
+        if (IS_PAPER) {
+            List<BaseComponent[]> bungee = new ArrayList<>();
+            BungeeComponentSerializer serializer = BungeeComponentSerializer.get();
+            for (Component component : components) {
+                bungee.add(serializer.serialize(component));
+            }
+            meta.setLoreComponents(bungee);
+        } else {
+            List<String> text = new ArrayList<>();
+            TextFormatter tf = new TextFormatter();
+            for (Component component : components) {
+                text.add(tf.toString(component));
+            }
+            meta.setLore(text);
         }
     }
 

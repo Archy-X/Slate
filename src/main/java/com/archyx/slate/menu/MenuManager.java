@@ -293,33 +293,39 @@ public class MenuManager {
      * @param page The page number to open, 0 is the first page
      */
     public void openMenu(Player player, String name, Map<String, Object> properties, int page) {
-        ConfigurableMenu menu = menus.get(name);
-        if (menu == null) {
-            throw new IllegalArgumentException("Menu with name " + name + " not registered");
-        }
-        MenuInventory menuInventory = new MenuInventory(slate, menu, player, properties, page);
-        String title = menu.getTitle();
-        // Replace title placeholders
-        if (menu.getProvider() != null) {
-            String[] placeholders = TextUtil.substringsBetween(title, "{", "}");
-            if (placeholders != null) {
-                for (String placeholder : placeholders) {
-                    title = TextUtil.replace(title, "{" + placeholder + "}",
-                            menu.getProvider().onPlaceholderReplace(placeholder, player, menuInventory.getActiveMenu()));
+        try {
+            ConfigurableMenu menu = menus.get(name);
+            if (menu == null) {
+                throw new IllegalArgumentException("Menu with name " + name + " not registered");
+            }
+            MenuInventory menuInventory = new MenuInventory(slate, menu, player, properties, page);
+            String title = menu.getTitle();
+            // Replace title placeholders
+            if (menu.getProvider() != null) {
+                String[] placeholders = TextUtil.substringsBetween(title, "{", "}");
+                if (placeholders != null) {
+                    for (String placeholder : placeholders) {
+                        title = TextUtil.replace(title, "{" + placeholder + "}",
+                                menu.getProvider().onPlaceholderReplace(placeholder, player, menuInventory.getActiveMenu()));
+                    }
+                }
+                if (slate.isPlaceholderAPIEnabled()) {
+                    title = PlaceholderAPI.setPlaceholders(player, title);
                 }
             }
-            if (slate.isPlaceholderAPIEnabled()) {
-                title = PlaceholderAPI.setPlaceholders(player, title);
-            }
+            // Build inventory and open
+            SmartInventory smartInventory = SmartInventory.builder()
+                    .title(title)
+                    .size(menu.getSize(), 9)
+                    .manager(slate.getInventoryManager())
+                    .provider(menuInventory)
+                    .build();
+            smartInventory.open(player);
+        } catch (Exception e) {
+            player.closeInventory();
+            slate.getPlugin().getLogger().warning("Error opening Slate menu " + name);
+            e.printStackTrace();
         }
-        // Build inventory and open
-        SmartInventory smartInventory = SmartInventory.builder()
-                .title(title)
-                .size(menu.getSize(), 9)
-                .manager(slate.getInventoryManager())
-                .provider(menuInventory)
-                .build();
-        smartInventory.open(player);
     }
 
     public void openMenu(Player player, String name, Map<String, Object> properties) {

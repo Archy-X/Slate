@@ -18,6 +18,7 @@ import com.archyx.slate.item.provider.TemplateItemProvider;
 import com.archyx.slate.lore.LoreInterpreter;
 import com.archyx.slate.lore.LoreLine;
 import com.archyx.slate.position.PositionProvider;
+import com.archyx.slate.text.TextFormatter;
 import com.archyx.slate.util.LoreUtil;
 import com.archyx.slate.util.PaperUtil;
 import com.archyx.slate.util.TextUtil;
@@ -29,9 +30,6 @@ import fr.minuskube.inv.content.InventoryProvider;
 import fr.minuskube.inv.content.SlotPos;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.Style;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -58,6 +56,7 @@ public class MenuInventory implements InventoryProvider {
     private final int currentPage;
     private final Player player;
     private InventoryContents contents;
+    private final TextFormatter tf = new TextFormatter();
 
     public MenuInventory(Slate slate, ConfigurableMenu menu, Player player, Map<String, Object> properties, int currentPage) {
         this.slate = slate;
@@ -140,12 +139,11 @@ public class MenuInventory implements InventoryProvider {
             if (meta != null) {
                 String displayName = fillItem.getDisplayName();
                 if (displayName != null) {
-                    meta.setDisplayName(displayName);
+                    setDisplayName(meta, tf.toComponent(displayName));
                 }
                 List<LoreLine> loreLines = fillItem.getLore();
                 if (loreLines != null) {
-                    List<String> lore = loreInterpreter.interpretLore(loreLines, null, player, activeMenu);
-                    meta.setLore(lore);
+                    setLore(meta, loreInterpreter.interpretLore(loreLines, null, player, activeMenu));
                 }
                 itemStack.setItemMeta(meta);
             }
@@ -211,14 +209,11 @@ public class MenuInventory implements InventoryProvider {
                 if (slate.isPlaceholderAPIEnabled()) {
                     displayName = PlaceholderAPI.setPlaceholders(player, displayName);
                 }
-                setDisplayName(meta, TextUtil.toComponent(displayName));
+                setDisplayName(meta, tf.toComponent(displayName));
             }
             List<LoreLine> loreLines = item.getLore();
             if (loreLines != null) {
-                List<String> lore = loreInterpreter.interpretLore(loreLines, provider, player, activeMenu);
-                if (!lore.isEmpty()) {
-                    meta.setLore(lore);
-                }
+                setLore(meta, loreInterpreter.interpretLore(loreLines, provider, player, activeMenu));
             }
             itemStack.setItemMeta(meta);
         }
@@ -272,14 +267,11 @@ public class MenuInventory implements InventoryProvider {
                     if (slate.isPlaceholderAPIEnabled()) {
                         displayName = PlaceholderAPI.setPlaceholders(player, displayName);
                     }
-                    setDisplayName(meta, TextUtil.toComponent(displayName));
+                    setDisplayName(meta, tf.toComponent(displayName));
                 }
                 List<LoreLine> loreLines = item.getActiveLore(context);
                 if (loreLines != null) {
-                    List<String> lore = loreInterpreter.interpretLore(loreLines, provider, player, activeMenu, context);
-                    if (!lore.isEmpty()) {
-                        meta.setLore(lore);
-                    }
+                    setLore(meta, loreInterpreter.interpretLore(loreLines, provider, player, activeMenu, context));
                 }
                 itemStack.setItemMeta(meta);
             }
@@ -306,17 +298,16 @@ public class MenuInventory implements InventoryProvider {
     }
 
     private void setDisplayName(ItemMeta meta, Component component) {
-        String displayName = TextUtil.toString(component);
+        String displayName = tf.toString(component);
         if (displayName.contains("!!REMOVE!!")) {
             return;
         }
-        if (displayName.contains("{lang:")) {
-            String key = TextUtil.substringsBetween(displayName, "{lang:", "}")[0];
-            Component lang = Component.translatable(key, Style.style(
-                    NamedTextColor.WHITE,
-                    TextDecoration.ITALIC.withState(false)));
-            PaperUtil.setDisplayName(meta, lang);
-        }
+        PaperUtil.setDisplayName(meta, component);
+    }
+
+    private void setLore(ItemMeta meta, List<Component> components) {
+        if (components.isEmpty()) return;
+        PaperUtil.setLore(meta, components);
     }
 
     /**

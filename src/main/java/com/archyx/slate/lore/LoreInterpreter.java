@@ -11,10 +11,12 @@ import com.archyx.slate.item.provider.TemplateItemProvider;
 import com.archyx.slate.lore.type.ComponentLore;
 import com.archyx.slate.lore.type.TextLore;
 import com.archyx.slate.menu.ActiveMenu;
+import com.archyx.slate.text.TextFormatter;
 import com.archyx.slate.util.LoreUtil;
 import com.archyx.slate.util.Pair;
 import com.archyx.slate.util.TextUtil;
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,49 +29,44 @@ import java.util.concurrent.atomic.AtomicReference;
 public class LoreInterpreter {
 
     private final Slate slate;
+    private final TextFormatter tf = new TextFormatter();
 
     public LoreInterpreter(Slate slate) {
         this.slate = slate;
     }
 
     @NotNull
-    public List<String> interpretLore(List<LoreLine> loreLines, @Nullable SingleItemProvider provider, Player player, ActiveMenu activeMenu) {
+    public List<Component> interpretLore(List<LoreLine> loreLines, @Nullable SingleItemProvider provider, Player player, ActiveMenu activeMenu) {
         List<String> lore = new ArrayList<>();
         for (LoreLine line : loreLines) {
-            if (line instanceof TextLore) {
-                TextLore textLore = (TextLore) line;
+            if (line instanceof TextLore textLore) {
                 lore.add(interpretTextLore(textLore, provider, player, activeMenu));
-            } else if (line instanceof ComponentLore) {
-                ComponentLore componentLore = (ComponentLore) line;
+            } else if (line instanceof ComponentLore componentLore) {
                 List<String> list = interpretComponent(componentLore, player, activeMenu);
                 if (list != null) {
                     lore.addAll(list);
                 }
             }
         }
-        lore = TextUtil.applyNewLines(lore);
-        lore = applyColorToLore(lore);
-        return lore;
+        lore = tf.applyNewLines(lore);
+        return tf.toComponentLore(lore);
     }
 
     @NotNull
-    public <T> List<String> interpretLore(List<LoreLine> loreLines, @Nullable TemplateItemProvider<T> provider, Player player, ActiveMenu activeMenu, T context) {
+    public <T> List<Component> interpretLore(List<LoreLine> loreLines, @Nullable TemplateItemProvider<T> provider, Player player, ActiveMenu activeMenu, T context) {
         List<String> lore = new ArrayList<>();
         for (LoreLine line : loreLines) {
-            if (line instanceof TextLore) {
-                TextLore textLore = (TextLore) line;
+            if (line instanceof TextLore textLore) {
                 lore.add(interpretTextLore(textLore, provider, player, activeMenu, context));
-            } else if (line instanceof ComponentLore) {
-                ComponentLore componentLore = (ComponentLore) line;
+            } else if (line instanceof ComponentLore componentLore) {
                 List<String> list = interpretComponent(componentLore, player, activeMenu, context);
                 if (list != null) {
                     lore.addAll(list);
                 }
             }
         }
-        lore = TextUtil.applyNewLines(lore);
-        lore = applyColorToLore(lore);
-        return lore;
+        lore = tf.applyNewLines(lore);
+        return tf.toComponentLore(lore);
     }
 
     private String interpretTextLore(TextLore textLore, @Nullable SingleItemProvider provider, Player player, ActiveMenu activeMenu) {
@@ -269,14 +266,6 @@ public class LoreInterpreter {
             text = TextUtil.replace(text, "</" + i + ">", "");
         }
         return text;
-    }
-
-    private List<String> applyColorToLore(List<String> lore) {
-        List<String> appliedLore = new ArrayList<>();
-        for (String line : lore) {
-            appliedLore.add(TextUtil.toString(TextUtil.toComponent(line)));
-        }
-        return appliedLore;
     }
 
 }
