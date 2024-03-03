@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.serialize.SerializationException;
+import org.spongepowered.configurate.yaml.NodeStyle;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
 import java.io.File;
@@ -163,6 +164,7 @@ public class MenuManager {
         YamlConfigurationLoader loader = YamlConfigurationLoader.builder()
                 .file(file)
                 .indent(2)
+                .nodeStyle(NodeStyle.BLOCK)
                 .build();
         try {
             ConfigurationNode config = loader.load();
