@@ -23,11 +23,7 @@ public class PaperUtil {
 
     @SuppressWarnings("deprecation")
     public static void setDisplayName(ItemMeta meta, Component component) {
-        if (IS_PAPER) {
-            meta.displayName(component);
-        } else {
-            meta.setDisplayName(LegacyComponentSerializer.legacySection().serialize(component));
-        }
+        meta.setDisplayName(LegacyComponentSerializer.legacySection().serialize(component));
     }
 
 }
