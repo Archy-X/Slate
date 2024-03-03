@@ -3,6 +3,7 @@ package com.archyx.slate.item;
 import com.archyx.slate.Slate;
 import com.archyx.slate.action.Action;
 import com.archyx.slate.action.click.ClickAction;
+import com.archyx.slate.lore.LoreLine;
 import fr.minuskube.inv.content.SlotPos;
 import org.bukkit.inventory.ItemStack;
 
@@ -14,7 +15,7 @@ public class SingleItem extends MenuItem {
     private final SlotPos position;
     private final ItemStack baseItem;
 
-    public SingleItem(Slate slate, String name, ItemStack baseItem, String displayName, List<String> lore, Map<ClickAction, List<Action>> actions, SlotPos position, Map<String, Object> options) {
+    public SingleItem(Slate slate, String name, ItemStack baseItem, String displayName, List<LoreLine> lore, Map<ClickAction, List<Action>> actions, SlotPos position, Map<String, Object> options) {
         super(slate, name, displayName, lore, actions, options);
         this.position = position;
         this.baseItem = baseItem;

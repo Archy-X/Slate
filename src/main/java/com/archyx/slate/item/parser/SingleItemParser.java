@@ -4,7 +4,9 @@ import com.archyx.slate.Slate;
 import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.builder.SingleItemBuilder;
 import com.archyx.slate.util.Validate;
-import org.bukkit.configuration.ConfigurationSection;
+import org.spongepowered.configurate.ConfigurationNode;
+
+import java.util.Objects;
 
 public class SingleItemParser extends MenuItemParser {
 
@@ -13,21 +15,21 @@ public class SingleItemParser extends MenuItemParser {
     }
 
     @Override
-    public MenuItem parse(ConfigurationSection section, String menuName) {
+    public MenuItem parse(ConfigurationNode section, String menuName) {
         SingleItemBuilder builder = new SingleItemBuilder(slate);
 
-        String name = section.getName();
+        String name = (String) Objects.requireNonNull(section.key());
         builder.name(name);
-        builder.baseItem(parseBaseItem(section));
+        builder.baseItem(itemParser.parseBaseItem(section));
 
-        String positionString = section.getString("pos");
+        String positionString = section.node("pos").getString();
         Validate.notNull(positionString, "Item must specify pos");
         builder.position(parsePosition(positionString));
 
-        builder.displayName(parseDisplayName(section));
-        builder.lore(parseLore(section));
+        builder.displayName(itemParser.parseDisplayName(section));
+        builder.lore(itemParser.parseLore(section));
 
-        parseActions(builder, section.getValues(false), menuName, name);
+        parseActions(builder, section, menuName, name);
 
         builder.options(slate.getMenuManager().loadOptions(section));
 

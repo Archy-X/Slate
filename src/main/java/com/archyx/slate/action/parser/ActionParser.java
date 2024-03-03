@@ -3,8 +3,7 @@ package com.archyx.slate.action.parser;
 import com.archyx.slate.Slate;
 import com.archyx.slate.action.Action;
 import com.archyx.slate.util.MapParser;
-
-import java.util.Map;
+import org.spongepowered.configurate.ConfigurationNode;
 
 public abstract class ActionParser extends MapParser {
 
@@ -14,6 +13,6 @@ public abstract class ActionParser extends MapParser {
         this.slate = slate;
     }
 
-    public abstract Action parse(Map<?, ?> map);
+    public abstract Action parse(ConfigurationNode config);
 
 }

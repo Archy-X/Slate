@@ -1,19 +1,12 @@
 package com.archyx.slate.util;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.ParsingException;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
+import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Array;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class TextUtil {
 
-    private static final Pattern hexPattern = Pattern.compile("&#([A-Fa-f0-9]{6})");
     private static final String[] EMPTY_STRING_ARRAY = {};
 
     public static String replace(String source, String os, String ns) {
@@ -66,47 +59,6 @@ public class TextUtil {
         String replaced = replace(source, "\\" + os, "\uE000"); // Replace escaped characters with intermediate char
         replaced = replace(replaced, os, ns); // Replace normal chars
         return replace(replaced, "\uE000", os); // Replace intermediate with original
-    }
-
-    public static List<String> applyNewLines(List<String> input) {
-        List<String> lore = new ArrayList<>();
-        for (String entry : input) {
-            lore.addAll(Arrays.asList(entry.split("(\\u005C\\u006E)|(\\n)")));
-        }
-        return lore;
-    }
-
-    public static List<String> applyNewLines(String input) {
-        return new ArrayList<>(Arrays.asList(input.split("(\\u005C\\u006E)|(\\n)")));
-    }
-
-    public static String applyColor(String message) {
-        message = TextUtil.replace(message, "§", "&"); // Replace section symbols to allow MiniMessage parsing
-        MiniMessage mm = MiniMessage.miniMessage();
-        try {
-            Component component = mm.deserialize(message);
-            message = LegacyComponentSerializer.builder().hexColors().useUnusualXRepeatedCharacterHexFormat().build()
-                    .serialize(component);
-        } catch (ParsingException e) {
-            Bukkit.getLogger().info("[Slate] Error applying MiniMessage formatting to input message: " + message);
-            e.printStackTrace();
-        }
-
-        Matcher matcher = hexPattern.matcher(message);
-        StringBuffer buffer = new StringBuffer(message.length() + 4 * 8);
-        while (matcher.find()) {
-            String group = matcher.group(1);
-            char COLOR_CHAR = ChatColor.COLOR_CHAR;
-            matcher.appendReplacement(buffer, COLOR_CHAR + "x"
-                    + COLOR_CHAR + group.charAt(0) + COLOR_CHAR + group.charAt(1)
-                    + COLOR_CHAR + group.charAt(2) + COLOR_CHAR + group.charAt(3)
-                    + COLOR_CHAR + group.charAt(4) + COLOR_CHAR + group.charAt(5)
-            );
-        }
-        message = matcher.appendTail(buffer).toString();
-        message = TextUtil.replaceNonEscaped(message, "&", "§");
-        // MiniMessage parsing
-        return message;
     }
 
     public static boolean isEmpty(final CharSequence cs) {
@@ -257,10 +209,20 @@ public class TextUtil {
                 break;
             }
             start += openLen;
-            final int end = str.indexOf(close, start);
+            int end = str.indexOf(close, start);
             if (end < 0) {
                 break;
             }
+
+            // Check if the substring is actually a double placeholder
+            boolean isDoublePlaceholder = str.startsWith(open, start);
+            if (isDoublePlaceholder) {
+                end = str.indexOf(close, end + closeLen);
+                if (end < 0) {
+                    break;
+                }
+            }
+
             list.add(str.substring(start, end));
             pos = end + closeLen;
         }
@@ -296,6 +258,129 @@ public class TextUtil {
             return "";
         }
         return str.substring(pos + separator.length());
+    }
+
+    public static String replaceEach(final String text, final String[] searchList, final String[] replacementList) {
+        return replaceEach(text, searchList, replacementList, false, 0);
+    }
+
+    private static String replaceEach(
+            final String text, final String[] searchList, final String[] replacementList, final boolean repeat, final int timeToLive) {
+        if (timeToLive < 0) {
+            final Set<String> searchSet = new HashSet<>(Arrays.asList(searchList));
+            final Set<String> replacementSet = new HashSet<>(Arrays.asList(replacementList));
+            searchSet.retainAll(replacementSet);
+            if (!searchSet.isEmpty()) {
+                throw new IllegalStateException("Aborting to protect against StackOverflowError - " +
+                        "output of one loop is the input of another");
+            }
+        }
+
+        if (isEmpty(text) || isEmpty(searchList) || isEmpty(replacementList) || !isEmpty(searchList) && timeToLive == -1) {
+            return text;
+        }
+
+        final int searchLength = searchList.length;
+        final int replacementLength = replacementList.length;
+
+        if (searchLength != replacementLength) {
+            throw new IllegalArgumentException("Search and Replace array lengths don't match: "
+                    + searchLength
+                    + " vs "
+                    + replacementLength);
+        }
+
+        final boolean[] noMoreMatchesForReplIndex = new boolean[searchLength];
+
+        int textIndex = -1;
+        int replaceIndex = -1;
+        int tempIndex;
+
+        for (int i = 0; i < searchLength; i++) {
+            if (noMoreMatchesForReplIndex[i] || isEmpty(searchList[i]) || replacementList[i] == null) {
+                continue;
+            }
+            tempIndex = text.indexOf(searchList[i]);
+
+            if (tempIndex == -1) {
+                noMoreMatchesForReplIndex[i] = true;
+            } else if (textIndex == -1 || tempIndex < textIndex) {
+                textIndex = tempIndex;
+                replaceIndex = i;
+            }
+        }
+
+        if (textIndex == -1) {
+            return text;
+        }
+
+        int start = 0;
+
+        final StringBuilder buf = getStringBuilder(text, searchList, replacementList);
+
+        while (textIndex != -1) {
+
+            for (int i = start; i < textIndex; i++) {
+                buf.append(text.charAt(i));
+            }
+            buf.append(replacementList[replaceIndex]);
+
+            start = textIndex + searchList[replaceIndex].length();
+
+            textIndex = -1;
+            replaceIndex = -1;
+            // find the next earliest match
+            // NOTE: logic mostly duplicated above START
+            for (int i = 0; i < searchLength; i++) {
+                if (noMoreMatchesForReplIndex[i] || isEmpty(searchList[i]) || replacementList[i] == null) {
+                    continue;
+                }
+                tempIndex = text.indexOf(searchList[i], start);
+
+                // see if we need to keep searching for this
+                if (tempIndex == -1) {
+                    noMoreMatchesForReplIndex[i] = true;
+                } else if (textIndex == -1 || tempIndex < textIndex) {
+                    textIndex = tempIndex;
+                    replaceIndex = i;
+                }
+            }
+            // NOTE: logic duplicated above END
+
+        }
+        final int textLength = text.length();
+        for (int i = start; i < textLength; i++) {
+            buf.append(text.charAt(i));
+        }
+        final String result = buf.toString();
+        if (!repeat) {
+            return result;
+        }
+
+        return replaceEach(result, searchList, replacementList, repeat, timeToLive - 1);
+    }
+
+    private static boolean isEmpty(Object[] array) {
+        return (array == null ? 0 : Array.getLength(array)) == 0;
+    }
+
+    @NotNull
+    private static StringBuilder getStringBuilder(String text, String[] searchList, String[] replacementList) {
+        int increase = 0;
+
+        for (int i = 0; i < searchList.length; i++) {
+            if (searchList[i] == null || replacementList[i] == null) {
+                continue;
+            }
+            final int greater = replacementList[i].length() - searchList[i].length();
+            if (greater > 0) {
+                increase += 3 * greater; // assume 3 matches
+            }
+        }
+        // have upper-bound at 20% increase, then let Java take over
+        increase = Math.min(increase, text.length() / 5);
+
+        return new StringBuilder(text.length() + increase);
     }
 
 }

@@ -4,9 +4,10 @@ import com.archyx.slate.Slate;
 import com.archyx.slate.action.Action;
 import com.archyx.slate.action.CommandAction;
 import com.archyx.slate.action.builder.CommandActionBuilder;
+import org.spongepowered.configurate.ConfigurationNode;
 
 import java.util.Locale;
-import java.util.Map;
+import java.util.Objects;
 
 public class CommandActionParser extends ActionParser {
 
@@ -15,10 +16,10 @@ public class CommandActionParser extends ActionParser {
     }
 
     @Override
-    public Action parse(Map<?, ?> map) {
+    public Action parse(ConfigurationNode config) {
         return new CommandActionBuilder(slate)
-                .command(getString(map, "command"))
-                .executor(CommandAction.Executor.valueOf(getString(map, "executor", "console").toUpperCase(Locale.ROOT)))
+                .command(Objects.requireNonNull(config.node("command").getString()))
+                .executor(CommandAction.Executor.valueOf(config.node("executor").getString("console").toUpperCase(Locale.ROOT)))
                 .build();
     }
 }

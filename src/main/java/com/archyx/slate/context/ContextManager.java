@@ -44,6 +44,19 @@ public class ContextManager {
         return keyedContexts.get(key);
     }
 
+    @Nullable
+    public Class<?> getContextClass(String key) {
+        ContextProvider<?> provider = getContextProvider(key);
+        if (provider != null) {
+            for (Map.Entry<Class<?>, ContextProvider<?>> entry : contexts.entrySet()) {
+                if (provider.equals(entry.getValue())) {
+                    return entry.getKey();
+                }
+            }
+        }
+        return null;
+    }
+
     private void registerDefaults() {
         registerContext(Integer.class, ((menuName, input) -> Ints.tryParse(input)));
         registerContext(Long.class, ((menuName, input) -> Longs.tryParse(input)));

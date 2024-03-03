@@ -1,9 +1,15 @@
 package com.archyx.slate.menu;
 
+import com.archyx.slate.component.MenuComponent;
+import com.archyx.slate.context.ContextGroup;
 import com.archyx.slate.item.MenuItem;
+import com.archyx.slate.item.TemplateItem;
 import com.archyx.slate.item.active.ActiveItem;
+import com.archyx.slate.position.PositionProvider;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class ActiveMenu {
@@ -135,6 +141,43 @@ public class ActiveMenu {
             }
         }
         return def;
+    }
+
+    public Map<String, MenuComponent> getComponents() {
+        return menuInventory.getMenu().getComponents();
+    }
+
+    public Map<String, String> getFormats() {
+        return menuInventory.getMenu().getFormats();
+    }
+
+    /**
+     * Gets a format from the menu's formats, returns the key if the format does not exist
+     *
+     * @param key The key of the format
+     * @return The format, or the key if the format does not exist
+     */
+    @NotNull
+    public String getFormat(String key) {
+        return menuInventory.getMenu().getFormats().getOrDefault(key, key);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> void setPositionProvider(String templateName, T context, PositionProvider provider) {
+        MenuItem menuItem = menuInventory.getMenu().getItems().get(templateName);
+        if (menuItem instanceof TemplateItem) {
+            TemplateItem<T> templateItem = (TemplateItem<T>) menuItem;
+            templateItem.getPositionsMap().put(context, provider);
+        }
+    }
+
+    public Map<String, ContextGroup> getContextGroups(String templateName) {
+        MenuItem menuItem = menuInventory.getMenu().getItems().get(templateName);
+        if (menuItem instanceof TemplateItem) {
+            TemplateItem<?> templateItem = (TemplateItem<?>) menuItem;
+            return templateItem.getContextGroups();
+        }
+        return new HashMap<>();
     }
 
 }

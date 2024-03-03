@@ -1,28 +1,22 @@
 plugins {
-    id 'com.github.johnrengelman.shadow' version '5.2.0'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'java'
     id 'java-library'
 }
 
-apply plugin: 'java'
-apply plugin: 'com.github.johnrengelman.shadow'
-
 group = 'com.archyx'
 version = '1.0.0'
 
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
+sourceCompatibility = '17'
+targetCompatibility = '17'
 
 repositories {
     mavenCentral()
     maven { url 'https://jitpack.io' }
     maven {
         url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
-        content {
-            includeGroup 'org.bukkit'
-            includeGroup 'org.spigotmc'
-        }
     }
+    maven { url = 'https://repo.papermc.io/repository/maven-public/' }
     maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
     maven { url = 'https://oss.sonatype.org/content/repositories/central' }
     maven {
@@ -38,38 +32,23 @@ repositories {
 }
 
 dependencies {
-    implementation('com.github.Archy-X:SmartInvs:5e842f3108') {
-        exclude group: 'org.spigotmc'
-    }
+    implementation("org.spongepowered:configurate-yaml:4.1.2")
+    implementation('com.github.Archy-X:SmartInvs:f77ddde177')
     implementation 'com.github.Archy-X:XSeries:887fe61174'
     implementation 'dev.dbassett:skullcreator:3.0.1'
-    implementation "net.kyori:adventure-text-minimessage:4.11.0"
-    implementation "net.kyori:adventure-platform-bukkit:4.1.2"
+    compileOnly("net.kyori:adventure-text-minimessage:4.14.0")
+    compileOnly("net.kyori:adventure-platform-bukkit:4.3.2")
     compileOnly 'de.tr7zw:item-nbt-api:2.11.3'
-    compileOnly 'org.spigotmc:spigot-api:1.19.4-R0.1-SNAPSHOT'
+    compileOnly 'io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT'
     compileOnly 'me.clip:placeholderapi:2.10.10'
-}
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 }
 
 shadowJar {
-    archiveName = "$baseName-$version.$extension"
-    relocate 'net.kyori.adventure', 'com.archyx.slate.adventure'
-    relocate 'net.kyori.examination', 'com.archyx.slate.examination'
+    archiveFileName.set("slate-${projectVersion}.jar")
 }
 
 artifacts {
-    archives sourcesJar
-    archives javadocJar
     archives shadowJar
 }
-
-build.dependsOn shadowJar
