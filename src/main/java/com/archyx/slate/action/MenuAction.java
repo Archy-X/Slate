@@ -24,7 +24,7 @@ public class MenuAction extends Action {
     public void execute(Player player, MenuInventory menuInventory, InventoryContents contents) {
         switch (actionType) {
             case OPEN:
-                slate.getMenuManager().openMenu(player, menuName, properties);
+                slate.getMenuManager().openMenu(player, menuName, getProperties(menuInventory));
                 break;
             case CLOSE:
                 player.closeInventory();
@@ -32,17 +32,24 @@ public class MenuAction extends Action {
             case NEXT_PAGE:
                 int nextPage = menuInventory.getCurrentPage() + 1;
                 if (nextPage < menuInventory.getTotalPages()) {
-                    slate.getMenuManager().openMenu(player, menuInventory.getMenu().getName(), properties, nextPage);
+                    slate.getMenuManager().openMenu(player, menuInventory.getMenu().getName(), getProperties(menuInventory), nextPage);
                 }
                 break;
             case PREVIOUS_PAGE:
                 int previousPage = menuInventory.getCurrentPage() - 1;
                 if (previousPage >= 0) {
-                    slate.getMenuManager().openMenu(player, menuInventory.getMenu().getName(), properties, previousPage);
+                    slate.getMenuManager().openMenu(player, menuInventory.getMenu().getName(), getProperties(menuInventory), previousPage);
                 }
                 break;
         }
 
+    }
+
+    private Map<String, Object> getProperties(MenuInventory inventory) {
+        if (!properties.isEmpty()) {
+            return properties;
+        }
+        return inventory.getProperties();
     }
 
     public enum ActionType {

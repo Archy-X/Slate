@@ -111,8 +111,7 @@ public class MenuInventory implements InventoryProvider {
             }
             if (menuItem instanceof SingleItem) {
                 activeItem = new ActiveSingleItem((SingleItem) menuItem);
-            } else if (menuItem instanceof TemplateItem) {
-                TemplateItem<?> templateItem = (TemplateItem<?>) menuItem;
+            } else if (menuItem instanceof TemplateItem<?> templateItem) {
                 activeItem = new ActiveTemplateItem<>(templateItem);
             } else {
                 continue;
@@ -316,8 +315,7 @@ public class MenuInventory implements InventoryProvider {
      */
     private void addSingleItemToInventory(SingleItem singleItem, ItemStack itemStack, SlotPos pos, InventoryContents contents, Player player, SingleItemProvider provider) {
         contents.set(pos, ClickableItem.from(itemStack, c -> {
-            if (!(c.getEvent() instanceof InventoryClickEvent)) return;
-            InventoryClickEvent event = (InventoryClickEvent) c.getEvent();
+            if (!(c.getEvent() instanceof InventoryClickEvent event)) return;
 
             ActiveItem activeItem = activeItems.get(singleItem.getName());
             if (activeItem != null && activeItem.getCooldown() != 0) {
@@ -335,8 +333,7 @@ public class MenuInventory implements InventoryProvider {
 
     private <C> void addTemplateItemToInventory(TemplateItem<C> templateItem, ItemStack itemStack, SlotPos pos, InventoryContents contents, Player player, TemplateItemProvider<C> provider, C context) {
         contents.set(pos, ClickableItem.from(itemStack, c -> {
-            if (!(c.getEvent() instanceof InventoryClickEvent)) return;
-            InventoryClickEvent event = (InventoryClickEvent) c.getEvent();
+            if (!(c.getEvent() instanceof InventoryClickEvent event)) return;
 
             ActiveItem activeItem = activeItems.get(templateItem.getName());
             if (activeItem != null && activeItem.getCooldown() != 0) {
@@ -357,10 +354,9 @@ public class MenuInventory implements InventoryProvider {
      */
     private void executeActions(MenuItem menuItem, Player player, InventoryContents contents, ItemClickData clickData) {
         // Convert click data event to InventoryClickEvent
-        if (!(clickData.getEvent() instanceof InventoryClickEvent)) {
+        if (!(clickData.getEvent() instanceof InventoryClickEvent event)) {
             return;
         }
-        InventoryClickEvent event = (InventoryClickEvent) clickData.getEvent();
 
         Set<ClickAction> clickActions = getClickActions(event.getClick());
         Map<ClickAction, List<Action>> actions = menuItem.getActions();
@@ -417,8 +413,7 @@ public class MenuInventory implements InventoryProvider {
             return;
         }
         ItemMeta meta = item.getItemMeta();
-        if (meta instanceof SkullMeta) {
-            SkullMeta skullMeta = (SkullMeta) meta;
+        if (meta instanceof SkullMeta skullMeta) {
             PersistentDataContainer container = skullMeta.getPersistentDataContainer();
             NamespacedKey key = new NamespacedKey(slate.getPlugin(), "skull_placeholder_uuid");
             String placeholder = container.get(key, PersistentDataType.STRING);
