@@ -2,9 +2,11 @@ package com.archyx.slate.action;
 
 import com.archyx.slate.Slate;
 import com.archyx.slate.menu.MenuInventory;
+import com.archyx.slate.menu.MenuProvider;
 import fr.minuskube.inv.content.InventoryContents;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class MenuAction extends Action {
@@ -46,10 +48,19 @@ public class MenuAction extends Action {
     }
 
     private Map<String, Object> getProperties(MenuInventory inventory) {
-        if (!properties.isEmpty()) {
-            return properties;
+        Map<String, Object> base = new HashMap<>();
+        // Use menu provider default properties
+        MenuProvider provider = slate.getMenuManager().getMenuProvider(menuName);
+        if (provider != null) {
+            base.putAll(provider.getDefaultProperties(inventory.getActiveMenu()));
         }
-        return inventory.getProperties();
+        // Otherwise fallback to current menu properties
+        if (base.isEmpty()) {
+            base.putAll(inventory.getProperties());
+        }
+        // Override with action-defined properties
+        base.putAll(properties);
+        return base;
     }
 
     public enum ActionType {

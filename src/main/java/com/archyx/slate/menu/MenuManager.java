@@ -17,6 +17,7 @@ import com.archyx.slate.util.TextUtil;
 import fr.minuskube.inv.SmartInventory;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.ConfigurationNode;
@@ -125,6 +126,20 @@ public class MenuManager {
      */
     public void registerMenuProvider(String name, MenuProvider provider) {
         menuProviders.put(name, provider);
+    }
+
+    @Nullable
+    public MenuProvider getMenuProvider(String name) {
+        return menuProviders.get(name);
+    }
+
+    @NotNull
+    public Map<String, Object> getDefaultProperties(String name, ActiveMenu activeMenu) {
+        MenuProvider provider = getMenuProvider(name);
+        if (provider != null) {
+            return provider.getDefaultProperties(activeMenu);
+        }
+        return new HashMap<>();
     }
 
     public ProviderManager getProviderManager(String menuName) {

@@ -3,6 +3,9 @@ package com.archyx.slate.menu;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public interface MenuProvider {
 
     /**
@@ -39,5 +42,9 @@ public interface MenuProvider {
     }
 
     default void onUpdate(Player player, ActiveMenu menu) {}
+
+    default Map<String, Object> getDefaultProperties(ActiveMenu activeMenu) {
+        return new HashMap<>();
+    }
 
 }
