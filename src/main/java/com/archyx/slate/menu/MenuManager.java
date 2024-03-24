@@ -13,6 +13,7 @@ import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.parser.SingleItemParser;
 import com.archyx.slate.item.parser.TemplateItemParser;
 import com.archyx.slate.item.provider.*;
+import com.archyx.slate.text.TextFormatter;
 import com.archyx.slate.util.TextUtil;
 import fr.minuskube.inv.SmartInventory;
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -37,6 +38,7 @@ public class MenuManager {
     private final Map<String, ProviderManager> menuProviderManagers;
     private final Map<String, MenuProvider> menuProviders;
     private final Map<String, Map<String, Object>> defaultOptions;
+    private final TextFormatter tf = new TextFormatter();
 
     public MenuManager(Slate slate) {
         this.slate = slate;
@@ -330,7 +332,7 @@ public class MenuManager {
             }
             // Build inventory and open
             SmartInventory smartInventory = SmartInventory.builder()
-                    .title(title)
+                    .title(tf.toString(tf.toComponent(title)))
                     .size(menu.getSize(), 9)
                     .manager(slate.getInventoryManager())
                     .provider(menuInventory)
