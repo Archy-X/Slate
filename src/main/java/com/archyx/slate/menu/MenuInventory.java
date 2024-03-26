@@ -22,7 +22,6 @@ import com.archyx.slate.text.TextFormatter;
 import com.archyx.slate.util.LoreUtil;
 import com.archyx.slate.util.PaperUtil;
 import com.archyx.slate.util.TextUtil;
-import com.cryptomorin.xseries.XMaterial;
 import fr.minuskube.inv.ClickableItem;
 import fr.minuskube.inv.ItemClickData;
 import fr.minuskube.inv.content.InventoryContents;
@@ -409,9 +408,6 @@ public class MenuInventory implements InventoryProvider {
 
     private void replaceItemPlaceholders(ItemStack item) {
         if (item == null) return;
-        if (XMaterial.getVersion() < 14) {
-            return;
-        }
         ItemMeta meta = item.getItemMeta();
         if (meta instanceof SkullMeta skullMeta) {
             PersistentDataContainer container = skullMeta.getPersistentDataContainer();

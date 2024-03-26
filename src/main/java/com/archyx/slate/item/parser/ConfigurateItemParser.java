@@ -6,8 +6,6 @@ import com.archyx.slate.lore.LoreFactory;
 import com.archyx.slate.lore.LoreLine;
 import com.archyx.slate.util.NumberUtil;
 import com.archyx.slate.util.Validate;
-import com.cryptomorin.xseries.XEnchantment;
-import com.cryptomorin.xseries.XMaterial;
 import de.tr7zw.changeme.nbtapi.NBTCompound;
 import de.tr7zw.changeme.nbtapi.NBTContainer;
 import de.tr7zw.changeme.nbtapi.NBTItem;
@@ -15,6 +13,7 @@ import dev.dbassett.skullcreator.SkullCreator;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -112,21 +111,13 @@ public class ConfigurateItemParser {
         return null;
     }
 
-    @SuppressWarnings("deprecation")
     private void parseDurability(ConfigurationNode section, ItemStack item) {
         ItemMeta meta = getMeta(item);
         int durability = section.node("durability").getInt();
-        if (XMaterial.isNewVersion()) {
-            if (meta instanceof Damageable) {
-                Damageable damageable = (Damageable) meta;
-                short maxDurability = item.getType().getMaxDurability();
-                damageable.setDamage(Math.max(maxDurability - durability, maxDurability));
-                item.setItemMeta(meta);
-            }
-        } else {
-            // For old versions
+        if (meta instanceof Damageable damageable) {
             short maxDurability = item.getType().getMaxDurability();
-            item.setDurability((short) Math.max(maxDurability - durability, maxDurability));
+            damageable.setDamage(Math.max(maxDurability - durability, maxDurability));
+            item.setItemMeta(meta);
         }
     }
 
@@ -190,20 +181,14 @@ public class ConfigurateItemParser {
                 if (splitEntry.length > 1) {
                     level = NumberUtil.toInt(splitEntry[1], 1);
                 }
-                Optional<XEnchantment> xEnchantment = XEnchantment.matchXEnchantment(enchantmentName.toUpperCase(Locale.ROOT));
-                if (xEnchantment.isPresent()) {
-                    Enchantment enchantment = xEnchantment.get().parseEnchantment();
-                    if (enchantment != null) {
-                        if (item.getType() == Material.ENCHANTED_BOOK && meta instanceof EnchantmentStorageMeta) {
-                            EnchantmentStorageMeta esm = (EnchantmentStorageMeta) meta;
-                            esm.addStoredEnchant(enchantment, level, true);
-                            item.setItemMeta(esm);
-                        } else {
-                            meta.addEnchant(enchantment, level, true);
-                            item.setItemMeta(meta);
-                        }
+                Enchantment enchantment = Registry.ENCHANTMENT.get(NamespacedKey.minecraft(enchantmentName.toLowerCase(Locale.ROOT)));
+                if (enchantment != null) {
+                    if (item.getType() == Material.ENCHANTED_BOOK && meta instanceof EnchantmentStorageMeta esm) {
+                        esm.addStoredEnchant(enchantment, level, true);
+                        item.setItemMeta(esm);
                     } else {
-                        throw new IllegalArgumentException("Invalid enchantment name " + enchantmentName);
+                        meta.addEnchant(enchantment, level, true);
+                        item.setItemMeta(meta);
                     }
                 } else {
                     throw new IllegalArgumentException("Invalid enchantment name " + enchantmentName);
@@ -283,12 +268,7 @@ public class ConfigurateItemParser {
     }
 
     protected Material parseMaterial(String name) {
-        Material material = Material.getMaterial(name);
-        if (material != null) {
-            return material;
-        }
-        Optional<XMaterial> materialOptional = XMaterial.matchXMaterial(name);
-        return materialOptional.map(XMaterial::parseMaterial).orElse(null);
+        return Material.getMaterial(name);
     }
 
     private void parseSkullMeta(ItemStack item, ItemMeta meta, ConfigurationNode section) {
@@ -310,14 +290,12 @@ public class ConfigurateItemParser {
         if (url != null) { // From Mojang URL
             SkullCreator.itemWithUrl(item, url);
         }
-        if (XMaterial.getVersion() >= 14) { // Persistent data container requires 1.14+
-            String placeholder = section.node("placeholder_uuid").getString();
-            if (placeholder != null) {
-                PersistentDataContainer container = meta.getPersistentDataContainer();
-                NamespacedKey key = new NamespacedKey(plugin, "skull_placeholder_uuid");
-                container.set(key, PersistentDataType.STRING, placeholder);
-                item.setItemMeta(meta);
-            }
+        String placeholder = section.node("placeholder_uuid").getString();
+        if (placeholder != null) {
+            PersistentDataContainer container = meta.getPersistentDataContainer();
+            NamespacedKey key = new NamespacedKey(plugin, "skull_placeholder_uuid");
+            container.set(key, PersistentDataType.STRING, placeholder);
+            item.setItemMeta(meta);
         }
     }
 

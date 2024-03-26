@@ -2,7 +2,7 @@ package com.archyx.slate.fill;
 
 import com.archyx.slate.Slate;
 import com.archyx.slate.item.MenuItem;
-import com.cryptomorin.xseries.XMaterial;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
@@ -22,7 +22,7 @@ public class FillItem extends MenuItem {
     }
 
     public static FillItem getDefault(Slate slate) {
-        return new FillItem(slate, XMaterial.BLACK_STAINED_GLASS_PANE.parseItem());
+        return new FillItem(slate, new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
     }
 
 }
