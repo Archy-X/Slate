@@ -1,6 +1,8 @@
 package com.archyx.slate.action;
 
 import com.archyx.slate.Slate;
+import com.archyx.slate.builder.BuiltMenu;
+import com.archyx.slate.info.MenuInfo;
 import com.archyx.slate.menu.MenuInventory;
 import com.archyx.slate.menu.MenuProvider;
 import fr.minuskube.inv.content.InventoryContents;
@@ -54,6 +56,9 @@ public class MenuAction extends Action {
         if (provider != null) {
             base.putAll(provider.getDefaultProperties(inventory.getActiveMenu()));
         }
+        // Add BuiltMenu properties from PropertyProvider
+        BuiltMenu builtMenu = slate.getBuiltMenu(menuName);
+        base.putAll(builtMenu.propertyProvider().get(new MenuInfo(inventory.getPlayer(), inventory.getActiveMenu())));
         // Otherwise fallback to current menu properties
         if (base.isEmpty()) {
             base.putAll(inventory.getProperties());

@@ -4,6 +4,8 @@ import org.jetbrains.annotations.Nullable;
 
 public interface ContextProvider<C> {
 
+    Class<C> getType();
+
     /**
      * Parses a context from an input
      *

@@ -6,7 +6,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
-@SuppressWarnings("UnstableApiUsage")
 public class ContextManager {
 
     private final Map<Class<?>, ContextProvider<?>> contexts;
@@ -21,16 +20,15 @@ public class ContextManager {
     /**
      * Registers a context provider to the given context type
      *
-     * @param contextClass The class to add the context provider for
      * @param provider The context provider
      * @param <C> The context type
      */
-    public <C> void registerContext(Class<C> contextClass, ContextProvider<C> provider) {
-        contexts.put(contextClass, provider);
+    public <C> void registerContext(ContextProvider<C> provider) {
+        contexts.put(provider.getType(), provider);
     }
 
-    public <C> void registerContext(String key, Class<C> contextClass, ContextProvider<C> provider) {
-        registerContext(contextClass, provider);
+    public <C> void registerContext(String key, ContextProvider<C> provider) {
+        registerContext(provider);
         keyedContexts.put(key, provider);
     }
 
@@ -58,32 +56,32 @@ public class ContextManager {
     }
 
     private void registerDefaults() {
-        registerContext(Integer.class, ((menuName, input) -> Ints.tryParse(input)));
-        registerContext(Long.class, ((menuName, input) -> Longs.tryParse(input)));
-        registerContext(Float.class, ((menuName, input) -> Floats.tryParse(input)));
-        registerContext(Double.class, ((menuName, input) -> Doubles.tryParse(input)));
-        registerContext(Short.class, (menuName, input) -> {
+        registerContext(new DefaultContextProvider<>(Integer.class, (menuName, input) -> Ints.tryParse(input)));
+        registerContext(new DefaultContextProvider<>(Long.class, (menuName, input) -> Longs.tryParse(input)));
+        registerContext(new DefaultContextProvider<>(Float.class, (menuName, input) -> Floats.tryParse(input)));
+        registerContext(new DefaultContextProvider<>(Double.class, (menuName, input) -> Doubles.tryParse(input)));
+        registerContext(new DefaultContextProvider<>(Short.class, (menuName, input) -> {
             Integer integer = Ints.tryParse(input);
             if (integer != null) {
                 return (short) integer.intValue();
             }
             return null;
-        });
-        registerContext(Byte.class, (menuName, input) -> {
+        }));
+        registerContext(new DefaultContextProvider<>(Byte.class, (menuName, input) -> {
             Integer integer = Ints.tryParse(input);
             if (integer != null) {
                 return (byte) integer.intValue();
             }
             return null;
-        });
-        registerContext(Boolean.class, (menuName, input) -> input.equalsIgnoreCase("true"));
-        registerContext(Character.class, (menuName, input) -> {
+        }));
+        registerContext(new DefaultContextProvider<>(Boolean.class, (menuName, input) -> input.equalsIgnoreCase("true")));
+        registerContext(new DefaultContextProvider<>(Character.class, (menuName, input) -> {
             if (input.length() == 1) {
                 return input.toCharArray()[0];
             }
             return null;
-        });
-        registerContext(String.class, (menuName, input) -> input);
+        }));
+        registerContext(new DefaultContextProvider<>(String.class, (menuName, input) -> input));
     }
 
 }

@@ -1,6 +1,8 @@
 package com.archyx.slate.menu;
 
 import com.archyx.slate.Slate;
+import com.archyx.slate.builder.BuiltMenu;
+import com.archyx.slate.builder.BuiltTemplate;
 import com.archyx.slate.component.ComponentParser;
 import com.archyx.slate.component.ComponentProvider;
 import com.archyx.slate.component.MenuComponent;
@@ -9,6 +11,7 @@ import com.archyx.slate.fill.FillData;
 import com.archyx.slate.fill.FillItem;
 import com.archyx.slate.fill.FillItemParser;
 import com.archyx.slate.fill.SlotParser;
+import com.archyx.slate.info.MenuInfo;
 import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.parser.SingleItemParser;
 import com.archyx.slate.item.parser.TemplateItemParser;
@@ -136,12 +139,16 @@ public class MenuManager {
     }
 
     @NotNull
-    public Map<String, Object> getDefaultProperties(String name, ActiveMenu activeMenu) {
+    public Map<String, Object> getDefaultProperties(String name, Player player, ActiveMenu activeMenu) {
         MenuProvider provider = getMenuProvider(name);
         if (provider != null) {
-            return provider.getDefaultProperties(activeMenu);
+            // Copy in case inner is immutable
+            return new HashMap<>(provider.getDefaultProperties(activeMenu));
+        } else {
+            BuiltMenu builtMenu = slate.getBuiltMenu(name);
+            // Copy in case inner is immutable
+            return new HashMap<>(builtMenu.propertyProvider().get(new MenuInfo(player, activeMenu)));
         }
-        return new HashMap<>();
     }
 
     public ProviderManager getProviderManager(String menuName) {
@@ -209,9 +216,17 @@ public class MenuManager {
                     String templateName = (String) Objects.requireNonNull(keyObj);
                     ConfigurationNode templateSection = templatesSection.node(keyObj);
                     if (!templateSection.virtual()) {
+                        ContextProvider<?> contextProvider = null;
                         ProviderManager providerManager = menuProviderManagers.get(menuName);
                         if (providerManager != null) {
-                            ContextProvider<?> contextProvider = providerManager.getContextProvider(templateName);
+                            contextProvider = providerManager.getContextProvider(templateName);
+                        } else {
+                            BuiltTemplate<?> builtTemplate = slate.getBuiltMenu(menuName).templates().get(templateName);
+                            if (builtTemplate != null) {
+                                contextProvider = slate.getContextManager().getContextProvider(builtTemplate.contextType());
+                            }
+                        }
+                        if (contextProvider != null) {
                             MenuItem item = new TemplateItemParser<>(slate, contextProvider).parse(templateSection, menuName);
                             items.put(templateName, item);
                         }
@@ -318,18 +333,21 @@ public class MenuManager {
             MenuInventory menuInventory = new MenuInventory(slate, menu, player, properties, page);
             String title = menu.getTitle();
             // Replace title placeholders
-            if (menu.getProvider() != null) {
-                String[] placeholders = TextUtil.substringsBetween(title, "{", "}");
-                if (placeholders != null) {
-                    for (String placeholder : placeholders) {
-                        title = TextUtil.replace(title, "{" + placeholder + "}",
-                                menu.getProvider().onPlaceholderReplace(placeholder, player, menuInventory.getActiveMenu()));
-                    }
-                }
-                if (slate.isPlaceholderAPIEnabled()) {
-                    title = PlaceholderAPI.setPlaceholders(player, title);
+            String[] placeholders = TextUtil.substringsBetween(title, "{", "}");
+            if (placeholders != null && menu.getProvider() != null) {
+                for (String placeholder : placeholders) {
+                    title = TextUtil.replace(title, "{" + placeholder + "}",
+                            menu.getProvider().onPlaceholderReplace(placeholder, player, menuInventory.getActiveMenu()));
                 }
             }
+            // Apply BuiltMenu replacers
+            BuiltMenu builtMenu = slate.getBuiltMenu(name);
+            title = builtMenu.applyTitleReplacers(title, slate, player, menuInventory.getActiveMenu());
+
+            if (slate.isPlaceholderAPIEnabled()) {
+                title = PlaceholderAPI.setPlaceholders(player, title);
+            }
+
             // Build inventory and open
             SmartInventory smartInventory = SmartInventory.builder()
                     .title(tf.toString(tf.toComponent(title)))
@@ -373,6 +391,12 @@ public class MenuManager {
 
     public Set<String> getMenuProviderNames() {
         return menuProviders.keySet();
+    }
+
+    public Set<String> getMenuNames() {
+        Set<String> names = new HashSet<>(menuProviders.keySet());
+        names.addAll(slate.getBuiltMenus().keySet());
+        return names;
     }
 
     public ProviderManager getGlobalProviderManager() {

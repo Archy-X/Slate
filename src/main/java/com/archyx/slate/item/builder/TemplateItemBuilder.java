@@ -15,6 +15,7 @@ import java.util.Map;
 
 public class TemplateItemBuilder<C> extends MenuItemBuilder {
 
+    private Class<C> contextClass;
     private Map<C, PositionProvider> positions;
     private Map<C, ItemStack> baseItems;
     private Map<C, String> contextualDisplayNames;
@@ -25,6 +26,11 @@ public class TemplateItemBuilder<C> extends MenuItemBuilder {
 
     public TemplateItemBuilder(Slate slate) {
         super(slate);
+    }
+
+    public TemplateItemBuilder<C> contextClass(Class<C> contextClass) {
+        this.contextClass = contextClass;
+        return this;
     }
 
     public TemplateItemBuilder<C> positions(Map<C, PositionProvider> positions) {
@@ -64,6 +70,6 @@ public class TemplateItemBuilder<C> extends MenuItemBuilder {
 
     @Override
     public MenuItem build() {
-        return new TemplateItem<>(slate, name, baseItems, defaultBaseItem, displayName, lore, contextualDisplayNames, contextualLore, actions, positions, defaultPosition, options, contextGroups);
+        return new TemplateItem<>(slate, name, contextClass, baseItems, defaultBaseItem, displayName, lore, contextualDisplayNames, contextualLore, actions, positions, defaultPosition, options, contextGroups);
     }
 }

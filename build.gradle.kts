@@ -21,21 +21,27 @@ repositories {
 }
 
 dependencies {
+    api("org.spongepowered:configurate-yaml:4.1.2") {
+        exclude("org.yaml", "snakeyaml")
+    }
     implementation("com.github.Archy-X:SmartInvs:f77ddde177")
     implementation("dev.dbassett:skullcreator:3.0.1")
-    compileOnly("org.spongepowered:configurate-yaml:4.1.2")
     compileOnly("net.kyori:adventure-text-minimessage:4.14.0")
     compileOnly("net.kyori:adventure-platform-bukkit:4.3.2")
     compileOnly("de.tr7zw:item-nbt-api:2.11.3")
     compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.10.10")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.1")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.1")
 }
 
 tasks.withType<ShadowJar> {
     val projectVersion: String by project
-    archiveFileName.set("slate-${projectVersion}.jar")
+    archiveFileName.set("Slate-${projectVersion}.jar")
+
+    relocate("dev.dbassett.skullcreator", "com.archyx.slate.skullcreator")
+
+    exclude("plugin.yml")
 }
 
 tasks.withType<JavaCompile> {
@@ -44,9 +50,6 @@ tasks.withType<JavaCompile> {
 
 tasks {
     build {
-        dependsOn(shadowJar)
-    }
-    jar {
         dependsOn(shadowJar)
     }
 }

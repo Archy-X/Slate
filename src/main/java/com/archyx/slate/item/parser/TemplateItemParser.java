@@ -12,15 +12,17 @@ import com.archyx.slate.position.GroupPosition;
 import com.archyx.slate.position.PositionProvider;
 import fr.minuskube.inv.content.SlotPos;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.ConfigurationNode;
 
 import java.util.*;
 
 public class TemplateItemParser<C> extends MenuItemParser {
 
+    @NotNull
     private final ContextProvider<C> contextProvider;
 
-    public TemplateItemParser(Slate slate, ContextProvider<C> contextProvider) {
+    public TemplateItemParser(Slate slate, @NotNull ContextProvider<C> contextProvider) {
         super(slate);
         this.contextProvider = contextProvider;
     }
@@ -32,6 +34,8 @@ public class TemplateItemParser<C> extends MenuItemParser {
         String name = (String) Objects.requireNonNull(section.key());
         builder.name(name);
 
+        builder.contextClass(contextProvider.getType());
+
         Map<String, ContextGroup> groups = loadGroups(section);
         builder.contextGroups(groups);
 
@@ -42,43 +46,41 @@ public class TemplateItemParser<C> extends MenuItemParser {
         Map<C, String> contextualDisplayNames = new HashMap<>();
         Map<C, List<LoreLine>> contextualLore = new HashMap<>();
 
-        if (contextProvider != null) {
-            for (ConfigurationNode contextNode : section.node("contexts").childrenMap().values()) {
-                String key;
-                if (contextNode.key() instanceof String) {
-                    key = (String) Objects.requireNonNull(contextNode.key());
-                } else {
-                    key = String.valueOf(contextNode.key());
+        for (ConfigurationNode contextNode : section.node("contexts").childrenMap().values()) {
+            String key;
+            if (contextNode.key() instanceof String) {
+                key = (String) Objects.requireNonNull(contextNode.key());
+            } else {
+                key = String.valueOf(contextNode.key());
+            }
+
+            C context = contextProvider.parse(menuName, key);
+
+            if (context != null) { // Context parse found a match
+                if (!contextNode.node("material").virtual() || !contextNode.node("key").virtual()) {
+                    baseItems.put(context, itemParser.parseBaseItem(contextNode));
                 }
-
-                C context = contextProvider.parse(menuName, key);
-
-                if (context != null) { // Context parse found a match
-                    if (!contextNode.node("material").virtual() || !contextNode.node("key").virtual()) {
-                        baseItems.put(context, itemParser.parseBaseItem(contextNode));
+                String positionString = contextNode.node("pos").getString();
+                if (positionString != null) {
+                    positions.put(context, new FixedPosition(parsePosition(positionString)));
+                } else if (!contextNode.node("group").virtual()) {
+                    String groupName = contextNode.node("group").getString();
+                    ContextGroup group = groups.get(groupName);
+                    if (group == null) {
+                        positions.put(context, new FixedPosition(parsePosition("0,0")));
+                    } else {
+                        int order = contextNode.node("order").getInt(1);
+                        positions.put(context, new GroupPosition(group, order));
                     }
-                    String positionString = contextNode.node("pos").getString();
-                    if (positionString != null) {
-                        positions.put(context, new FixedPosition(parsePosition(positionString)));
-                    } else if (!contextNode.node("group").virtual()) {
-                        String groupName = contextNode.node("group").getString();
-                        ContextGroup group = groups.get(groupName);
-                        if (group == null) {
-                            positions.put(context, new FixedPosition(parsePosition("0,0")));
-                        } else {
-                            int order = contextNode.node("order").getInt(1);
-                            positions.put(context, new GroupPosition(group, order));
-                        }
-                    }
-                    // Parse contextual display name and lore
-                    String contextualDisplayName = itemParser.parseDisplayName(contextNode);
-                    if (contextualDisplayName != null) {
-                        contextualDisplayNames.put(context, contextualDisplayName);
-                    }
-                    List<LoreLine> contextualLoreList = itemParser.parseLore(contextNode);
-                    if (!contextualLoreList.isEmpty()) {
-                        contextualLore.put(context, contextualLoreList);
-                    }
+                }
+                // Parse contextual display name and lore
+                String contextualDisplayName = itemParser.parseDisplayName(contextNode);
+                if (contextualDisplayName != null) {
+                    contextualDisplayNames.put(context, contextualDisplayName);
+                }
+                List<LoreLine> contextualLoreList = itemParser.parseLore(contextNode);
+                if (!contextualLoreList.isEmpty()) {
+                    contextualLore.put(context, contextualLoreList);
                 }
             }
         }

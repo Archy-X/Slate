@@ -1,0 +1,68 @@
+package com.archyx.slate.builder;
+
+import com.archyx.slate.action.click.ClickAction;
+import com.archyx.slate.function.*;
+import com.archyx.slate.info.TemplateInfo;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+
+public class TemplateBuilder<T> {
+
+    private final Class<T> contextType;
+    private final Map<String, TemplateReplacer<T>> replacers = new HashMap<>();
+    private TemplateReplacer<T> anyReplacer = p -> null;
+    private final Map<ClickAction, TemplateClicker<T>> clickers = new HashMap<>();
+    private TemplateModifier<T> modifier = TemplateInfo::item;
+    private DefinedContexts<T> definedContexts = m -> new HashSet<>();
+    private TemplateSlot<T> slotProvider = t -> null;
+
+    public TemplateBuilder(Class<T> contextType) {
+        this.contextType = contextType;
+    }
+
+    public static <T> TemplateBuilder<T> builder(Class<T> type) {
+        return new TemplateBuilder<>(type);
+    }
+
+    public TemplateBuilder<T> replace(String from, TemplateReplacer<T> replacer) {
+        replacers.put(from, replacer);
+        return this;
+    }
+
+    public TemplateBuilder<T> replaceAny(TemplateReplacer<T> replacer) {
+        anyReplacer = replacer;
+        return this;
+    }
+
+    public TemplateBuilder<T> onClick(TemplateClicker<T> clicker) {
+        clickers.put(ClickAction.ANY, clicker);
+        return this;
+    }
+
+    public TemplateBuilder<T> onClick(ClickAction action, TemplateClicker<T> clicker) {
+        clickers.put(action, clicker);
+        return this;
+    }
+
+    public TemplateBuilder<T> modify(TemplateModifier<T> modifier) {
+        this.modifier = modifier;
+        return this;
+    }
+
+    public TemplateBuilder<T> definedContexts(DefinedContexts<T> context) {
+        this.definedContexts = context;
+        return this;
+    }
+
+    public TemplateBuilder<T> slotPos(TemplateSlot<T> slot) {
+        this.slotProvider = slot;
+        return this;
+    }
+
+    public BuiltTemplate<T> build() {
+        return new BuiltTemplate<>(contextType, replacers, anyReplacer, clickers, modifier, definedContexts, slotProvider);
+    }
+    
+}

@@ -3,11 +3,14 @@ package com.archyx.slate.menu;
 import com.archyx.slate.Slate;
 import com.archyx.slate.action.Action;
 import com.archyx.slate.action.click.ClickAction;
+import com.archyx.slate.builder.BuiltItem;
+import com.archyx.slate.builder.BuiltMenu;
+import com.archyx.slate.builder.BuiltTemplate;
 import com.archyx.slate.fill.FillData;
 import com.archyx.slate.fill.FillItem;
-import com.archyx.slate.item.MenuItem;
-import com.archyx.slate.item.SingleItem;
-import com.archyx.slate.item.TemplateItem;
+import com.archyx.slate.info.ItemInfo;
+import com.archyx.slate.info.MenuInfo;
+import com.archyx.slate.item.*;
 import com.archyx.slate.item.active.ActiveItem;
 import com.archyx.slate.item.active.ActiveSingleItem;
 import com.archyx.slate.item.active.ActiveTemplateItem;
@@ -18,6 +21,8 @@ import com.archyx.slate.item.provider.TemplateItemProvider;
 import com.archyx.slate.lore.LoreInterpreter;
 import com.archyx.slate.lore.LoreLine;
 import com.archyx.slate.position.PositionProvider;
+import com.archyx.slate.item.TemplateClick;
+import com.archyx.slate.info.TemplateInfo;
 import com.archyx.slate.text.TextFormatter;
 import com.archyx.slate.util.LoreUtil;
 import com.archyx.slate.util.PaperUtil;
@@ -69,7 +74,8 @@ public class MenuInventory implements InventoryProvider {
         if (provider != null) {
             this.totalPages = provider.getPages(player, activeMenu);
         } else {
-            this.totalPages = 1;
+            BuiltMenu builtMenu = slate.getBuiltMenu(menu.getName());
+            this.totalPages = builtMenu.pageProvider().getPages(new MenuInfo(player, activeMenu));
         }
         this.currentPage = currentPage;
     }
@@ -141,7 +147,7 @@ public class MenuInventory implements InventoryProvider {
                 }
                 List<LoreLine> loreLines = fillItem.getLore();
                 if (loreLines != null) {
-                    setLore(meta, loreInterpreter.interpretLore(loreLines, null, player, activeMenu));
+                    setLore(meta, loreInterpreter.interpretLore(loreLines, null, player, activeMenu, BuiltItem.createEmpty()));
                 }
                 itemStack.setItemMeta(meta);
             }
@@ -180,21 +186,24 @@ public class MenuInventory implements InventoryProvider {
     private void addSingleItem(ActiveSingleItem activeItem, InventoryContents contents, Player player) {
         SingleItem item = activeItem.getItem();
         SingleItemProvider provider = slate.getMenuManager().constructSingleItem(item.getName(), menu.getName());
+        BuiltItem builtItem = slate.getBuiltMenu(menu.getName()).items().getOrDefault(item.getName(), BuiltItem.createEmpty());
 
         ItemStack itemStack = item.getBaseItem().clone();
-        if (provider != null) {
+        if (provider != null && builtItem.enableProvider()) {
             provider.onInitialize(player, activeMenu);
             itemStack = modifyBaseItem(provider, itemStack, player, activeMenu); // Apply provider base item modifications
         }
-        if (itemStack == null) {
-            return;
-        }
+        replaceItemPlaceholders(itemStack);
+        // Apply ItemModifier of built item
+        itemStack = builtItem.modifier().modify(new ItemInfo(player, activeMenu, itemStack));
+        if (itemStack == null) return;
+
         ItemMeta meta = itemStack.getItemMeta();
         if (meta != null) {
             String displayName = item.getDisplayName();
             if (displayName != null) {
                 // Replace display name placeholders
-                if (provider != null) {
+                if (provider != null && builtItem.enableProvider()) {
                     String[] placeholders = TextUtil.substringsBetween(displayName, "{", "}");
                     if (placeholders != null) {
                         String style = LoreUtil.getStyle(displayName);
@@ -204,6 +213,9 @@ public class MenuInventory implements InventoryProvider {
                         }
                     }
                 }
+                // BuiltItem replacers
+                displayName = builtItem.applyReplacers(displayName, slate, player, activeMenu, PlaceholderType.DISPLAY_NAME);
+
                 if (slate.isPlaceholderAPIEnabled()) {
                     displayName = PlaceholderAPI.setPlaceholders(player, displayName);
                 }
@@ -211,89 +223,111 @@ public class MenuInventory implements InventoryProvider {
             }
             List<LoreLine> loreLines = item.getLore();
             if (loreLines != null) {
-                setLore(meta, loreInterpreter.interpretLore(loreLines, provider, player, activeMenu));
+                setLore(meta, loreInterpreter.interpretLore(loreLines, provider, player, activeMenu, builtItem));
             }
             itemStack.setItemMeta(meta);
         }
 
         // Add item to inventory
         SlotPos pos = item.getPosition();
-        addSingleItemToInventory(item, itemStack, pos, contents, player, provider);
+        addSingleItemToInventory(item, itemStack, pos, contents, player, provider, builtItem);
     }
 
     private <C> void addTemplateItem(ActiveTemplateItem<C> activeItem, InventoryContents contents, Player player) {
         TemplateItem<C> item = activeItem.getItem();
         TemplateItemProvider<C> provider = slate.getMenuManager().constructTemplateItem(item.getName(), menu.getName());
+        BuiltTemplate<C> builtTemplate = slate.getBuiltMenu(menu.getName()).getTemplate(item.getName(), item.getContextClass());
 
         Set<C> contexts;
         if (provider != null) {
             provider.onInitialize(player, activeMenu);
             contexts = provider.getDefinedContexts(player, activeMenu);
         } else {
-            contexts = item.getBaseItems().keySet();
+            Set<C> builtDefined = builtTemplate.definedContexts().get(new MenuInfo(player, activeMenu));
+            if (!builtDefined.isEmpty()) {
+                contexts = builtDefined;
+            } else {
+                contexts = item.getBaseItems().keySet();
+            }
         }
 
         for (C context : contexts) {
-            ItemStack itemStack = item.getBaseItems().get(context); // Get a context-specific base item
-            if (itemStack == null) {
-                itemStack = item.getDefaultBaseItem(); // Otherwise use default base item
-            }
-            if (itemStack != null) {
-                itemStack = itemStack.clone();
-            }
-            if (provider != null) {
-                provider.onInitialize(player, activeMenu, context);
-                itemStack = modifyBaseItem(provider, itemStack, player, activeMenu, context); // Apply provider base item modifications
-            }
-            if (itemStack == null) {
-                continue;
-            }
-            ItemMeta meta = itemStack.getItemMeta();
-            if (meta != null) {
-                String displayName = item.getActiveDisplayName(context); // Get the context-specific display name, or default if not defined
-                if (displayName != null) {
-                    // Replace display name placeholders
-                    if (provider != null) {
-                        String[] placeholders = TextUtil.substringsBetween(displayName, "{", "}");
-                        if (placeholders != null) {
-                            String style = LoreUtil.getStyle(displayName);
-                            for (String placeholder : placeholders) {
-                                String replacedText = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.DISPLAY_NAME, style, null), context);
-                                displayName = TextUtil.replace(displayName, "{" + placeholder + "}", replacedText);
-                            }
-                        }
-                    }
-                    if (slate.isPlaceholderAPIEnabled()) {
-                        displayName = PlaceholderAPI.setPlaceholders(player, displayName);
-                    }
-                    setDisplayName(meta, tf.toComponent(displayName));
-                }
-                List<LoreLine> loreLines = item.getActiveLore(context);
-                if (loreLines != null) {
-                    setLore(meta, loreInterpreter.interpretLore(loreLines, provider, player, activeMenu, context));
-                }
-                itemStack.setItemMeta(meta);
-            }
-            // Add item to inventory
-            PositionProvider posProvider = item.getPosition(context);
-            SlotPos pos = null;
-            if (posProvider == null && provider != null) {
-                pos = provider.getSlotPos(player, activeMenu, context); // Use provider position if config pos is not defined
-            } else if (posProvider != null) {
-                List<PositionProvider> providers = new ArrayList<>();
-                for (C cont : contexts) {
-                    providers.add(item.getPosition(cont));
-                }
-                // Parse the fixed or group position from providers
-                pos = posProvider.getPosition(providers);
-            }
-            if (pos == null) {
-                pos = item.getDefaultPosition();
-            }
-            if (pos != null) {
-                addTemplateItemToInventory(item, itemStack, pos, contents, player, provider, context);
-            }
+            addContextItem(contents, player, context, item, provider, builtTemplate, contexts);
         }
+    }
+
+    private <C> void addContextItem(InventoryContents contents, Player player, C context, TemplateItem<C> item, TemplateItemProvider<C> provider, BuiltTemplate<C> builtTemplate, Set<C> contexts) {
+        ItemStack itemStack = item.getBaseItems().get(context); // Get a context-specific base item
+        if (itemStack == null) {
+            itemStack = item.getDefaultBaseItem(); // Otherwise use default base item
+        }
+        if (itemStack != null) {
+            itemStack = itemStack.clone();
+        }
+        if (provider != null) {
+            provider.onInitialize(player, activeMenu, context);
+            itemStack = modifyBaseItem(provider, itemStack, player, activeMenu, context); // Apply provider base item modifications
+        }
+        replaceItemPlaceholders(itemStack);
+        // Apply TemplateModifier of built template
+        itemStack = builtTemplate.modifier().modify(new TemplateInfo<>(player, activeMenu, itemStack, context));
+
+        if (itemStack == null) return;
+
+        ItemMeta meta = itemStack.getItemMeta();
+        if (meta != null) {
+            setContextMeta(player, context, item, provider, builtTemplate, meta, itemStack);
+        }
+        // Add item to inventory
+        PositionProvider posProvider = item.getPosition(context);
+        SlotPos pos;
+        if (posProvider == null && provider != null) {
+            pos = provider.getSlotPos(player, activeMenu, context); // Use provider position if config pos is not defined
+        } else if (posProvider != null) {
+            List<PositionProvider> providers = new ArrayList<>();
+            for (C cont : contexts) {
+                providers.add(item.getPosition(cont));
+            }
+            // Parse the fixed or group position from providers
+            pos = posProvider.getPosition(providers);
+        } else {
+            pos = builtTemplate.slotProvider().get(new TemplateInfo<>(player, activeMenu, itemStack, context));
+        }
+        if (pos == null) {
+            pos = item.getDefaultPosition();
+        }
+        if (pos != null) {
+            addTemplateItemToInventory(item, itemStack, pos, contents, player, provider, builtTemplate, context);
+        }
+    }
+
+    private <C> void setContextMeta(Player player, C context, TemplateItem<C> item, TemplateItemProvider<C> provider, BuiltTemplate<C> builtTemplate, ItemMeta meta, ItemStack itemStack) {
+        String displayName = item.getActiveDisplayName(context); // Get the context-specific display name, or default if not defined
+        if (displayName != null) {
+            // Replace display name placeholders
+            if (provider != null) {
+                String[] placeholders = TextUtil.substringsBetween(displayName, "{", "}");
+                if (placeholders != null) {
+                    String style = LoreUtil.getStyle(displayName);
+                    for (String placeholder : placeholders) {
+                        String replacedText = provider.onPlaceholderReplace(placeholder, player, activeMenu, new PlaceholderData(PlaceholderType.DISPLAY_NAME, style, null), context);
+                        displayName = TextUtil.replace(displayName, "{" + placeholder + "}", replacedText);
+                    }
+                }
+            }
+            // BuiltTemplate replacers
+            displayName = builtTemplate.applyReplacers(displayName, slate, player, activeMenu, PlaceholderType.DISPLAY_NAME, context);
+
+            if (slate.isPlaceholderAPIEnabled()) {
+                displayName = PlaceholderAPI.setPlaceholders(player, displayName);
+            }
+            setDisplayName(meta, tf.toComponent(displayName));
+        }
+        List<LoreLine> loreLines = item.getActiveLore(context);
+        if (loreLines != null) {
+            setLore(meta, loreInterpreter.interpretLore(loreLines, provider, player, activeMenu, builtTemplate, context));
+        }
+        itemStack.setItemMeta(meta);
     }
 
     private void setDisplayName(ItemMeta meta, Component component) {
@@ -312,7 +346,7 @@ public class MenuInventory implements InventoryProvider {
     /**
      * Adds the menu item itself to the inventory menu and registers click listeners, both listeners and actions
      */
-    private void addSingleItemToInventory(SingleItem singleItem, ItemStack itemStack, SlotPos pos, InventoryContents contents, Player player, SingleItemProvider provider) {
+    private void addSingleItemToInventory(SingleItem singleItem, ItemStack itemStack, SlotPos pos, InventoryContents contents, Player player, SingleItemProvider provider, BuiltItem builtItem) {
         contents.set(pos, ClickableItem.from(itemStack, c -> {
             if (!(c.getEvent() instanceof InventoryClickEvent event)) return;
 
@@ -322,15 +356,16 @@ public class MenuInventory implements InventoryProvider {
             }
 
             // Run coded click functionality
-            if (provider != null) {
+            if (provider != null && builtItem.enableProvider()) {
                 provider.onClick(player, event, c.getItem(), pos, activeMenu);
             }
+            builtItem.handleClick(getClickActions(event.getClick()), new ItemClick(player, event, c.getItem(), pos, activeMenu));
 
             executeActions(singleItem, player, contents, c); // Run custom click actions
         }));
     }
 
-    private <C> void addTemplateItemToInventory(TemplateItem<C> templateItem, ItemStack itemStack, SlotPos pos, InventoryContents contents, Player player, TemplateItemProvider<C> provider, C context) {
+    private <C> void addTemplateItemToInventory(TemplateItem<C> templateItem, ItemStack itemStack, SlotPos pos, InventoryContents contents, Player player, TemplateItemProvider<C> provider, BuiltTemplate<C> builtTemplate, C context) {
         contents.set(pos, ClickableItem.from(itemStack, c -> {
             if (!(c.getEvent() instanceof InventoryClickEvent event)) return;
 
@@ -343,6 +378,7 @@ public class MenuInventory implements InventoryProvider {
             if (provider != null) {
                 provider.onClick(player, event, c.getItem(), pos, activeMenu, context);
             }
+            builtTemplate.handleClick(getClickActions(event.getClick()), new TemplateClick<>(player, event, c.getItem(), pos, activeMenu, context));
 
             executeActions(templateItem, player, contents, c); // Run custom click actions
         }));
@@ -397,12 +433,10 @@ public class MenuInventory implements InventoryProvider {
     }
 
     private ItemStack modifyBaseItem(SingleItemProvider provider, ItemStack baseItem, Player player, ActiveMenu activeMenu) {
-        replaceItemPlaceholders(baseItem);
         return provider.onItemModify(baseItem, player, activeMenu);
     }
 
     private <C> ItemStack modifyBaseItem(TemplateItemProvider<C> provider, ItemStack baseItem, Player player, ActiveMenu activeMenu, C context) {
-        replaceItemPlaceholders(baseItem);
         return provider.onItemModify(baseItem, player, activeMenu, context);
     }
 

@@ -1,9 +1,13 @@
 package com.archyx.slate.lore;
 
 import com.archyx.slate.Slate;
+import com.archyx.slate.builder.BuiltComponent;
+import com.archyx.slate.builder.BuiltItem;
+import com.archyx.slate.builder.BuiltTemplate;
 import com.archyx.slate.component.ComponentData;
 import com.archyx.slate.component.ComponentProvider;
 import com.archyx.slate.component.MenuComponent;
+import com.archyx.slate.info.TemplateInfo;
 import com.archyx.slate.item.provider.PlaceholderData;
 import com.archyx.slate.item.provider.PlaceholderType;
 import com.archyx.slate.item.provider.SingleItemProvider;
@@ -17,7 +21,9 @@ import com.archyx.slate.util.Pair;
 import com.archyx.slate.util.TextUtil;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,11 +42,11 @@ public class LoreInterpreter {
     }
 
     @NotNull
-    public List<Component> interpretLore(List<LoreLine> loreLines, @Nullable SingleItemProvider provider, Player player, ActiveMenu activeMenu) {
+    public List<Component> interpretLore(List<LoreLine> loreLines, @Nullable SingleItemProvider provider, Player player, ActiveMenu activeMenu, BuiltItem builtItem) {
         List<String> lore = new ArrayList<>();
         for (LoreLine line : loreLines) {
             if (line instanceof TextLore textLore) {
-                lore.add(interpretTextLore(textLore, provider, player, activeMenu));
+                lore.add(interpretTextLore(textLore, provider, player, activeMenu, builtItem));
             } else if (line instanceof ComponentLore componentLore) {
                 List<String> list = interpretComponent(componentLore, player, activeMenu);
                 if (list != null) {
@@ -53,11 +59,11 @@ public class LoreInterpreter {
     }
 
     @NotNull
-    public <T> List<Component> interpretLore(List<LoreLine> loreLines, @Nullable TemplateItemProvider<T> provider, Player player, ActiveMenu activeMenu, T context) {
+    public <T> List<Component> interpretLore(List<LoreLine> loreLines, @Nullable TemplateItemProvider<T> provider, Player player, ActiveMenu activeMenu, BuiltTemplate<T> builtTemplate, T context) {
         List<String> lore = new ArrayList<>();
         for (LoreLine line : loreLines) {
             if (line instanceof TextLore textLore) {
-                lore.add(interpretTextLore(textLore, provider, player, activeMenu, context));
+                lore.add(interpretTextLore(textLore, provider, player, activeMenu, builtTemplate, context));
             } else if (line instanceof ComponentLore componentLore) {
                 List<String> list = interpretComponent(componentLore, player, activeMenu, context);
                 if (list != null) {
@@ -69,9 +75,9 @@ public class LoreInterpreter {
         return tf.toComponentLore(lore);
     }
 
-    private String interpretTextLore(TextLore textLore, @Nullable SingleItemProvider provider, Player player, ActiveMenu activeMenu) {
+    private String interpretTextLore(TextLore textLore, @Nullable SingleItemProvider provider, Player player, ActiveMenu activeMenu, BuiltItem builtItem) {
         String text = textLore.getText();
-        if (provider != null) { // Replace lore placeholders
+        if (provider != null && builtItem.enableProvider()) { // Replace lore placeholders
             String[] placeholders = TextUtil.substringsBetween(text, "{", "}");
             if (placeholders != null) {
                 for (String placeholder : placeholders) {
@@ -84,10 +90,11 @@ public class LoreInterpreter {
                 }
             }
         }
+        text = builtItem.applyReplacers(text, slate, player, activeMenu, PlaceholderType.LORE);
         return replaceAndWrap(textLore, player, text);
     }
 
-    private <T> String interpretTextLore(TextLore textLore, @Nullable TemplateItemProvider<T> provider, Player player, ActiveMenu activeMenu, T context) {
+    private <T> String interpretTextLore(TextLore textLore, @Nullable TemplateItemProvider<T> provider, Player player, ActiveMenu activeMenu, BuiltTemplate<T> builtTemplate, T context) {
         String text = textLore.getText();
         if (provider != null) { // Replace lore placeholders
             String[] placeholders = TextUtil.substringsBetween(text, "{", "}");
@@ -102,10 +109,11 @@ public class LoreInterpreter {
                 }
             }
         }
+        text = builtTemplate.applyReplacers(text, slate, player, activeMenu, PlaceholderType.LORE, context);
         return replaceAndWrap(textLore, player, text);
     }
 
-    private <T> String interpretTextLore(TextLore textLore, @Nullable ComponentProvider provider, Player player, ActiveMenu activeMenu, ComponentData componentData, T context) {
+    private <T> String interpretTextLore(TextLore textLore, @Nullable ComponentProvider provider, Player player, ActiveMenu activeMenu, ComponentData componentData, @NotNull BuiltComponent<T> builtComponent, T context) {
         String text = textLore.getText();
         if (provider != null) { // Replace lore placeholders
             String[] placeholders = TextUtil.substringsBetween(text, "{", "}");
@@ -120,10 +128,11 @@ public class LoreInterpreter {
                 }
             }
         }
+        text = builtComponent.applyReplacers(text, slate, player, activeMenu, context);
         return replaceAndWrap(textLore, player, text);
     }
 
-    private Pair<String, ListData> detectListPlaceholder(String placeholder) {
+    public static Pair<String, ListData> detectListPlaceholder(String placeholder) {
         if (!placeholder.endsWith("]") && !placeholder.endsWith(")")) {
             return new Pair<>(placeholder, new ListData(null, 0));
         }
@@ -151,6 +160,7 @@ public class LoreInterpreter {
         return new Pair<>(placeholder.substring(0, openBracket), new ListData(insert, interval));
     }
 
+    @SuppressWarnings("unchecked")
     private <T> List<String> interpretComponent(ComponentLore lore, Player player, ActiveMenu activeMenu, T context) {
         // Choose the component if multiple
         String componentName = lore.getComponent();
@@ -163,7 +173,20 @@ public class LoreInterpreter {
         if (componentProvider != null && !componentProvider.shouldShow(player, activeMenu, context)) {
             return null;
         }
-        int instances = componentProvider != null ? componentProvider.getInstances(player, activeMenu, context) : 1;
+        @NotNull BuiltComponent<T> builtComponent = (BuiltComponent<T>) slate.getBuiltMenu(activeMenu.getName()).components()
+                .getOrDefault(componentName, BuiltComponent.createEmpty(component.getContextClass()));
+        TemplateInfo<T> info = new TemplateInfo<>(player, activeMenu, new ItemStack(Material.STONE), context);
+        if (!builtComponent.visibility().shouldShow(info)) {
+            return null;
+        }
+        // Get number of instances from provider or built component
+        int instances;
+        if (componentProvider != null) {
+            instances = componentProvider.getInstances(player, activeMenu, context);
+        } else {
+            instances = builtComponent.instances().getInstances(info);
+        }
+
         List<String> list = new ArrayList<>();
         for (int i = 0; i < instances; i++) {
             ComponentData componentData = new ComponentData(i);
@@ -172,12 +195,13 @@ public class LoreInterpreter {
                 if (!(line instanceof TextLore)) { // Lines in a component must be TextLore
                     continue;
                 }
-                list.add(interpretTextLore((TextLore) line, componentProvider, player, activeMenu, componentData, context));
+                list.add(interpretTextLore((TextLore) line, componentProvider, player, activeMenu, componentData, builtComponent, context));
             }
         }
         return list;
     }
 
+    @SuppressWarnings("unchecked")
     private List<String> interpretComponent(ComponentLore lore, Player player, ActiveMenu activeMenu) {
         // Choose the component if multiple
         String componentName = lore.getComponent();
@@ -190,7 +214,20 @@ public class LoreInterpreter {
         if (componentProvider != null && !componentProvider.shouldShow(player, activeMenu, null)) {
             return null;
         }
-        int instances = componentProvider != null ? componentProvider.getInstances(player, activeMenu, null) : 1;
+        @NotNull BuiltComponent<Object> builtComponent = (BuiltComponent<Object>) slate.getBuiltMenu(activeMenu.getName()).components()
+                .getOrDefault(componentName, BuiltComponent.createEmpty(component.getContextClass()));
+        TemplateInfo<Object> info = new TemplateInfo<>(player, activeMenu, new ItemStack(Material.STONE), null);
+        if (!builtComponent.visibility().shouldShow(info)) {
+            return null;
+        }
+
+        // Get number of instances from provider or built component
+        int instances;
+        if (componentProvider != null) {
+            instances = componentProvider.getInstances(player, activeMenu, null);
+        } else {
+            instances = builtComponent.instances().getInstances(info);
+        }
         List<String> list = new ArrayList<>();
         for (int i = 0; i < instances; i++) {
             ComponentData componentData = new ComponentData(i);
@@ -199,7 +236,7 @@ public class LoreInterpreter {
                 if (!(line instanceof TextLore)) { // Lines in a component must be TextLore
                     continue;
                 }
-                list.add(interpretTextLore((TextLore) line, componentProvider, player, activeMenu, componentData, null));
+                list.add(interpretTextLore((TextLore) line, componentProvider, player, activeMenu, componentData, builtComponent, null));
             }
         }
         return list;
