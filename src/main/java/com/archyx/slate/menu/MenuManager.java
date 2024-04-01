@@ -147,7 +147,7 @@ public class MenuManager {
         } else {
             BuiltMenu builtMenu = slate.getBuiltMenu(name);
             // Copy in case inner is immutable
-            return new HashMap<>(builtMenu.propertyProvider().get(new MenuInfo(player, activeMenu)));
+            return new HashMap<>(builtMenu.propertyProvider().get(new MenuInfo(slate, player, activeMenu)));
         }
     }
 

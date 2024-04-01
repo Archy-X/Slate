@@ -29,7 +29,7 @@ public class TemplateTextReplacer<T> {
     }
 
     public String applyReplacers(String input, Player player, ActiveMenu activeMenu, PlaceholderType type, T value) {
-        input = slate.getGlobalOptions().applyGlobalReplacers(input, player, activeMenu, type);
+        input = slate.getGlobalOptions().applyGlobalReplacers(input, slate, player, activeMenu, type);
         // Detect placeholders
         String[] placeholders = TextUtil.substringsBetween(input, "{", "}");
         if (placeholders != null) {
@@ -40,7 +40,7 @@ public class TemplateTextReplacer<T> {
                 PlaceholderData data = new PlaceholderData(type, style, pair.second());
 
                 String coreName = pair.first(); // The name of the placeholder without list data formatting
-                TemplatePlaceholderInfo<T> info = new TemplatePlaceholderInfo<>(player, coreName, activeMenu, data, value);
+                TemplatePlaceholderInfo<T> info = new TemplatePlaceholderInfo<>(slate, player, coreName, activeMenu, data, value);
 
                 // Apply single replacers
                 for (Entry<String, com.archyx.slate.function.TemplateReplacer<T>> entry : replacers.entrySet()) {

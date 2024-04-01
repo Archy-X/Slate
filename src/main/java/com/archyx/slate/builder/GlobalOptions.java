@@ -1,5 +1,7 @@
 package com.archyx.slate.builder;
 
+import com.archyx.slate.Slate;
+import com.archyx.slate.function.LocaleProvider;
 import com.archyx.slate.info.PlaceholderInfo;
 import com.archyx.slate.function.ItemReplacer;
 import com.archyx.slate.item.provider.PlaceholderData;
@@ -15,10 +17,11 @@ import org.bukkit.entity.Player;
 import java.util.Set;
 
 public record GlobalOptions(
-        Set<ItemReplacer> globalReplacers
+        Set<ItemReplacer> globalReplacers,
+        LocaleProvider localeProvider
 ) {
 
-    public String applyGlobalReplacers(String input, Player player, ActiveMenu activeMenu, PlaceholderType type) {
+    public String applyGlobalReplacers(String input, Slate slate, Player player, ActiveMenu activeMenu, PlaceholderType type) {
         String[] placeholders = TextUtil.substringsBetween(input, "{", "}");
         if (placeholders != null) {
             String style = LoreUtil.getStyle(input);
@@ -26,7 +29,7 @@ public record GlobalOptions(
                 Pair<String, ListData> pair = LoreInterpreter.detectListPlaceholder(placeholder);
                 PlaceholderData data = new PlaceholderData(type, style, pair.second());
                 for (ItemReplacer replacer : globalReplacers) {
-                    String replaced = replacer.replace(new PlaceholderInfo(player, pair.first(), activeMenu, data));
+                    String replaced = replacer.replace(new PlaceholderInfo(slate, player, pair.first(), activeMenu, data));
                     if (replaced != null) {
                         input = TextUtil.replace(input, "{" + placeholder + "}", replaced);
                     }

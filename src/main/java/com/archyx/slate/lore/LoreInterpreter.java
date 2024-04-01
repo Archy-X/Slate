@@ -175,7 +175,7 @@ public class LoreInterpreter {
         }
         @NotNull BuiltComponent<T> builtComponent = (BuiltComponent<T>) slate.getBuiltMenu(activeMenu.getName()).components()
                 .getOrDefault(componentName, BuiltComponent.createEmpty(component.getContextClass()));
-        TemplateInfo<T> info = new TemplateInfo<>(player, activeMenu, new ItemStack(Material.STONE), context);
+        TemplateInfo<T> info = new TemplateInfo<>(slate, player, activeMenu, new ItemStack(Material.STONE), context);
         if (!builtComponent.visibility().shouldShow(info)) {
             return null;
         }
@@ -216,7 +216,7 @@ public class LoreInterpreter {
         }
         @NotNull BuiltComponent<Object> builtComponent = (BuiltComponent<Object>) slate.getBuiltMenu(activeMenu.getName()).components()
                 .getOrDefault(componentName, BuiltComponent.createEmpty(component.getContextClass()));
-        TemplateInfo<Object> info = new TemplateInfo<>(player, activeMenu, new ItemStack(Material.STONE), null);
+        TemplateInfo<Object> info = new TemplateInfo<>(slate, player, activeMenu, new ItemStack(Material.STONE), null);
         if (!builtComponent.visibility().shouldShow(info)) {
             return null;
         }

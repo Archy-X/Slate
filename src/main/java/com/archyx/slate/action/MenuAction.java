@@ -58,7 +58,7 @@ public class MenuAction extends Action {
         }
         // Add BuiltMenu properties from PropertyProvider
         BuiltMenu builtMenu = slate.getBuiltMenu(menuName);
-        base.putAll(builtMenu.propertyProvider().get(new MenuInfo(inventory.getPlayer(), inventory.getActiveMenu())));
+        base.putAll(builtMenu.propertyProvider().get(new MenuInfo(slate, inventory.getPlayer(), inventory.getActiveMenu())));
         // Otherwise fallback to current menu properties
         if (base.isEmpty()) {
             base.putAll(inventory.getProperties());

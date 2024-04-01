@@ -75,7 +75,7 @@ public class MenuInventory implements InventoryProvider {
             this.totalPages = provider.getPages(player, activeMenu);
         } else {
             BuiltMenu builtMenu = slate.getBuiltMenu(menu.getName());
-            this.totalPages = builtMenu.pageProvider().getPages(new MenuInfo(player, activeMenu));
+            this.totalPages = builtMenu.pageProvider().getPages(new MenuInfo(slate, player, activeMenu));
         }
         this.currentPage = currentPage;
     }
@@ -195,7 +195,7 @@ public class MenuInventory implements InventoryProvider {
         }
         replaceItemPlaceholders(itemStack);
         // Apply ItemModifier of built item
-        itemStack = builtItem.modifier().modify(new ItemInfo(player, activeMenu, itemStack));
+        itemStack = builtItem.modifier().modify(new ItemInfo(slate, player, activeMenu, itemStack));
         if (itemStack == null) return;
 
         ItemMeta meta = itemStack.getItemMeta();
@@ -243,7 +243,7 @@ public class MenuInventory implements InventoryProvider {
             provider.onInitialize(player, activeMenu);
             contexts = provider.getDefinedContexts(player, activeMenu);
         } else {
-            Set<C> builtDefined = builtTemplate.definedContexts().get(new MenuInfo(player, activeMenu));
+            Set<C> builtDefined = builtTemplate.definedContexts().get(new MenuInfo(slate, player, activeMenu));
             if (!builtDefined.isEmpty()) {
                 contexts = builtDefined;
             } else {
@@ -270,7 +270,7 @@ public class MenuInventory implements InventoryProvider {
         }
         replaceItemPlaceholders(itemStack);
         // Apply TemplateModifier of built template
-        itemStack = builtTemplate.modifier().modify(new TemplateInfo<>(player, activeMenu, itemStack, context));
+        itemStack = builtTemplate.modifier().modify(new TemplateInfo<>(slate, player, activeMenu, itemStack, context));
 
         if (itemStack == null) return;
 
@@ -291,7 +291,7 @@ public class MenuInventory implements InventoryProvider {
             // Parse the fixed or group position from providers
             pos = posProvider.getPosition(providers);
         } else {
-            pos = builtTemplate.slotProvider().get(new TemplateInfo<>(player, activeMenu, itemStack, context));
+            pos = builtTemplate.slotProvider().get(new TemplateInfo<>(slate, player, activeMenu, itemStack, context));
         }
         if (pos == null) {
             pos = item.getDefaultPosition();

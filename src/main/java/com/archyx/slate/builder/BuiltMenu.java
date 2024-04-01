@@ -50,12 +50,12 @@ public record BuiltMenu(
 
     public String applyTitleReplacers(String input, Slate slate, Player player, ActiveMenu activeMenu) {
         PlaceholderType type = PlaceholderType.TITLE;
-        input = slate.getGlobalOptions().applyGlobalReplacers(input, player, activeMenu, type);
+        input = slate.getGlobalOptions().applyGlobalReplacers(input, slate, player, activeMenu, type);
         for (Entry<String, ItemReplacer> entry : titleReplacers.entrySet()) {
             String placeholder = entry.getKey();
             PlaceholderData data = new PlaceholderData(type, LoreUtil.getStyle(input), null);
 
-            String replaced = entry.getValue().replace(new PlaceholderInfo(player, placeholder, activeMenu, data));
+            String replaced = entry.getValue().replace(new PlaceholderInfo(slate, player, placeholder, activeMenu, data));
             if (replaced != null) {
                 input = TextUtil.replace(input, "{" + placeholder + "}", replaced);
             }
@@ -65,7 +65,7 @@ public record BuiltMenu(
         if (placeholders != null) {
             PlaceholderData data = new PlaceholderData(type, LoreUtil.getStyle(input), null);
             for (String placeholder : placeholders) {
-                String replaced = titleAnyReplacer.replace(new PlaceholderInfo(player, placeholder, activeMenu, data));
+                String replaced = titleAnyReplacer.replace(new PlaceholderInfo(slate, player, placeholder, activeMenu, data));
                 if (replaced != null) {
                     input = TextUtil.replace(input, "{" + placeholder + "}", replaced);
                 }
