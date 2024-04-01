@@ -7,7 +7,7 @@ plugins {
     `maven-publish`
 }
 
-group = "dev.aurelium"
+group = "com.archyx"
 version = project.property("projectVersion") as String
 
 repositories {
@@ -64,4 +64,12 @@ idea {
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+        }
+    }
 }
