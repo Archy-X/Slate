@@ -1,8 +1,8 @@
 package com.archyx.slate.builder;
 
 import com.archyx.slate.function.ComponentInstances;
+import com.archyx.slate.function.ComponentReplacer;
 import com.archyx.slate.function.ComponentVisibility;
-import com.archyx.slate.function.TemplateReplacer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,8 +10,8 @@ import java.util.Map;
 public class ComponentBuilder<T> {
 
     private final Class<T> contextType;
-    private final Map<String, TemplateReplacer<T>> replacers = new HashMap<>();
-    private TemplateReplacer<T> anyReplacer = p -> null;
+    private final Map<String, ComponentReplacer<T>> replacers = new HashMap<>();
+    private ComponentReplacer<T> anyReplacer = p -> null;
     private ComponentVisibility<T> visibility = t -> true;
     private ComponentInstances<T> instances = t -> 1;
 
@@ -23,12 +23,12 @@ public class ComponentBuilder<T> {
         return new ComponentBuilder<>(contextType);
     }
 
-    public ComponentBuilder<T> replace(String from, TemplateReplacer<T> replacer) {
+    public ComponentBuilder<T> replace(String from, ComponentReplacer<T> replacer) {
         replacers.put(from, replacer);
         return this;
     }
 
-    public ComponentBuilder<T> replaceAny(TemplateReplacer<T> replacer) {
+    public ComponentBuilder<T> replaceAny(ComponentReplacer<T> replacer) {
         anyReplacer = replacer;
         return this;
     }

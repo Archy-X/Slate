@@ -128,7 +128,7 @@ public class LoreInterpreter {
                 }
             }
         }
-        text = builtComponent.applyReplacers(text, slate, player, activeMenu, context);
+        text = builtComponent.applyReplacers(text, slate, player, activeMenu, componentData, context);
         return replaceAndWrap(textLore, player, text);
     }
 

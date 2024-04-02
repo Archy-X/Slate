@@ -43,7 +43,7 @@ public class TemplateTextReplacer<T> {
                 TemplatePlaceholderInfo<T> info = new TemplatePlaceholderInfo<>(slate, player, coreName, activeMenu, data, value);
 
                 // Apply single replacers
-                for (Entry<String, com.archyx.slate.function.TemplateReplacer<T>> entry : replacers.entrySet()) {
+                for (Entry<String, TemplateReplacer<T>> entry : replacers.entrySet()) {
                     if (!entry.getKey().equals(coreName)) continue;
                     // Replacer target string matches current placeholder name
                     String replaced = entry.getValue().replace(info);
