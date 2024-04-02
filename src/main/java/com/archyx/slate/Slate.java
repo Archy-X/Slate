@@ -65,7 +65,7 @@ public class Slate {
     }
 
     public int getLoreWrappingWidth() {
-        return options.getLoreWrappingWidth();
+        return options.loreWrappingWidth();
     }
 
     public void buildMenu(String name, Consumer<MenuBuilder> menu) {

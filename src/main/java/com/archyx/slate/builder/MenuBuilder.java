@@ -1,8 +1,6 @@
 package com.archyx.slate.builder;
 
-import com.archyx.slate.function.ItemReplacer;
-import com.archyx.slate.function.PageProvider;
-import com.archyx.slate.function.PropertyProvider;
+import com.archyx.slate.function.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +16,9 @@ public class MenuBuilder {
     private ItemReplacer titleAnyReplacer = p -> null;
     private PageProvider pageProvider = m -> 1;
     private PropertyProvider propertyProvider = m -> new HashMap<>();
+    private ItemModifier fillItem = i -> null;
+    private MenuListener openListener = m -> {};
+    private MenuListener updateListener = m -> {};
 
     private MenuBuilder() {
 
@@ -83,6 +84,21 @@ public class MenuBuilder {
         return this;
     }
 
+    public MenuBuilder fillItem(ItemModifier modifier) {
+        this.fillItem = modifier;
+        return this;
+    }
+
+    public MenuBuilder onOpen(MenuListener listener) {
+        this.openListener = listener;
+        return this;
+    }
+
+    public MenuBuilder onUpdate(MenuListener listener) {
+        this.updateListener = listener;
+        return this;
+    }
+
     public BuiltMenu build() {
         Map<String, BuiltItem> items = new HashMap<>();
         for (Entry<String, ItemBuilder> entry : itemBuilders.entrySet()) {
@@ -96,7 +112,8 @@ public class MenuBuilder {
         for (Entry<String, ComponentBuilder<?>> entry : componentBuilders.entrySet()) {
             components.put(entry.getKey(), entry.getValue().build());
         }
-        return new BuiltMenu(items, templates, components, titleReplacers, titleAnyReplacer, pageProvider, propertyProvider);
+        return new BuiltMenu(items, templates, components, titleReplacers, titleAnyReplacer, pageProvider, propertyProvider,
+                fillItem, openListener, updateListener);
     }
 
 }

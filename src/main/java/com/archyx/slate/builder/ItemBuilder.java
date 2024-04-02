@@ -2,9 +2,10 @@ package com.archyx.slate.builder;
 
 import com.archyx.slate.action.click.ClickAction;
 import com.archyx.slate.function.ItemClicker;
-import com.archyx.slate.info.ItemInfo;
 import com.archyx.slate.function.ItemModifier;
 import com.archyx.slate.function.ItemReplacer;
+import com.archyx.slate.function.MenuListener;
+import com.archyx.slate.info.ItemInfo;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +16,7 @@ public class ItemBuilder {
     private ItemReplacer anyReplacer = p -> null; // Default anyReplacer doesn't replace by returning null
     private final Map<ClickAction, ItemClicker> clickers = new HashMap<>();
     private ItemModifier modifier = ItemInfo::item;
-    private boolean enableProvider = false;
+    private MenuListener initListener;
 
     public static ItemBuilder builder() {
         return new ItemBuilder();
@@ -46,13 +47,13 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder enableProvider() {
-        this.enableProvider = true;
+    public ItemBuilder initialize(MenuListener listener) {
+        this.initListener = listener;
         return this;
     }
 
     public BuiltItem build() {
-        return new BuiltItem(replacers, anyReplacer, clickers, modifier, enableProvider);
+        return new BuiltItem(replacers, anyReplacer, clickers, modifier, initListener);
     }
 
 }

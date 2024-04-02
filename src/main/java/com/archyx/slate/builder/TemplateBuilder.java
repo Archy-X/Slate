@@ -17,6 +17,8 @@ public class TemplateBuilder<T> {
     private TemplateModifier<T> modifier = TemplateInfo::item;
     private DefinedContexts<T> definedContexts = m -> new HashSet<>();
     private TemplateSlot<T> slotProvider = t -> null;
+    private MenuListener initListener = m -> {};
+    private ContextListener<T> contextListener = t -> {};
 
     public TemplateBuilder(Class<T> contextType) {
         this.contextType = contextType;
@@ -61,8 +63,19 @@ public class TemplateBuilder<T> {
         return this;
     }
 
+    public TemplateBuilder<T> initialize(MenuListener listener) {
+        this.initListener = listener;
+        return this;
+    }
+
+    public TemplateBuilder<T> initializeContext(ContextListener<T> listener) {
+        this.contextListener = listener;
+        return this;
+    }
+
     public BuiltTemplate<T> build() {
-        return new BuiltTemplate<>(contextType, replacers, anyReplacer, clickers, modifier, definedContexts, slotProvider);
+        return new BuiltTemplate<>(contextType, replacers, anyReplacer, clickers, modifier, definedContexts,
+                slotProvider, initListener, contextListener);
     }
     
 }

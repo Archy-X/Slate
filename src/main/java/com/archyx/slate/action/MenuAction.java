@@ -4,7 +4,6 @@ import com.archyx.slate.Slate;
 import com.archyx.slate.builder.BuiltMenu;
 import com.archyx.slate.info.MenuInfo;
 import com.archyx.slate.menu.MenuInventory;
-import com.archyx.slate.menu.MenuProvider;
 import fr.minuskube.inv.content.InventoryContents;
 import org.bukkit.entity.Player;
 
@@ -50,15 +49,10 @@ public class MenuAction extends Action {
     }
 
     private Map<String, Object> getProperties(MenuInventory inventory) {
-        Map<String, Object> base = new HashMap<>();
-        // Use menu provider default properties
-        MenuProvider provider = slate.getMenuManager().getMenuProvider(menuName);
-        if (provider != null) {
-            base.putAll(provider.getDefaultProperties(inventory.getActiveMenu()));
-        }
         // Add BuiltMenu properties from PropertyProvider
         BuiltMenu builtMenu = slate.getBuiltMenu(menuName);
-        base.putAll(builtMenu.propertyProvider().get(new MenuInfo(slate, inventory.getPlayer(), inventory.getActiveMenu())));
+        MenuInfo info = new MenuInfo(slate, inventory.getPlayer(), inventory.getActiveMenu());
+        Map<String, Object> base = new HashMap<>(builtMenu.propertyProvider().get(info));
         // Otherwise fallback to current menu properties
         if (base.isEmpty()) {
             base.putAll(inventory.getProperties());

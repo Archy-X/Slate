@@ -4,7 +4,6 @@ import com.archyx.slate.Slate;
 import com.archyx.slate.builder.BuiltMenu;
 import com.archyx.slate.builder.BuiltTemplate;
 import com.archyx.slate.component.ComponentParser;
-import com.archyx.slate.component.ComponentProvider;
 import com.archyx.slate.component.MenuComponent;
 import com.archyx.slate.context.ContextProvider;
 import com.archyx.slate.fill.FillData;
@@ -15,9 +14,8 @@ import com.archyx.slate.info.MenuInfo;
 import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.parser.SingleItemParser;
 import com.archyx.slate.item.parser.TemplateItemParser;
-import com.archyx.slate.item.provider.*;
+import com.archyx.slate.item.provider.ProviderManager;
 import com.archyx.slate.text.TextFormatter;
-import com.archyx.slate.util.TextUtil;
 import fr.minuskube.inv.SmartInventory;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
@@ -39,16 +37,14 @@ public class MenuManager {
     private final Map<String, ConfigurableMenu> menus;
     private final ProviderManager globalProviderManager;
     private final Map<String, ProviderManager> menuProviderManagers;
-    private final Map<String, MenuProvider> menuProviders;
     private final Map<String, Map<String, Object>> defaultOptions;
     private final TextFormatter tf = new TextFormatter();
 
     public MenuManager(Slate slate) {
         this.slate = slate;
         this.menus = new LinkedHashMap<>();
-        this.globalProviderManager = new ProviderManager(slate);
+        this.globalProviderManager = new ProviderManager();
         this.menuProviderManagers = new HashMap<>();
-        this.menuProviders = new HashMap<>();
         this.defaultOptions = new HashMap<>();
     }
 
@@ -61,98 +57,18 @@ public class MenuManager {
         menus.clear();
         globalProviderManager.unregisterAll();
         menuProviderManagers.clear();
-        menuProviders.clear();
         defaultOptions.clear();
-    }
-
-    @Nullable
-    public SingleItemProvider constructSingleItem(String itemName, String menuName) {
-        // Use skill specific provider if exits
-        ProviderManager menuProviderManager = menuProviderManagers.get(menuName);
-        if (menuProviderManager != null) {
-            SingleItemProvider provider = menuProviderManager.constructSingleItem(itemName);
-            if (provider != null) {
-                return provider;
-            }
-        }
-        return globalProviderManager.constructSingleItem(itemName); // Otherwise use global provider
-    }
-
-    @Nullable
-    public <C> TemplateItemProvider<C> constructTemplateItem(String itemName, String menuName) {
-        // Use skill specific provider if exits
-        ProviderManager menuProviderManager = menuProviderManagers.get(menuName);
-        if (menuProviderManager != null) {
-            TemplateItemProvider<C> provider = menuProviderManager.constructTemplateItem(itemName);
-            if (provider != null) {
-                return provider;
-            }
-        }
-        return globalProviderManager.constructTemplateItem(itemName);
-    }
-
-    public ComponentProvider constructComponent(String componentName, String menuName) {
-        // Use skill specific provider if exits
-        ProviderManager menuProviderManager = menuProviderManagers.get(menuName);
-        if (menuProviderManager != null) {
-            ComponentProvider provider = menuProviderManager.constructComponent(componentName);
-            if (provider != null) {
-                return provider;
-            }
-        }
-        return globalProviderManager.constructComponent(componentName); // Otherwise use global provider
-    }
-
-    /**
-     * Registers an item provider for a single item. Providers are used to define unique behavior for items.
-     *
-     * @param name The name of the single item
-     * @param constructor The constructor instance
-     */
-    public <T extends SingleItemProvider> void registerSingleItem(String name, SingleItemConstructor<T> constructor) {
-        globalProviderManager.registerSingleItem(name, constructor);
-    }
-
-    /**
-     * Registers an item provider for a template item. Providers are used to define unique behavior for items.
-     *
-     * @param name The name of the template item
-     * @param constructor The constructor instance
-     */
-    public <T> void registerTemplateItem(String name, Class<T> contextClass, TemplateItemConstructor<? extends TemplateItemProvider<T>> constructor) {
-        globalProviderManager.registerTemplateItem(name, contextClass, constructor);
-    }
-
-    /**
-     * Registers a menu provider for a menu. Providers are used to define unique behavior for menus.
-     *
-     * @param name The name of the menu
-     * @param provider The provider instance
-     */
-    public void registerMenuProvider(String name, MenuProvider provider) {
-        menuProviders.put(name, provider);
-    }
-
-    @Nullable
-    public MenuProvider getMenuProvider(String name) {
-        return menuProviders.get(name);
     }
 
     @NotNull
     public Map<String, Object> getDefaultProperties(String name, Player player, ActiveMenu activeMenu) {
-        MenuProvider provider = getMenuProvider(name);
-        if (provider != null) {
-            // Copy in case inner is immutable
-            return new HashMap<>(provider.getDefaultProperties(activeMenu));
-        } else {
-            BuiltMenu builtMenu = slate.getBuiltMenu(name);
-            // Copy in case inner is immutable
-            return new HashMap<>(builtMenu.propertyProvider().get(new MenuInfo(slate, player, activeMenu)));
-        }
+        BuiltMenu builtMenu = slate.getBuiltMenu(name);
+        // Copy in case inner is immutable
+        return new HashMap<>(builtMenu.propertyProvider().get(new MenuInfo(slate, player, activeMenu)));
     }
 
     public ProviderManager getProviderManager(String menuName) {
-        return menuProviderManagers.computeIfAbsent(menuName, k -> new ProviderManager(slate));
+        return menuProviderManagers.computeIfAbsent(menuName, k -> new ProviderManager());
     }
 
     public void registerDefaultOptions(String name, Map<String, Object> map) {
@@ -266,11 +182,10 @@ public class MenuManager {
                 }
             }
 
-            MenuProvider provider = menuProviders.get(menuName);
             generateDefaultOptions(menuName, config, loader);
             Map<String, Object> options = loadOptions(config);
             // Add menu to map
-            ConfigurableMenu menu = new ConfigurableMenu(menuName, title, size, items, components, formats, provider, fillData, options);
+            ConfigurableMenu menu = new ConfigurableMenu(menuName, title, size, items, components, formats, fillData, options);
             menus.put(menuName, menu);
         } catch (ConfigurateException | RuntimeException e) {
             slate.getPlugin().getLogger().warning("Error loading menu " + menuName + ": " + e.getMessage());
@@ -332,14 +247,6 @@ public class MenuManager {
             }
             MenuInventory menuInventory = new MenuInventory(slate, menu, player, properties, page);
             String title = menu.getTitle();
-            // Replace title placeholders
-            String[] placeholders = TextUtil.substringsBetween(title, "{", "}");
-            if (placeholders != null && menu.getProvider() != null) {
-                for (String placeholder : placeholders) {
-                    title = TextUtil.replace(title, "{" + placeholder + "}",
-                            menu.getProvider().onPlaceholderReplace(placeholder, player, menuInventory.getActiveMenu()));
-                }
-            }
             // Apply BuiltMenu replacers
             BuiltMenu builtMenu = slate.getBuiltMenu(name);
             title = builtMenu.applyTitleReplacers(title, slate, player, menuInventory.getActiveMenu());
@@ -389,14 +296,8 @@ public class MenuManager {
         openMenu(player, name, new HashMap<>(), 0);
     }
 
-    public Set<String> getMenuProviderNames() {
-        return menuProviders.keySet();
-    }
-
     public Set<String> getMenuNames() {
-        Set<String> names = new HashSet<>(menuProviders.keySet());
-        names.addAll(slate.getBuiltMenus().keySet());
-        return names;
+        return new HashSet<>(slate.getBuiltMenus().keySet());
     }
 
     public ProviderManager getGlobalProviderManager() {

@@ -1,16 +1,6 @@
 package com.archyx.slate.option;
 
-public class SlateOptions {
-
-    private final int loreWrappingWidth;
-
-    public SlateOptions(int loreWrappingWidth) {
-        this.loreWrappingWidth = loreWrappingWidth;
-    }
-
-    public int getLoreWrappingWidth() {
-        return loreWrappingWidth;
-    }
+public record SlateOptions(int loreWrappingWidth) {
 
     public static class SlateOptionsBuilder {
 

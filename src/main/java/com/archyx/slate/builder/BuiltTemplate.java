@@ -23,11 +23,14 @@ public record BuiltTemplate<T>(
         Map<ClickAction, TemplateClicker<T>> clickers,
         TemplateModifier<T> modifier,
         DefinedContexts<T> definedContexts,
-        TemplateSlot<T> slotProvider
+        TemplateSlot<T> slotProvider,
+        MenuListener initListener,
+        ContextListener<T> contextListener
 ) {
 
     public static <T> BuiltTemplate<T> createEmpty(Class<T> contextType) {
-        return new BuiltTemplate<>(contextType, new HashMap<>(), p -> null, new HashMap<>(), ItemInfo::item, m -> new HashSet<>(), t -> null);
+        return new BuiltTemplate<>(contextType, new HashMap<>(), p -> null, new HashMap<>(), ItemInfo::item,
+                m -> new HashSet<>(), t -> null, m -> {}, t -> {});
     }
 
     public String applyReplacers(String input, Slate slate, Player player, ActiveMenu activeMenu, PlaceholderType type, T value) {

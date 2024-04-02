@@ -5,6 +5,7 @@ import com.archyx.slate.action.click.ClickAction;
 import com.archyx.slate.function.ItemClicker;
 import com.archyx.slate.function.ItemModifier;
 import com.archyx.slate.function.ItemReplacer;
+import com.archyx.slate.function.MenuListener;
 import com.archyx.slate.info.ItemInfo;
 import com.archyx.slate.info.PlaceholderInfo;
 import com.archyx.slate.item.*;
@@ -29,11 +30,11 @@ public record BuiltItem(
         ItemReplacer anyReplacer,
         Map<ClickAction, ItemClicker> clickers,
         @NotNull ItemModifier modifier,
-        boolean enableProvider
+        MenuListener initListener
 ) {
 
     public static BuiltItem createEmpty() {
-        return new BuiltItem(new HashMap<>(), p -> null, new HashMap<>(), ItemInfo::item, true);
+        return new BuiltItem(new HashMap<>(), p -> null, new HashMap<>(), ItemInfo::item, m -> {});
     }
 
     public String applyReplacers(String input, Slate slate, Player player, ActiveMenu activeMenu, PlaceholderType type) {

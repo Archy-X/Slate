@@ -12,16 +12,11 @@ import org.spongepowered.configurate.ConfigurationNode;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 public abstract class MenuItemParser extends MapParser {
 
     protected final Slate slate;
     protected final ConfigurateItemParser itemParser;
-    private final String[] KEY_WORDS = new String[] {
-        "pos", "material", "display_name", "lore", "enchantments", "potion_data", "custom_effects", "glow", "nbt", "flags", "durability", "skull_meta", "key"
-    };
-    private final Pattern hexPattern = Pattern.compile("&#([A-Fa-f0-9]{6})");
 
     public MenuItemParser(Slate slate) {
         this.slate = slate;

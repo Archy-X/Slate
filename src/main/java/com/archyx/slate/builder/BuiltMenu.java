@@ -1,13 +1,11 @@
 package com.archyx.slate.builder;
 
 import com.archyx.slate.Slate;
-import com.archyx.slate.function.PropertyProvider;
+import com.archyx.slate.function.*;
 import com.archyx.slate.info.PlaceholderInfo;
-import com.archyx.slate.function.ItemReplacer;
 import com.archyx.slate.item.provider.PlaceholderData;
 import com.archyx.slate.item.provider.PlaceholderType;
 import com.archyx.slate.menu.ActiveMenu;
-import com.archyx.slate.function.PageProvider;
 import com.archyx.slate.util.LoreUtil;
 import com.archyx.slate.util.TextUtil;
 import org.bukkit.entity.Player;
@@ -23,11 +21,15 @@ public record BuiltMenu(
         Map<String, ItemReplacer> titleReplacers,
         ItemReplacer titleAnyReplacer,
         PageProvider pageProvider,
-        PropertyProvider propertyProvider
+        PropertyProvider propertyProvider,
+        ItemModifier fillItem,
+        MenuListener openListener,
+        MenuListener updateListener
 ) {
 
     public static BuiltMenu createEmpty() {
-        return new BuiltMenu(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>(), p -> null, m -> 1, m -> new HashMap<>());
+        return new BuiltMenu(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>(), p -> null, m -> 1,
+                m -> new HashMap<>(), i -> null, m -> {}, m -> {});
     }
 
     @SuppressWarnings("unchecked")
