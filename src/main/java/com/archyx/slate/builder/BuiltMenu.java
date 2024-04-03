@@ -24,12 +24,13 @@ public record BuiltMenu(
         PropertyProvider propertyProvider,
         ItemModifier fillItem,
         MenuListener openListener,
-        MenuListener updateListener
+        MenuListener updateListener,
+        Map<String, Object> defaultOptions
 ) {
 
     public static BuiltMenu createEmpty() {
         return new BuiltMenu(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>(), p -> null, m -> 1,
-                m -> new HashMap<>(), i -> null, m -> {}, m -> {});
+                m -> new HashMap<>(), i -> null, m -> {}, m -> {}, new HashMap<>());
     }
 
     @SuppressWarnings("unchecked")

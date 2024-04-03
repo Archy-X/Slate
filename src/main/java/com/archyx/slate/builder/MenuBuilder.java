@@ -19,6 +19,7 @@ public class MenuBuilder {
     private ItemModifier fillItem = i -> null;
     private MenuListener openListener = m -> {};
     private MenuListener updateListener = m -> {};
+    private Map<String, Object> defaultOptions = new HashMap<>();
 
     private MenuBuilder() {
 
@@ -99,6 +100,11 @@ public class MenuBuilder {
         return this;
     }
 
+    public MenuBuilder defaultOptions(Map<String, Object> defaultOptions) {
+        this.defaultOptions = defaultOptions;
+        return this;
+    }
+
     public BuiltMenu build() {
         Map<String, BuiltItem> items = new HashMap<>();
         for (Entry<String, ItemBuilder> entry : itemBuilders.entrySet()) {
@@ -113,7 +119,7 @@ public class MenuBuilder {
             components.put(entry.getKey(), entry.getValue().build());
         }
         return new BuiltMenu(items, templates, components, titleReplacers, titleAnyReplacer, pageProvider, propertyProvider,
-                fillItem, openListener, updateListener);
+                fillItem, openListener, updateListener, defaultOptions);
     }
 
 }

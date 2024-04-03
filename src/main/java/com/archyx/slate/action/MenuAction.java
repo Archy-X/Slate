@@ -27,7 +27,7 @@ public class MenuAction extends Action {
     public void execute(Player player, MenuInventory menuInventory, InventoryContents contents) {
         switch (actionType) {
             case OPEN:
-                slate.getMenuManager().openMenu(player, menuName, getProperties(menuInventory));
+                slate.openMenu(player, menuName, getProperties(menuInventory));
                 break;
             case CLOSE:
                 player.closeInventory();
@@ -35,13 +35,13 @@ public class MenuAction extends Action {
             case NEXT_PAGE:
                 int nextPage = menuInventory.getCurrentPage() + 1;
                 if (nextPage < menuInventory.getTotalPages()) {
-                    slate.getMenuManager().openMenu(player, menuInventory.getMenu().getName(), getProperties(menuInventory), nextPage);
+                    slate.openMenu(player, menuInventory.getMenu().name(), getProperties(menuInventory), nextPage);
                 }
                 break;
             case PREVIOUS_PAGE:
                 int previousPage = menuInventory.getCurrentPage() - 1;
                 if (previousPage >= 0) {
-                    slate.getMenuManager().openMenu(player, menuInventory.getMenu().getName(), getProperties(menuInventory), previousPage);
+                    slate.openMenu(player, menuInventory.getMenu().name(), getProperties(menuInventory), previousPage);
                 }
                 break;
         }

@@ -21,7 +21,7 @@ public class ActiveMenu {
     }
 
     public String getName() {
-        return menuInventory.getMenu().getName();
+        return menuInventory.getMenu().name();
     }
 
     /**
@@ -89,20 +89,20 @@ public class ActiveMenu {
 
     @Nullable
     public Object getOption(String key) {
-        return menuInventory.getMenu().getOptions().get(key);
+        return menuInventory.getMenu().options().get(key);
     }
 
     @Nullable
     public <T> T getOption(Class<T> clazz, String key) {
         try {
-            return clazz.cast(menuInventory.getMenu().getOptions().get(key));
+            return clazz.cast(menuInventory.getMenu().options().get(key));
         } catch (ClassCastException e) {
             return null;
         }
     }
 
     public Object getOption(String key, Object def) {
-        Object obj = menuInventory.getMenu().getOptions().get(key);
+        Object obj = menuInventory.getMenu().options().get(key);
         if (obj != null) {
             return obj;
         } else {
@@ -112,7 +112,7 @@ public class ActiveMenu {
 
     public <T> T getOption(Class<T> clazz, String key, T def) {
         try {
-            T result = clazz.cast(menuInventory.getMenu().getOptions().get(key));
+            T result = clazz.cast(menuInventory.getMenu().options().get(key));
             if (result != null) {
                 return result;
             } else {
@@ -125,7 +125,7 @@ public class ActiveMenu {
 
     @Nullable
     public Object getItemOption(String itemName, String key) {
-        MenuItem menuItem = menuInventory.getMenu().getItems().get(itemName);
+        MenuItem menuItem = menuInventory.getMenu().items().get(itemName);
         if (menuItem != null) {
             return menuItem.getOptions().get(key);
         }
@@ -133,7 +133,7 @@ public class ActiveMenu {
     }
 
     public Object getItemOption(String itemName, String key, Object def) {
-        MenuItem menuItem = menuInventory.getMenu().getItems().get(itemName);
+        MenuItem menuItem = menuInventory.getMenu().items().get(itemName);
         if (menuItem != null) {
             Object obj = menuItem.getOptions().get(key);
             if (obj != null) {
@@ -144,11 +144,11 @@ public class ActiveMenu {
     }
 
     public Map<String, MenuComponent> getComponents() {
-        return menuInventory.getMenu().getComponents();
+        return menuInventory.getMenu().components();
     }
 
     public Map<String, String> getFormats() {
-        return menuInventory.getMenu().getFormats();
+        return menuInventory.getMenu().formats();
     }
 
     /**
@@ -159,12 +159,12 @@ public class ActiveMenu {
      */
     @NotNull
     public String getFormat(String key) {
-        return menuInventory.getMenu().getFormats().getOrDefault(key, key);
+        return menuInventory.getMenu().formats().getOrDefault(key, key);
     }
 
     @SuppressWarnings("unchecked")
     public <T> void setPositionProvider(String templateName, T context, PositionProvider provider) {
-        MenuItem menuItem = menuInventory.getMenu().getItems().get(templateName);
+        MenuItem menuItem = menuInventory.getMenu().items().get(templateName);
         if (menuItem instanceof TemplateItem) {
             TemplateItem<T> templateItem = (TemplateItem<T>) menuItem;
             templateItem.getPositionsMap().put(context, provider);
@@ -172,9 +172,8 @@ public class ActiveMenu {
     }
 
     public Map<String, ContextGroup> getContextGroups(String templateName) {
-        MenuItem menuItem = menuInventory.getMenu().getItems().get(templateName);
-        if (menuItem instanceof TemplateItem) {
-            TemplateItem<?> templateItem = (TemplateItem<?>) menuItem;
+        MenuItem menuItem = menuInventory.getMenu().items().get(templateName);
+        if (menuItem instanceof TemplateItem<?> templateItem) {
             return templateItem.getContextGroups();
         }
         return new HashMap<>();

@@ -16,7 +16,7 @@ public class ItemBuilder {
     private ItemReplacer anyReplacer = p -> null; // Default anyReplacer doesn't replace by returning null
     private final Map<ClickAction, ItemClicker> clickers = new HashMap<>();
     private ItemModifier modifier = ItemInfo::item;
-    private MenuListener initListener;
+    private MenuListener initListener = m -> {};
 
     public static ItemBuilder builder() {
         return new ItemBuilder();

@@ -3,6 +3,7 @@ package com.archyx.slate.item.parser;
 import com.archyx.slate.Slate;
 import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.builder.SingleItemBuilder;
+import com.archyx.slate.menu.MenuLoader;
 import com.archyx.slate.util.Validate;
 import org.spongepowered.configurate.ConfigurationNode;
 
@@ -31,7 +32,7 @@ public class SingleItemParser extends MenuItemParser {
 
         parseActions(builder, section, menuName, name);
 
-        builder.options(slate.getMenuManager().loadOptions(section));
+        builder.options(MenuLoader.loadOptions(section));
 
         return builder.build();
     }

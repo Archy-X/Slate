@@ -7,6 +7,7 @@ import com.archyx.slate.context.GroupAlign;
 import com.archyx.slate.item.MenuItem;
 import com.archyx.slate.item.builder.TemplateItemBuilder;
 import com.archyx.slate.lore.LoreLine;
+import com.archyx.slate.menu.MenuLoader;
 import com.archyx.slate.position.FixedPosition;
 import com.archyx.slate.position.GroupPosition;
 import com.archyx.slate.position.PositionProvider;
@@ -107,7 +108,7 @@ public class TemplateItemParser<C> extends MenuItemParser {
 
         parseActions(builder, section, menuName, name);
 
-        builder.options(slate.getMenuManager().loadOptions(section));
+        builder.options(MenuLoader.loadOptions(section));
 
         return builder.build();
     }

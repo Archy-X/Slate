@@ -47,7 +47,7 @@ public class MenuInventory implements InventoryProvider {
 
     private final Slate slate;
     private final LoreInterpreter loreInterpreter;
-    private final ConfigurableMenu menu;
+    private final LoadedMenu menu;
     private final ActiveMenu activeMenu;
     private final Map<String, ActiveItem> activeItems;
     private final Map<String, Object> properties;
@@ -58,15 +58,15 @@ public class MenuInventory implements InventoryProvider {
     private final TextFormatter tf = new TextFormatter();
     private final BuiltMenu builtMenu;
 
-    public MenuInventory(Slate slate, ConfigurableMenu menu, Player player, Map<String, Object> properties, int currentPage) {
+    public MenuInventory(Slate slate, LoadedMenu menu, Player player, Map<String, Object> properties, int currentPage) {
         this.slate = slate;
         this.loreInterpreter = new LoreInterpreter(slate);
         this.menu = menu;
         this.activeItems = new LinkedHashMap<>();
         this.activeMenu = new ActiveMenu(this);
-        this.properties = properties;
+        this.properties = new HashMap<>(properties); // Make a copy in case the properties map passed in is immutable
         this.player = player;
-        this.builtMenu = slate.getBuiltMenu(menu.getName());
+        this.builtMenu = slate.getBuiltMenu(menu.name());
         this.totalPages = builtMenu.pageProvider().getPages(new MenuInfo(slate, player, activeMenu));
         this.currentPage = currentPage;
     }
@@ -75,7 +75,7 @@ public class MenuInventory implements InventoryProvider {
         return slate;
     }
 
-    public ConfigurableMenu getMenu() {
+    public LoadedMenu getMenu() {
         return menu;
     }
 
@@ -100,7 +100,7 @@ public class MenuInventory implements InventoryProvider {
     public void init(Player player, InventoryContents contents) {
         this.contents = contents;
         // Add active items
-        for (MenuItem menuItem : menu.getItems().values()) {
+        for (MenuItem menuItem : menu.items().values()) {
             ActiveItem activeItem = activeItems.get(menuItem.getName());
             if (activeItem != null && activeItem.isHidden()) {
                 continue;
@@ -117,7 +117,7 @@ public class MenuInventory implements InventoryProvider {
         // Handle onOpen
         builtMenu.openListener().handle(new MenuInfo(slate, player, activeMenu));
         // Place fill items
-        FillData fillData = menu.getFillData();
+        FillData fillData = menu.fillData();
         if (fillData.enabled()) {
             FillItem fillItem = fillData.item();
             ItemStack providedFill = builtMenu.fillItem().modify(new ItemInfo(slate, player, activeMenu, fillItem.getBaseItem()));
@@ -168,7 +168,7 @@ public class MenuInventory implements InventoryProvider {
 
     private void addSingleItem(ActiveSingleItem activeItem, InventoryContents contents, Player player) {
         SingleItem item = activeItem.getItem();
-        BuiltItem builtItem = slate.getBuiltMenu(menu.getName()).items().getOrDefault(item.getName(), BuiltItem.createEmpty());
+        BuiltItem builtItem = slate.getBuiltMenu(menu.name()).items().getOrDefault(item.getName(), BuiltItem.createEmpty());
 
         ItemStack itemStack = item.getBaseItem().clone();
         builtItem.initListener().handle(new MenuInfo(slate, player, activeMenu));
@@ -204,7 +204,7 @@ public class MenuInventory implements InventoryProvider {
 
     private <C> void addTemplateItem(ActiveTemplateItem<C> activeItem, InventoryContents contents, Player player) {
         TemplateItem<C> item = activeItem.getItem();
-        BuiltTemplate<C> builtTemplate = slate.getBuiltMenu(menu.getName()).getTemplate(item.getName(), item.getContextClass());
+        BuiltTemplate<C> builtTemplate = slate.getBuiltMenu(menu.name()).getTemplate(item.getName(), item.getContextClass());
 
         Set<C> contexts;
         builtTemplate.initListener().handle(new MenuInfo(slate, player, activeMenu));
