@@ -17,6 +17,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -142,6 +143,16 @@ public class Slate {
 
     public GlobalOptions getGlobalOptions() {
         return globalOptions;
+    }
+
+    public void addMergeDirectory(File mergeDir) {
+        if (!mergeDir.isDirectory()) return;
+
+        options.mergeDirectories().add(mergeDir);
+    }
+
+    public void removeMergeDirectory(File mergeDir) {
+        options.mergeDirectories().remove(mergeDir);
     }
 
 }
