@@ -104,7 +104,7 @@ public class ConfigurateItemParser {
 
     @Nullable
     private ItemStack parseItemKey(String key) {
-        KeyedItemProvider provider = slate.getMenuManager().getGlobalProviderManager().getKeyedItemProvider();
+        KeyedItemProvider provider = slate.getOptions().keyedItemProvider();
         if (provider != null) {
             return provider.getItem(key);
         }
@@ -142,6 +142,7 @@ public class ConfigurateItemParser {
         item.setItemMeta(meta);
     }
 
+    @SuppressWarnings("deprecation")
     private void parseCustomEffects(ConfigurationNode section, ItemStack item) {
         PotionMeta potionMeta = (PotionMeta) getMeta(item);
         for (ConfigurationNode effectNode : section.node("custom_effects").childrenList()) {
@@ -159,6 +160,7 @@ public class ConfigurateItemParser {
         item.setItemMeta(potionMeta);
     }
 
+    @SuppressWarnings("deprecation")
     private void parsePotionData(ItemStack item, ConfigurationNode node) {
         PotionMeta potionMeta = (PotionMeta) getMeta(item);
         PotionType potionType = PotionType.valueOf(node.node("type").getString("WATER").toUpperCase(Locale.ROOT));
@@ -242,8 +244,8 @@ public class ConfigurateItemParser {
             Object key = entry.getKey();
             Object value = entry.getValue().raw();
             if (key instanceof String) {
-                if (value instanceof ConfigurationNode) {
-                    ConfigurationNode childNode = (ConfigurationNode) value; // Recursively apply sub maps
+                if (value instanceof ConfigurationNode childNode) {
+                    // Recursively apply sub maps
                     applyMapToNBT(item.getOrCreateCompound((String) key), childNode.childrenMap());
                 } else {
                     if (value instanceof Integer) {
@@ -272,10 +274,9 @@ public class ConfigurateItemParser {
     }
 
     private void parseSkullMeta(ItemStack item, ItemMeta meta, ConfigurationNode section) {
-        if (!(meta instanceof SkullMeta)) {
+        if (!(meta instanceof SkullMeta skullMeta)) {
             return;
         }
-        SkullMeta skullMeta = (SkullMeta) meta;
         String uuid = section.node("uuid").getString();
         if (uuid != null) { // From UUID of player
             UUID id = UUID.fromString(uuid);

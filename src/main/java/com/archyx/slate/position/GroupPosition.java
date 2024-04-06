@@ -7,25 +7,8 @@ import fr.minuskube.inv.content.SlotPos;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class GroupPosition implements PositionProvider {
-
-    private final ContextGroup group;
-    private final int order;
-
-    public GroupPosition(ContextGroup group, int order) {
-        this.group = group;
-        this.order = order;
-    }
-
-    public ContextGroup getGroup() {
-        return group;
-    }
-
-    public int getOrder() {
-        return order;
-    }
+public record GroupPosition(ContextGroup group, int order) implements PositionProvider {
 
     @Override
     public SlotPos getPosition(Collection<PositionProvider> positionData) {
@@ -33,9 +16,9 @@ public class GroupPosition implements PositionProvider {
         List<GroupPosition> providers = positionData.stream()
                 .filter(p -> p instanceof GroupPosition)
                 .map(p -> (GroupPosition) p)
-                .filter(p -> p.getGroup().equals(group))
-                .sorted(Comparator.comparingInt(GroupPosition::getOrder)) // Sort by ascending order
-                .collect(Collectors.toList());
+                .filter(p -> p.group().equals(group))
+                .sorted(Comparator.comparingInt(GroupPosition::order)) // Sort by ascending order
+                .toList();
 
         int size = providers.size();
         int startRow = group.getStart().getRow();
@@ -45,8 +28,8 @@ public class GroupPosition implements PositionProvider {
 
         // Get the index of the current group in the list of providers
         int index = providers.size();
-        for (int i = 0; i < providers.size(); i ++) {
-            if (providers.get(i).getOrder() == order) {
+        for (int i = 0; i < providers.size(); i++) {
+            if (providers.get(i).order() == order) {
                 index = i;
             }
         }
@@ -70,7 +53,6 @@ public class GroupPosition implements PositionProvider {
         }
         return SlotPos.of(startRow, startCol);
     }
-
 
 
 }

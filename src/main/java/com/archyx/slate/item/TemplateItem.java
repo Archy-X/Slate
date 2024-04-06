@@ -16,6 +16,7 @@ import java.util.Map;
 
 public class TemplateItem<C> extends MenuItem {
 
+    private final Class<C> contextClass;
     private final Map<C, PositionProvider> positions;
     private final Map<C, ItemStack> baseItems;
     private final Map<C, String> contextualDisplayNames;
@@ -24,8 +25,9 @@ public class TemplateItem<C> extends MenuItem {
     private final SlotPos defaultPosition;
     private final Map<String, ContextGroup> contextGroups;
 
-    public TemplateItem(Slate slate, String name, Map<C, ItemStack> baseItems, ItemStack defaultBaseItem, String displayName, List<LoreLine> lore, Map<C, String> contextualDisplayNames, Map<C, List<LoreLine>> contextualLore, Map<ClickAction, List<Action>> actions, Map<C, PositionProvider> positions, SlotPos defaultPosition, Map<String, Object> options, Map<String, ContextGroup> contextGroups) {
+    public TemplateItem(Slate slate, String name, Class<C> contextClass, Map<C, ItemStack> baseItems, ItemStack defaultBaseItem, String displayName, List<LoreLine> lore, Map<C, String> contextualDisplayNames, Map<C, List<LoreLine>> contextualLore, Map<ClickAction, List<Action>> actions, Map<C, PositionProvider> positions, SlotPos defaultPosition, Map<String, Object> options, Map<String, ContextGroup> contextGroups) {
         super(slate, name, displayName, lore, actions, options);
+        this.contextClass = contextClass;
         this.positions = positions;
         this.baseItems = baseItems;
         this.contextualDisplayNames = contextualDisplayNames;
@@ -33,6 +35,10 @@ public class TemplateItem<C> extends MenuItem {
         this.defaultBaseItem = defaultBaseItem;
         this.defaultPosition = defaultPosition;
         this.contextGroups = contextGroups;
+    }
+
+    public Class<C> getContextClass() {
+        return contextClass;
     }
 
     public PositionProvider getPosition(C context) {

@@ -4,17 +4,7 @@ import fr.minuskube.inv.content.SlotPos;
 
 import java.util.Collection;
 
-public class FixedPosition implements PositionProvider {
-
-    private final SlotPos pos;
-
-    public FixedPosition(SlotPos pos) {
-        this.pos = pos;
-    }
-
-    public SlotPos getPos() {
-        return pos;
-    }
+public record FixedPosition(SlotPos pos) implements PositionProvider {
 
     @Override
     public SlotPos getPosition(Collection<PositionProvider> positionData) {

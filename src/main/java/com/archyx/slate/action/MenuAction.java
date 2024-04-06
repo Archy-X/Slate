@@ -1,8 +1,9 @@
 package com.archyx.slate.action;
 
 import com.archyx.slate.Slate;
+import com.archyx.slate.builder.BuiltMenu;
+import com.archyx.slate.info.MenuInfo;
 import com.archyx.slate.menu.MenuInventory;
-import com.archyx.slate.menu.MenuProvider;
 import fr.minuskube.inv.content.InventoryContents;
 import org.bukkit.entity.Player;
 
@@ -26,7 +27,7 @@ public class MenuAction extends Action {
     public void execute(Player player, MenuInventory menuInventory, InventoryContents contents) {
         switch (actionType) {
             case OPEN:
-                slate.getMenuManager().openMenu(player, menuName, getProperties(menuInventory));
+                slate.openMenu(player, menuName, getProperties(menuInventory));
                 break;
             case CLOSE:
                 player.closeInventory();
@@ -34,13 +35,13 @@ public class MenuAction extends Action {
             case NEXT_PAGE:
                 int nextPage = menuInventory.getCurrentPage() + 1;
                 if (nextPage < menuInventory.getTotalPages()) {
-                    slate.getMenuManager().openMenu(player, menuInventory.getMenu().getName(), getProperties(menuInventory), nextPage);
+                    slate.openMenu(player, menuInventory.getMenu().name(), getProperties(menuInventory), nextPage);
                 }
                 break;
             case PREVIOUS_PAGE:
                 int previousPage = menuInventory.getCurrentPage() - 1;
                 if (previousPage >= 0) {
-                    slate.getMenuManager().openMenu(player, menuInventory.getMenu().getName(), getProperties(menuInventory), previousPage);
+                    slate.openMenu(player, menuInventory.getMenu().name(), getProperties(menuInventory), previousPage);
                 }
                 break;
         }
@@ -48,12 +49,10 @@ public class MenuAction extends Action {
     }
 
     private Map<String, Object> getProperties(MenuInventory inventory) {
-        Map<String, Object> base = new HashMap<>();
-        // Use menu provider default properties
-        MenuProvider provider = slate.getMenuManager().getMenuProvider(menuName);
-        if (provider != null) {
-            base.putAll(provider.getDefaultProperties(inventory.getActiveMenu()));
-        }
+        // Add BuiltMenu properties from PropertyProvider
+        BuiltMenu builtMenu = slate.getBuiltMenu(menuName);
+        MenuInfo info = new MenuInfo(slate, inventory.getPlayer(), inventory.getActiveMenu());
+        Map<String, Object> base = new HashMap<>(builtMenu.propertyProvider().get(info));
         // Otherwise fallback to current menu properties
         if (base.isEmpty()) {
             base.putAll(inventory.getProperties());

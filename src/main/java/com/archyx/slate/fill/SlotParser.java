@@ -16,8 +16,7 @@ public class SlotParser {
                 if (element instanceof Integer) {
                     int value = (int) element;
                     slots[index] = SlotPos.of(value / 9, value % 9);
-                } else if (element instanceof String) {
-                    String str = (String) element;
+                } else if (element instanceof String str) {
                     String[] splitStr = str.split(",");
                     if (splitStr.length > 1) {
                         slots[index] = SlotPos.of(Integer.parseInt(splitStr[0]), Integer.parseInt(splitStr[1]));

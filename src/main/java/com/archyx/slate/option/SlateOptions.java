@@ -1,30 +1,19 @@
 package com.archyx.slate.option;
 
-public class SlateOptions {
+import com.archyx.slate.item.provider.KeyedItemProvider;
 
-    private final int loreWrappingWidth;
+import java.io.File;
+import java.util.List;
 
-    public SlateOptions(int loreWrappingWidth) {
-        this.loreWrappingWidth = loreWrappingWidth;
-    }
+public record SlateOptions(
+        File mainDirectory,
+        List<File> mergeDirectories,
+        int loreWrappingWidth,
+        KeyedItemProvider keyedItemProvider
+) {
 
-    public int getLoreWrappingWidth() {
-        return loreWrappingWidth;
-    }
-
-    public static class SlateOptionsBuilder {
-
-        private int loreWrappingWidth = 40;
-
-        public SlateOptionsBuilder loreWrappingWidth(int loreWrappingWidth) {
-            this.loreWrappingWidth = loreWrappingWidth;
-            return this;
-        }
-
-        public SlateOptions build() {
-            return new SlateOptions(loreWrappingWidth);
-        }
-
+    public static SlateOptionsBuilder builder() {
+        return new SlateOptionsBuilder();
     }
 
 }

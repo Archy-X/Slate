@@ -13,6 +13,9 @@ public class TextUtil {
         if (source == null) {
             return null;
         }
+        if (os == null || ns == null) {
+            return source;
+        }
         int i = 0;
         if ((i = source.indexOf(os, i)) >= 0) {
             char[] sourceArray = source.toCharArray();
