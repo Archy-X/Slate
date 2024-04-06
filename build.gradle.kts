@@ -36,6 +36,10 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.1")
 }
 
+configurations.all {
+    exclude("org.yaml", "snakeyaml")
+}
+
 tasks.withType<ShadowJar> {
     val projectVersion: String by project
     archiveFileName.set("Slate-${projectVersion}.jar")
