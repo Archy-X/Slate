@@ -148,6 +148,9 @@ public class Slate {
     public void addMergeDirectory(File mergeDir) {
         if (!mergeDir.isDirectory()) return;
 
+        if (options.mergeDirectories().contains(mergeDir)) {
+            removeMergeDirectory(mergeDir);
+        }
         options.mergeDirectories().add(mergeDir);
     }
 
