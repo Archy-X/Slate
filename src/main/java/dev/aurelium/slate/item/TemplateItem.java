@@ -4,9 +4,9 @@ import dev.aurelium.slate.Slate;
 import dev.aurelium.slate.action.Action;
 import dev.aurelium.slate.action.click.ClickAction;
 import dev.aurelium.slate.context.ContextGroup;
+import dev.aurelium.slate.inv.content.SlotPos;
 import dev.aurelium.slate.lore.LoreLine;
 import dev.aurelium.slate.position.PositionProvider;
-import fr.minuskube.inv.content.SlotPos;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 

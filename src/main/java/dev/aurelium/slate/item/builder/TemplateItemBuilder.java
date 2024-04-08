@@ -2,11 +2,11 @@ package dev.aurelium.slate.item.builder;
 
 import dev.aurelium.slate.Slate;
 import dev.aurelium.slate.context.ContextGroup;
+import dev.aurelium.slate.inv.content.SlotPos;
 import dev.aurelium.slate.item.MenuItem;
 import dev.aurelium.slate.item.TemplateItem;
 import dev.aurelium.slate.lore.LoreLine;
 import dev.aurelium.slate.position.PositionProvider;
-import fr.minuskube.inv.content.SlotPos;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;

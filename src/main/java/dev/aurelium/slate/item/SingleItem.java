@@ -3,8 +3,8 @@ package dev.aurelium.slate.item;
 import dev.aurelium.slate.Slate;
 import dev.aurelium.slate.action.Action;
 import dev.aurelium.slate.action.click.ClickAction;
+import dev.aurelium.slate.inv.content.SlotPos;
 import dev.aurelium.slate.lore.LoreLine;
-import fr.minuskube.inv.content.SlotPos;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;

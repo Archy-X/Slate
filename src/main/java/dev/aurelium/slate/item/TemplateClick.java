@@ -1,7 +1,7 @@
 package dev.aurelium.slate.item;
 
+import dev.aurelium.slate.inv.content.SlotPos;
 import dev.aurelium.slate.menu.ActiveMenu;
-import fr.minuskube.inv.content.SlotPos;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;

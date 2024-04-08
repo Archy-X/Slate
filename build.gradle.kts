@@ -27,7 +27,6 @@ dependencies {
     api("org.spongepowered:configurate-yaml:4.1.2") {
         exclude("org.yaml", "snakeyaml")
     }
-    implementation("com.github.Archy-X:SmartInvs:f77ddde177")
     implementation("dev.dbassett:skullcreator:3.0.1")
     implementation("net.kyori:adventure-text-minimessage:4.16.0")
     implementation("net.kyori:adventure-platform-bukkit:4.3.2")
@@ -44,7 +43,6 @@ configurations.all {
 
 tasks.withType<ShadowJar> {
     val projectVersion: String by project
-    archiveFileName.set("Slate-${projectVersion}.jar")
 
     relocate("dev.dbassett.skullcreator", "com.archyx.slate.skullcreator")
 
@@ -125,13 +123,5 @@ if (project.hasProperty("sonatypeUsername") && project.hasProperty("sonatypePass
         useGpgCmd()
         sign(publishing.publications.getByName("mavenJava"))
         isRequired = true
-    }
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            from(components["java"])
-        }
     }
 }

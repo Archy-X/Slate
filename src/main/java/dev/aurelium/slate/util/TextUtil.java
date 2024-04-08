@@ -65,7 +65,7 @@ public class TextUtil {
     }
 
     public static boolean isEmpty(final CharSequence cs) {
-        return cs == null || cs.length() == 0;
+        return cs == null || cs.isEmpty();
     }
 
     public static String capitalize(final String str) {
@@ -136,11 +136,7 @@ public class TextUtil {
                 }
                 return new String(output2);
             default :
-                final StringBuilder buf = new StringBuilder(outputLength);
-                for (int i = 0; i < repeat; i++) {
-                    buf.append(str);
-                }
-                return buf.toString();
+                return str.repeat(repeat);
         }
     }
 

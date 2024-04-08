@@ -3,10 +3,10 @@ package dev.aurelium.slate.item.parser;
 import dev.aurelium.slate.Slate;
 import dev.aurelium.slate.action.Action;
 import dev.aurelium.slate.action.click.ClickAction;
+import dev.aurelium.slate.inv.content.SlotPos;
 import dev.aurelium.slate.item.MenuItem;
 import dev.aurelium.slate.item.builder.MenuItemBuilder;
 import dev.aurelium.slate.util.MapParser;
-import fr.minuskube.inv.content.SlotPos;
 import org.spongepowered.configurate.ConfigurationNode;
 
 import java.util.LinkedHashMap;

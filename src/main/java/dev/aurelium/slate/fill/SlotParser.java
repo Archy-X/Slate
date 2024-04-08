@@ -1,6 +1,6 @@
 package dev.aurelium.slate.fill;
 
-import fr.minuskube.inv.content.SlotPos;
+import dev.aurelium.slate.inv.content.SlotPos;
 import org.spongepowered.configurate.ConfigurationNode;
 
 import java.util.List;

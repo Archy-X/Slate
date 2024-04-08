@@ -1,6 +1,6 @@
 package dev.aurelium.slate.context;
 
-import fr.minuskube.inv.content.SlotPos;
+import dev.aurelium.slate.inv.content.SlotPos;
 
 public class ContextGroup {
 

@@ -2,8 +2,8 @@ package dev.aurelium.slate.menu;
 
 import dev.aurelium.slate.Slate;
 import dev.aurelium.slate.builder.BuiltMenu;
+import dev.aurelium.slate.inv.SmartInventory;
 import dev.aurelium.slate.text.TextFormatter;
-import fr.minuskube.inv.SmartInventory;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
 

@@ -2,7 +2,7 @@ package dev.aurelium.slate.position;
 
 import dev.aurelium.slate.context.ContextGroup;
 import dev.aurelium.slate.context.GroupAlign;
-import fr.minuskube.inv.content.SlotPos;
+import dev.aurelium.slate.inv.content.SlotPos;
 
 import java.util.Collection;
 import java.util.Comparator;

@@ -1,9 +1,9 @@
 package dev.aurelium.slate.action;
 
 import dev.aurelium.slate.Slate;
+import dev.aurelium.slate.inv.content.InventoryContents;
 import dev.aurelium.slate.menu.MenuInventory;
 import dev.aurelium.slate.util.TextUtil;
-import fr.minuskube.inv.content.InventoryContents;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

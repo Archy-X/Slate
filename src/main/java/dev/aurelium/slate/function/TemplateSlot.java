@@ -1,7 +1,7 @@
 package dev.aurelium.slate.function;
 
 import dev.aurelium.slate.info.TemplateInfo;
-import fr.minuskube.inv.content.SlotPos;
+import dev.aurelium.slate.inv.content.SlotPos;
 import org.jetbrains.annotations.Nullable;
 
 @FunctionalInterface

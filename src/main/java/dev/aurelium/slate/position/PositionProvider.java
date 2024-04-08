@@ -1,6 +1,6 @@
 package dev.aurelium.slate.position;
 
-import fr.minuskube.inv.content.SlotPos;
+import dev.aurelium.slate.inv.content.SlotPos;
 
 import java.util.Collection;
 

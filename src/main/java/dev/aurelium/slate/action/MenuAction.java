@@ -3,8 +3,8 @@ package dev.aurelium.slate.action;
 import dev.aurelium.slate.Slate;
 import dev.aurelium.slate.builder.BuiltMenu;
 import dev.aurelium.slate.info.MenuInfo;
+import dev.aurelium.slate.inv.content.InventoryContents;
 import dev.aurelium.slate.menu.MenuInventory;
-import fr.minuskube.inv.content.InventoryContents;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;

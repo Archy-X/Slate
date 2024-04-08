@@ -1,8 +1,8 @@
 package dev.aurelium.slate.action;
 
 import dev.aurelium.slate.Slate;
+import dev.aurelium.slate.inv.content.InventoryContents;
 import dev.aurelium.slate.menu.MenuInventory;
-import fr.minuskube.inv.content.InventoryContents;
 import org.bukkit.entity.Player;
 
 public abstract class Action {

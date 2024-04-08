@@ -1,9 +1,9 @@
 package dev.aurelium.slate.item.builder;
 
 import dev.aurelium.slate.Slate;
+import dev.aurelium.slate.inv.content.SlotPos;
 import dev.aurelium.slate.item.MenuItem;
 import dev.aurelium.slate.item.SingleItem;
-import fr.minuskube.inv.content.SlotPos;
 import org.bukkit.inventory.ItemStack;
 
 public class SingleItemBuilder extends MenuItemBuilder {
