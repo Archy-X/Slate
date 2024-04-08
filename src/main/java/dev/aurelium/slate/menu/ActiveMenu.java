@@ -1,11 +1,13 @@
 package dev.aurelium.slate.menu;
 
+import dev.aurelium.slate.Slate;
 import dev.aurelium.slate.component.MenuComponent;
 import dev.aurelium.slate.context.ContextGroup;
 import dev.aurelium.slate.item.MenuItem;
 import dev.aurelium.slate.item.TemplateItem;
 import dev.aurelium.slate.item.active.ActiveItem;
 import dev.aurelium.slate.position.PositionProvider;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,6 +20,10 @@ public class ActiveMenu {
 
     public ActiveMenu(MenuInventory menuInventory) {
         this.menuInventory = menuInventory;
+    }
+
+    public static ActiveMenu empty(Slate slate, Player player) {
+        return new EmptyActiveMenu(slate, player);
     }
 
     public String getName() {
