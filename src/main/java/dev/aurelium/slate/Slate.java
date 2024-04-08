@@ -63,6 +63,10 @@ public class Slate {
         menuOpener.openMenu(player, name, properties, page);
     }
 
+    public void openMenuUnchecked(Player player, String name, Map<String, Object> properties, int page) {
+        menuOpener.openMenuUnchecked(player, name, properties, page);
+    }
+
     public void openMenu(Player player, String name, Map<String, Object> properties) {
         menuOpener.openMenu(player, name, properties);
     }

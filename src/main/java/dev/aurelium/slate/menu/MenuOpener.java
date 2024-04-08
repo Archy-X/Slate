@@ -29,33 +29,37 @@ public class MenuOpener {
      */
     public void openMenu(Player player, String name, Map<String, Object> properties, int page) {
         try {
-            LoadedMenu menu = slate.getLoadedMenu(name);
-            if (menu == null) {
-                throw new IllegalArgumentException("Menu with name " + name + " not registered");
-            }
-            MenuInventory menuInventory = new MenuInventory(slate, menu, player, properties, page);
-            String title = menu.title();
-            // Apply BuiltMenu replacers
-            BuiltMenu builtMenu = slate.getBuiltMenu(name);
-            title = builtMenu.applyTitleReplacers(title, slate, player, menuInventory.getActiveMenu());
-
-            if (slate.isPlaceholderAPIEnabled()) {
-                title = PlaceholderAPI.setPlaceholders(player, title);
-            }
-
-            // Build inventory and open
-            SmartInventory smartInventory = SmartInventory.builder()
-                    .title(tf.toString(tf.toComponent(title)))
-                    .size(menu.size(), 9)
-                    .manager(slate.getInventoryManager())
-                    .provider(menuInventory)
-                    .build();
-            smartInventory.open(player);
+            openMenuUnchecked(player, name, properties, page);
         } catch (Exception e) {
             player.closeInventory();
             slate.getPlugin().getLogger().warning("Error opening Slate menu " + name);
             e.printStackTrace();
         }
+    }
+
+    public void openMenuUnchecked(Player player, String name, Map<String, Object> properties, int page) {
+        LoadedMenu menu = slate.getLoadedMenu(name);
+        if (menu == null) {
+            throw new IllegalArgumentException("Menu with name " + name + " not registered");
+        }
+        MenuInventory menuInventory = new MenuInventory(slate, menu, player, properties, page);
+        String title = menu.title();
+        // Apply BuiltMenu replacers
+        BuiltMenu builtMenu = slate.getBuiltMenu(name);
+        title = builtMenu.applyTitleReplacers(title, slate, player, menuInventory.getActiveMenu());
+
+        if (slate.isPlaceholderAPIEnabled()) {
+            title = PlaceholderAPI.setPlaceholders(player, title);
+        }
+
+        // Build inventory and open
+        SmartInventory smartInventory = SmartInventory.builder()
+                .title(tf.toString(tf.toComponent(title)))
+                .size(menu.size(), 9)
+                .manager(slate.getInventoryManager())
+                .provider(menuInventory)
+                .build();
+        smartInventory.open(player);
     }
 
     public void openMenu(Player player, String name, Map<String, Object> properties) {
