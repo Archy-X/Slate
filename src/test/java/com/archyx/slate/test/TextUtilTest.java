@@ -1,6 +1,6 @@
 package com.archyx.slate.test;
 
-import com.archyx.slate.util.TextUtil;
+import dev.aurelium.slate.util.TextUtil;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
