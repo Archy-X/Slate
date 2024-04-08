@@ -27,12 +27,12 @@ dependencies {
     api("org.spongepowered:configurate-yaml:4.1.2") {
         exclude("org.yaml", "snakeyaml")
     }
-    implementation("dev.dbassett:skullcreator:3.0.1")
     implementation("net.kyori:adventure-text-minimessage:4.16.0")
     implementation("net.kyori:adventure-platform-bukkit:4.3.2")
     implementation("de.tr7zw:item-nbt-api:2.11.3")
     compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.10.10")
+    compileOnly("com.mojang:authlib:1.5.25")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.2")
 }

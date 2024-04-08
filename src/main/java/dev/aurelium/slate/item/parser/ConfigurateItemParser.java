@@ -1,15 +1,15 @@
 package dev.aurelium.slate.item.parser;
 
+import de.tr7zw.changeme.nbtapi.NBTCompound;
+import de.tr7zw.changeme.nbtapi.NBTContainer;
+import de.tr7zw.changeme.nbtapi.NBTItem;
 import dev.aurelium.slate.Slate;
 import dev.aurelium.slate.item.provider.KeyedItemProvider;
 import dev.aurelium.slate.lore.LoreFactory;
 import dev.aurelium.slate.lore.LoreLine;
 import dev.aurelium.slate.util.NumberUtil;
+import dev.aurelium.slate.util.SkullCreator;
 import dev.aurelium.slate.util.Validate;
-import de.tr7zw.changeme.nbtapi.NBTCompound;
-import de.tr7zw.changeme.nbtapi.NBTContainer;
-import de.tr7zw.changeme.nbtapi.NBTItem;
-import dev.dbassett.skullcreator.SkullCreator;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
