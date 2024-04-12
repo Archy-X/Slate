@@ -57,6 +57,17 @@ tasks {
     build {
         dependsOn(shadowJar)
     }
+    javadoc {
+        title = "Slate API (${project.version})"
+        source = sourceSets.main.get().allSource
+        classpath = files(sourceSets.main.get().compileClasspath)
+        options {
+            (this as CoreJavadocOptions).addStringOption("Xdoclint:none", "-quiet")
+            overview("javadoc/overview.html")
+            encoding("UTF-8")
+            charset("UTF-8")
+        }
+    }
 }
 
 idea {
@@ -67,6 +78,8 @@ idea {
 }
 
 java {
+    withJavadocJar()
+    withSourcesJar()
     sourceCompatibility = JavaVersion.VERSION_17
 }
 
