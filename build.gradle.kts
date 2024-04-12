@@ -54,9 +54,6 @@ tasks.withType<JavaCompile> {
 }
 
 tasks {
-    build {
-        dependsOn(shadowJar)
-    }
     javadoc {
         title = "Slate API (${project.version})"
         source = sourceSets.main.get().allSource
@@ -67,6 +64,10 @@ tasks {
             encoding("UTF-8")
             charset("UTF-8")
         }
+    }
+    build {
+        dependsOn(shadowJar)
+        dependsOn(javadoc)
     }
 }
 
