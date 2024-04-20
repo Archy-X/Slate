@@ -95,6 +95,9 @@ public class ConfigurateItemParser {
         if (!config.node("durability").virtual()) {
             parseDurability(config, item);
         }
+        if (!config.node("custom_model_data").virtual()) {
+            parseCustomModelData(config, item);
+        }
         ConfigurationNode skullMetaSection = config.node("skull_meta");
         if (!skullMetaSection.virtual()) {
             parseSkullMeta(item, item.getItemMeta(), skullMetaSection);
@@ -303,6 +306,13 @@ public class ConfigurateItemParser {
     private void parseAmount(ItemStack item, ConfigurationNode section) {
         int amount = section.node("amount").getInt(1);
         item.setAmount(amount);
+    }
+
+    private void parseCustomModelData(ConfigurationNode config, ItemStack item) {
+        int data = config.node("custom_model_data").getInt();
+        ItemMeta meta = getMeta(item);
+        meta.setCustomModelData(data);
+        item.setItemMeta(meta);
     }
 
 }
