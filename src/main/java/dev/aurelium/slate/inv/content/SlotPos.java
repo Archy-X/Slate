@@ -65,4 +65,18 @@ public class SlotPos {
         return new SlotPos(row, column);
     }
 
+    public static SlotPos parse(String input) {
+        String[] split = input.split(",");
+        int row = 0;
+        int column = 0;
+        try {
+            row = Integer.parseInt(split[0]);
+            if (split.length > 1) {
+                column = Integer.parseInt(split[1]);
+            }
+        } catch (NumberFormatException ignored) { }
+
+        return new SlotPos(row, column);
+    }
+
 }

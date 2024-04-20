@@ -40,19 +40,54 @@ public class MenuLoader {
         if (files == null) return 0;
 
         int menusLoaded = 0;
+        Set<String> mainLoaded = new HashSet<>();
+
         for (File menuFile : files) {
             try {
-                loadAndAddMenu(menuFile);
+                String menuName = loadAndAddMenu(menuFile);
                 menusLoaded++;
+                mainLoaded.add(menuName);
             } catch (ConfigurateException | RuntimeException e) {
                 slate.getPlugin().getLogger().warning("Error loading menu file " + menuFile.getName());
                 e.printStackTrace();
             }
         }
+
+        menusLoaded += loadExternalMenus(mainLoaded);
+
         return menusLoaded;
     }
 
-    private void loadAndAddMenu(File file) throws ConfigurateException, RuntimeException {
+    private int loadExternalMenus(Set<String> mainLoaded) {
+        int menusLoaded = 0;
+        // Load new menus from mergeDirs
+        for (File mergeDir : mergeDirs) { // Each merge directory
+            if (!mergeDir.isDirectory()) continue;
+
+            File[] files = mergeDir.listFiles((d, name) -> name.endsWith(".yml"));
+            if (files == null) continue;
+
+            for (File menuFile : files) { // Each menu file in external directory
+                String menuName = menuFile.getName().substring(0, menuFile.getName().lastIndexOf("."));
+
+                // Skip if already loaded and merged with a main dir menu file
+                if (mainLoaded.contains(menuName)) {
+                    continue;
+                }
+
+                try {
+                    loadAndAddMenu(menuFile);
+                    menusLoaded++;
+                } catch (ConfigurateException e) {
+                    slate.getPlugin().getLogger().warning("Error loading menu file " + menuFile.getName());
+                    e.printStackTrace();
+                }
+            }
+        }
+        return menusLoaded;
+    }
+
+    private String loadAndAddMenu(File file) throws ConfigurateException, RuntimeException {
         String menuName = file.getName();
         int pos = menuName.lastIndexOf(".");
         if (pos > 0) {
@@ -60,6 +95,7 @@ public class MenuLoader {
         }
         LoadedMenu menu = loadMenu(file, menuName);
         slate.addLoadedMenu(menu);
+        return menuName;
     }
 
     private ConfigurationNode mergeAndLoad(File mainFile) throws ConfigurateException {
