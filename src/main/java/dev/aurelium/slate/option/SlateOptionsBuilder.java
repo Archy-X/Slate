@@ -13,6 +13,7 @@ public class SlateOptionsBuilder {
     private List<File> mergeDirectories = new ArrayList<>();
     private int loreWrappingWidth = 40;
     private KeyedItemProvider keyedItemProvider = k -> null;
+    private boolean nbtEnabled = false;
 
     public SlateOptionsBuilder mainDirectory(File mainDirectory) {
         this.mainDirectory = mainDirectory;
@@ -34,9 +35,14 @@ public class SlateOptionsBuilder {
         return this;
     }
 
+    public SlateOptionsBuilder nbtEnabled(boolean nbtEnabled) {
+        this.nbtEnabled = nbtEnabled;
+        return this;
+    }
+
     public SlateOptions build() {
         Validate.notNull(mainDirectory, "mainDirectory not defined in SlateOptions");
-        return new SlateOptions(mainDirectory, mergeDirectories, loreWrappingWidth, keyedItemProvider);
+        return new SlateOptions(mainDirectory, mergeDirectories, loreWrappingWidth, keyedItemProvider, nbtEnabled);
     }
 
 }

@@ -1,12 +1,10 @@
 package dev.aurelium.slate.item.parser;
 
-import de.tr7zw.changeme.nbtapi.NBTCompound;
-import de.tr7zw.changeme.nbtapi.NBTContainer;
-import de.tr7zw.changeme.nbtapi.NBTItem;
 import dev.aurelium.slate.Slate;
 import dev.aurelium.slate.item.provider.KeyedItemProvider;
 import dev.aurelium.slate.lore.LoreFactory;
 import dev.aurelium.slate.lore.LoreLine;
+import dev.aurelium.slate.util.NbtParser;
 import dev.aurelium.slate.util.NumberUtil;
 import dev.aurelium.slate.util.SkullCreator;
 import dev.aurelium.slate.util.Validate;
@@ -78,14 +76,15 @@ public class ConfigurateItemParser {
             parseGlow(item);
         }
         // Custom NBT
-        if (!config.node("nbt").virtual()) {
+        if (!config.node("nbt").virtual() && slate.getOptions().nbtEnabled()) {
+            var nbtParser = new NbtParser();
             if (config.node("nbt").isMap()) {
                 ConfigurationNode nbtSection = config.node("nbt");
-                item = parseNBT(item, nbtSection.childrenMap());
+                item = nbtParser.parseNBT(item, nbtSection.childrenMap());
             } else if (config.node("nbt").getString() != null) {
                 String nbtString = config.getString("nbt");
                 if (nbtString != null) {
-                    item = parseNBTString(item, nbtString);
+                    item = nbtParser.parseNBTString(item, nbtString);
                 }
             }
         }
@@ -95,9 +94,9 @@ public class ConfigurateItemParser {
         if (!config.node("durability").virtual()) {
             parseDurability(config, item);
         }
-        if (!config.node("custom_model_data").virtual()) {
-            parseCustomModelData(config, item);
-        }
+        // Parses custom_model_data and old format CustomModelData nbt map
+        parseCustomModelData(config, item);
+
         ConfigurationNode skullMetaSection = config.node("skull_meta");
         if (!skullMetaSection.virtual()) {
             parseSkullMeta(item, item.getItemMeta(), skullMetaSection);
@@ -236,41 +235,7 @@ public class ConfigurateItemParser {
         return new LoreFactory(slate).getLore(loreNode);
     }
 
-    private ItemStack parseNBT(ItemStack item, Map<Object, ? extends ConfigurationNode> map) {
-        NBTItem nbtItem = new NBTItem(item);
-        applyMapToNBT(nbtItem, map);
-        return nbtItem.getItem();
-    }
 
-    private void applyMapToNBT(NBTCompound item, Map<Object, ? extends ConfigurationNode> map) {
-        for (Map.Entry<Object, ? extends ConfigurationNode> entry : map.entrySet()) {
-            Object key = entry.getKey();
-            Object value = entry.getValue().raw();
-            if (key instanceof String) {
-                if (value instanceof ConfigurationNode childNode) {
-                    // Recursively apply sub maps
-                    applyMapToNBT(item.getOrCreateCompound((String) key), childNode.childrenMap());
-                } else {
-                    if (value instanceof Integer) {
-                        item.setInteger((String) key, (int) value);
-                    } else if (value instanceof Double) {
-                        item.setDouble((String) key, (double) value);
-                    } else if (value instanceof Boolean) {
-                        item.setBoolean((String) key, (boolean) value);
-                    } else if (value instanceof String) {
-                        item.setString((String) key, (String) value);
-                    }
-                }
-            }
-        }
-    }
-
-    private ItemStack parseNBTString(ItemStack item, String nbtString) {
-        NBTContainer container = new NBTContainer(nbtString);
-        NBTItem nbtItem = new NBTItem(item);
-        nbtItem.mergeCompound(container);
-        return nbtItem.getItem();
-    }
 
     protected Material parseMaterial(String name) {
         return Material.getMaterial(name);
@@ -309,10 +274,17 @@ public class ConfigurateItemParser {
     }
 
     private void parseCustomModelData(ConfigurationNode config, ItemStack item) {
-        int data = config.node("custom_model_data").getInt();
-        ItemMeta meta = getMeta(item);
-        meta.setCustomModelData(data);
-        item.setItemMeta(meta);
+        if (!config.node("custom_model_data").virtual()) {
+            int data = config.node("custom_model_data").getInt();
+            ItemMeta meta = getMeta(item);
+            meta.setCustomModelData(data);
+            item.setItemMeta(meta);
+        } else if (!config.node("nbt").node("CustomModelData").virtual()) {
+            int data = config.node("nbt").node("CustomModelData").getInt();
+            ItemMeta meta = getMeta(item);
+            meta.setCustomModelData(data);
+            item.setItemMeta(meta);
+        }
     }
 
 }

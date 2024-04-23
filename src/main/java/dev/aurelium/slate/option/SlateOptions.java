@@ -9,7 +9,8 @@ public record SlateOptions(
         File mainDirectory,
         List<File> mergeDirectories,
         int loreWrappingWidth,
-        KeyedItemProvider keyedItemProvider
+        KeyedItemProvider keyedItemProvider,
+        boolean nbtEnabled
 ) {
 
     public static SlateOptionsBuilder builder() {
