@@ -1,6 +1,7 @@
 package dev.aurelium.slate.item.parser;
 
 import dev.aurelium.slate.Slate;
+import dev.aurelium.slate.function.ItemMetaParser;
 import dev.aurelium.slate.item.provider.KeyedItemProvider;
 import dev.aurelium.slate.lore.LoreFactory;
 import dev.aurelium.slate.lore.LoreLine;
@@ -19,10 +20,8 @@ import org.bukkit.inventory.meta.*;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.configurate.ConfigurationNode;
@@ -62,11 +61,6 @@ public class ConfigurateItemParser {
         if (!config.node("enchantments").virtual()) {
             parseEnchantments(item, config);
         }
-        // Potions
-        ConfigurationNode potionDataSection = config.node("potion_data");
-        if (!potionDataSection.virtual()) {
-            parsePotionData(item, potionDataSection);
-        }
         // Custom potion effects
         if (!config.node("custom_effects").virtual()) {
             parseCustomEffects(config, item);
@@ -100,6 +94,13 @@ public class ConfigurateItemParser {
         ConfigurationNode skullMetaSection = config.node("skull_meta");
         if (!skullMetaSection.virtual()) {
             parseSkullMeta(item, item.getItemMeta(), skullMetaSection);
+        }
+        // Custom item meta parsers
+        for (Map.Entry<String, ItemMetaParser> entry : slate.getOptions().itemMetaParsers().entrySet()) {
+            ConfigurationNode section = config.node(entry.getKey());
+            if (!section.virtual()) {
+                item = entry.getValue().parse(item, section);
+            }
         }
         return item;
     }
@@ -159,18 +160,6 @@ public class ConfigurateItemParser {
                 throw new IllegalArgumentException("Invalid potion effect type " + effectName);
             }
         }
-        item.setItemMeta(potionMeta);
-    }
-
-    @SuppressWarnings("deprecation")
-    private void parsePotionData(ItemStack item, ConfigurationNode node) {
-        PotionMeta potionMeta = (PotionMeta) getMeta(item);
-        PotionType potionType = PotionType.valueOf(node.node("type").getString("WATER").toUpperCase(Locale.ROOT));
-        boolean extended = node.node("extended").getBoolean(false);
-        boolean upgraded = node.node("upgraded").getBoolean(false);
-
-        PotionData potionData = new PotionData(potionType, extended, upgraded);
-        potionMeta.setBasePotionData(potionData);
         item.setItemMeta(potionMeta);
     }
 

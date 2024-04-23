@@ -1,11 +1,14 @@
 package dev.aurelium.slate.option;
 
+import dev.aurelium.slate.function.ItemMetaParser;
 import dev.aurelium.slate.item.provider.KeyedItemProvider;
 import dev.aurelium.slate.util.Validate;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SlateOptionsBuilder {
 
@@ -14,6 +17,7 @@ public class SlateOptionsBuilder {
     private int loreWrappingWidth = 40;
     private KeyedItemProvider keyedItemProvider = k -> null;
     private boolean nbtEnabled = false;
+    private final Map<String, ItemMetaParser> itemMetaParsers = new HashMap<>();
 
     public SlateOptionsBuilder mainDirectory(File mainDirectory) {
         this.mainDirectory = mainDirectory;
@@ -40,9 +44,14 @@ public class SlateOptionsBuilder {
         return this;
     }
 
+    public SlateOptionsBuilder itemMetaParser(String name, ItemMetaParser parser) {
+        this.itemMetaParsers.put(name, parser);
+        return this;
+    }
+
     public SlateOptions build() {
         Validate.notNull(mainDirectory, "mainDirectory not defined in SlateOptions");
-        return new SlateOptions(mainDirectory, mergeDirectories, loreWrappingWidth, keyedItemProvider, nbtEnabled);
+        return new SlateOptions(mainDirectory, mergeDirectories, loreWrappingWidth, keyedItemProvider, nbtEnabled, itemMetaParsers);
     }
 
 }
