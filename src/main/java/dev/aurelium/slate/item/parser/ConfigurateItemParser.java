@@ -5,7 +5,6 @@ import dev.aurelium.slate.function.ItemMetaParser;
 import dev.aurelium.slate.item.provider.KeyedItemProvider;
 import dev.aurelium.slate.lore.LoreFactory;
 import dev.aurelium.slate.lore.LoreLine;
-import dev.aurelium.slate.util.NbtParser;
 import dev.aurelium.slate.util.NumberUtil;
 import dev.aurelium.slate.util.SkullCreator;
 import dev.aurelium.slate.util.Validate;
@@ -68,19 +67,6 @@ public class ConfigurateItemParser {
         // Glowing w/o enchantments visible
         if (config.node("glow").getBoolean(false)) {
             parseGlow(item);
-        }
-        // Custom NBT
-        if (!config.node("nbt").virtual() && slate.getOptions().nbtEnabled()) {
-            var nbtParser = new NbtParser();
-            if (config.node("nbt").isMap()) {
-                ConfigurationNode nbtSection = config.node("nbt");
-                item = nbtParser.parseNBT(item, nbtSection.childrenMap());
-            } else if (config.node("nbt").getString() != null) {
-                String nbtString = config.getString("nbt");
-                if (nbtString != null) {
-                    item = nbtParser.parseNBTString(item, nbtString);
-                }
-            }
         }
         if (!config.node("flags").virtual()) {
             parseFlags(config, item);
