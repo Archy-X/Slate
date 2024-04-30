@@ -198,8 +198,7 @@ public class MenuInventory implements InventoryProvider {
         }
 
         // Add item to inventory
-        SlotPos pos = item.getPosition();
-        addSingleItemToInventory(item, itemStack, pos, contents, player, builtItem);
+        addSingleItemToInventory(item, itemStack, item.getPositions(), contents, player, builtItem);
     }
 
     private <C> void addTemplateItem(ActiveTemplateItem<C> activeItem, InventoryContents contents, Player player) {
@@ -299,20 +298,22 @@ public class MenuInventory implements InventoryProvider {
     /**
      * Adds the menu item itself to the inventory menu and registers click listeners, both listeners and actions
      */
-    private void addSingleItemToInventory(SingleItem singleItem, ItemStack itemStack, SlotPos pos, InventoryContents contents, Player player, BuiltItem builtItem) {
-        contents.set(pos, ClickableItem.from(itemStack, c -> {
-            if (!(c.getEvent() instanceof InventoryClickEvent event)) return;
+    private void addSingleItemToInventory(SingleItem singleItem, ItemStack itemStack, List<SlotPos> positions, InventoryContents contents, Player player, BuiltItem builtItem) {
+        for (SlotPos pos : positions) { // Set item for each position
+            contents.set(pos, ClickableItem.from(itemStack, c -> {
+                if (!(c.getEvent() instanceof InventoryClickEvent event)) return;
 
-            ActiveItem activeItem = activeItems.get(singleItem.getName());
-            if (activeItem != null && activeItem.getCooldown() != 0) {
-                return;
-            }
+                ActiveItem activeItem = activeItems.get(singleItem.getName());
+                if (activeItem != null && activeItem.getCooldown() != 0) {
+                    return;
+                }
 
-            // Run coded click functionality
-            builtItem.handleClick(getClickActions(event.getClick()), new ItemClick(player, event, c.getItem(), pos, activeMenu));
+                // Run coded click functionality
+                builtItem.handleClick(getClickActions(event.getClick()), new ItemClick(player, event, c.getItem(), pos, activeMenu));
 
-            executeActions(singleItem, player, contents, c); // Run custom click actions
-        }));
+                executeActions(singleItem, player, contents, c); // Run custom click actions
+            }));
+        }
     }
 
     private <C> void addTemplateItemToInventory(TemplateItem<C> templateItem, ItemStack itemStack, SlotPos pos, InventoryContents contents, Player player, BuiltTemplate<C> builtTemplate, C context) {

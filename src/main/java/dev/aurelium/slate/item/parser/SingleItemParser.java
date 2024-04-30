@@ -1,12 +1,15 @@
 package dev.aurelium.slate.item.parser;
 
 import dev.aurelium.slate.Slate;
+import dev.aurelium.slate.inv.content.SlotPos;
 import dev.aurelium.slate.item.MenuItem;
 import dev.aurelium.slate.item.builder.SingleItemBuilder;
 import dev.aurelium.slate.menu.MenuLoader;
 import dev.aurelium.slate.util.Validate;
 import org.spongepowered.configurate.ConfigurationNode;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class SingleItemParser extends MenuItemParser {
@@ -23,9 +26,23 @@ public class SingleItemParser extends MenuItemParser {
         builder.name(name);
         builder.baseItem(itemParser.parseBaseItem(section));
 
-        String positionString = section.node("pos").getString();
-        Validate.notNull(positionString, "Item must specify pos");
-        builder.position(parsePosition(positionString));
+        ConfigurationNode posNode = section.node("pos");
+        if (posNode.isList()) { // Multiple positions
+            List<SlotPos> positions = new ArrayList<>();
+            // Parse each position and add to list
+            for (ConfigurationNode entry : posNode.childrenList()) {
+                String positionString = entry.getString();
+                if (positionString == null) continue;
+
+                positions.add(parsePosition(positionString));
+            }
+            builder.positions(positions);
+        } else { // Single position
+            String positionString = posNode.getString();
+            Validate.notNull(positionString, "Item must specify pos");
+            builder.positions(List.of(parsePosition(positionString)));
+        }
+
 
         builder.displayName(itemParser.parseDisplayName(section));
         builder.lore(itemParser.parseLore(section));

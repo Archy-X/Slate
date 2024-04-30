@@ -12,17 +12,17 @@ import java.util.Map;
 
 public class SingleItem extends MenuItem {
 
-    private final SlotPos position;
+    private final List<SlotPos> positions;
     private final ItemStack baseItem;
 
-    public SingleItem(Slate slate, String name, ItemStack baseItem, String displayName, List<LoreLine> lore, Map<ClickAction, List<Action>> actions, SlotPos position, Map<String, Object> options) {
+    public SingleItem(Slate slate, String name, ItemStack baseItem, String displayName, List<LoreLine> lore, Map<ClickAction, List<Action>> actions, List<SlotPos> positions, Map<String, Object> options) {
         super(slate, name, displayName, lore, actions, options);
-        this.position = position;
+        this.positions = positions;
         this.baseItem = baseItem;
     }
 
-    public SlotPos getPosition() {
-        return position;
+    public List<SlotPos> getPositions() {
+        return positions;
     }
 
     public ItemStack getBaseItem() {
