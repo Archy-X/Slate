@@ -9,7 +9,7 @@ A configurable and concise inventory GUI framework for Bukkit.
 Slate is a comprehensive GUI menu framework that uses a front-end YAML configuration file backed by code to define functionality.
 
 The API is designed around:
-- Separation of appearance (YAML file) and functionality (your code)
+- Separation of appearance and functionality
 - Full configurability on the individual servers your plugin runs on
 - Rapid building and iteration to save development time
 - Writing the least amount of code needed to implement functionality
@@ -29,7 +29,7 @@ These features are natively supported through Slate's YAML-based configuration l
 
 The API is designed to be declarative and hierarchical. Code is structured using lambdas and builders to match the layout of the configuration file. API features include:
 
-- Run code when an item is clicked, including for specific mouse buttons
+- Running code when an item is clicked, including for specific mouse buttons
 - Placeholder system for inserting player-dependent data into menus at runtime
 - Page system
 - Templates for defining multiple instances of a similar item
@@ -39,6 +39,10 @@ The API is designed to be declarative and hierarchical. Code is structured using
 ## Documentation
 
 [Documentation can be found on the wiki](https://wiki.aurelium.dev/slate) (under construction).
+
+## Compatibility
+
+**Slate requires at least Java 17**, and has been tested on Minecraft 1.18 - 1.20. However, older server versions may work if they run Java 17 and 1.14.4 at minimum.
 
 ## Installation
 
