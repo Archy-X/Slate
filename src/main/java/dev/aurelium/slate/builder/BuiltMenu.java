@@ -53,7 +53,7 @@ public record BuiltMenu(
 
     public String applyTitleReplacers(String input, Slate slate, Player player, ActiveMenu activeMenu) {
         PlaceholderType type = PlaceholderType.TITLE;
-        input = slate.getGlobalOptions().applyGlobalReplacers(input, slate, player, activeMenu, type);
+        input = slate.getGlobalBehavior().applyGlobalReplacers(input, slate, player, activeMenu, type);
         for (Entry<String, ItemReplacer> entry : titleReplacers.entrySet()) {
             String placeholder = entry.getKey();
             PlaceholderData data = new PlaceholderData(type, LoreUtil.getStyle(input), null);

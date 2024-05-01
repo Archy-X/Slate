@@ -5,6 +5,9 @@ import dev.aurelium.slate.menu.ActiveMenu;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * Represents contextual information about an item in a menu.
+ */
 public class ItemInfo extends MenuInfo {
 
     private final ItemStack item;

@@ -33,7 +33,7 @@ public record BuiltComponent<T>(
     }
 
     public String applyReplacers(String input, Slate slate, Player player, ActiveMenu activeMenu, ComponentData componentData, T value) {
-        input = slate.getGlobalOptions().applyGlobalReplacers(input, slate, player, activeMenu, PlaceholderType.LORE);
+        input = slate.getGlobalBehavior().applyGlobalReplacers(input, slate, player, activeMenu, PlaceholderType.LORE);
         // Detect placeholders
         String[] placeholders = TextUtil.substringsBetween(input, "{", "}");
         if (placeholders != null) {

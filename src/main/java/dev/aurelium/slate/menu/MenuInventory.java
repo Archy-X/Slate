@@ -122,7 +122,7 @@ public class MenuInventory implements InventoryProvider {
             FillItem fillItem = fillData.item();
             ItemStack providedFill = builtMenu.fillItem().modify(new ItemInfo(slate, player, activeMenu, fillItem.getBaseItem()));
             if (providedFill != null) {
-                fillItem =  new FillItem(slate, providedFill);
+                fillItem = new FillItem(slate, providedFill);
             }
             ItemStack itemStack = fillItem.getBaseItem();
             ItemMeta meta = itemStack.getItemMeta();

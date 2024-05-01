@@ -29,7 +29,7 @@ public class TemplateTextReplacer<T> {
     }
 
     public String applyReplacers(String input, Player player, ActiveMenu activeMenu, PlaceholderType type, T value) {
-        input = slate.getGlobalOptions().applyGlobalReplacers(input, slate, player, activeMenu, type);
+        input = slate.getGlobalBehavior().applyGlobalReplacers(input, slate, player, activeMenu, type);
         // Detect placeholders
         String[] placeholders = TextUtil.substringsBetween(input, "{", "}");
         if (placeholders != null) {

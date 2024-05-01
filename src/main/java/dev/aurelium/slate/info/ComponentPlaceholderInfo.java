@@ -6,6 +6,11 @@ import dev.aurelium.slate.item.provider.PlaceholderData;
 import dev.aurelium.slate.menu.ActiveMenu;
 import org.bukkit.entity.Player;
 
+/**
+ * Represents contextual information about a placeholder in a menu within a component.
+ *
+ * @param <T> the linked template context object type
+ */
 public class ComponentPlaceholderInfo<T> extends TemplatePlaceholderInfo<T> {
 
     private final ComponentData component;
@@ -15,6 +20,12 @@ public class ComponentPlaceholderInfo<T> extends TemplatePlaceholderInfo<T> {
         this.component = component;
     }
 
+    /**
+     * Gets the component data of the component containing the placeholder, which contains
+     * information about this instance.
+     *
+     * @return the component data
+     */
     public ComponentData component() {
         return component;
     }

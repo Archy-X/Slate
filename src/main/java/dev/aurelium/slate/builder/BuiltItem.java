@@ -38,7 +38,7 @@ public record BuiltItem(
     }
 
     public String applyReplacers(String input, Slate slate, Player player, ActiveMenu activeMenu, PlaceholderType type) {
-        input = slate.getGlobalOptions().applyGlobalReplacers(input, slate, player, activeMenu, type);
+        input = slate.getGlobalBehavior().applyGlobalReplacers(input, slate, player, activeMenu, type);
         // Detect placeholders
         String[] placeholders = TextUtil.substringsBetween(input, "{", "}");
         if (placeholders != null) {

@@ -16,7 +16,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Set;
 
-public record GlobalOptions(
+public record GlobalBehavior(
         Set<ItemReplacer> globalReplacers,
         LocaleProvider localeProvider
 ) {

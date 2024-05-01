@@ -5,6 +5,11 @@ import dev.aurelium.slate.item.provider.PlaceholderData;
 import dev.aurelium.slate.menu.ActiveMenu;
 import org.bukkit.entity.Player;
 
+/**
+ * Represents contextual information about a placeholder in a menu within a template.
+ *
+ * @param <T> the template context object type
+ */
 public class TemplatePlaceholderInfo<T> extends PlaceholderInfo {
 
     private final T value;
@@ -14,6 +19,11 @@ public class TemplatePlaceholderInfo<T> extends PlaceholderInfo {
         this.value = value;
     }
 
+    /**
+     * Gets the value of the context of this template instance.
+     *
+     * @return the context object
+     */
     public T value() {
         return value;
     }

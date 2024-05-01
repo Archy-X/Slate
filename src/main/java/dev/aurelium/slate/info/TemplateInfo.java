@@ -5,6 +5,11 @@ import dev.aurelium.slate.menu.ActiveMenu;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * Represents contextual information about an instance of a template in a menu with a specific context.
+ *
+ * @param <T> the context object type
+ */
 public class TemplateInfo<T> extends ItemInfo {
 
     private final T value;
@@ -14,6 +19,11 @@ public class TemplateInfo<T> extends ItemInfo {
         this.value = value;
     }
 
+    /**
+     * Gets the value of the context of this template instance.
+     *
+     * @return the context object
+     */
     public T value() {
         return value;
     }
