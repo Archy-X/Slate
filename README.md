@@ -51,7 +51,6 @@ Release versions of the API are published to the Maven central repository.
 ### Gradle
 
 **Kotlin DSL:**
-
 ```kotlin
 repositories {
     mavenCentral()
@@ -63,8 +62,7 @@ dependencies {
 ```
 
 **Groovy DSL:**
-
-```groovy
+```gradle
 repositories {
     mavenCentral()
 }
