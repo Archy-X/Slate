@@ -12,7 +12,6 @@ public record SlateOptions(
         List<File> mergeDirectories,
         int loreWrappingWidth,
         KeyedItemProvider keyedItemProvider,
-        boolean nbtEnabled,
         Map<String, ItemMetaParser> itemMetaParsers
 ) {
 

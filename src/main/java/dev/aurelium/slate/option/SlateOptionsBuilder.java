@@ -16,7 +16,6 @@ public class SlateOptionsBuilder {
     private List<File> mergeDirectories = new ArrayList<>();
     private int loreWrappingWidth = 40;
     private KeyedItemProvider keyedItemProvider = k -> null;
-    private boolean nbtEnabled = false;
     private final Map<String, ItemMetaParser> itemMetaParsers = new HashMap<>();
 
     public SlateOptionsBuilder mainDirectory(File mainDirectory) {
@@ -39,11 +38,6 @@ public class SlateOptionsBuilder {
         return this;
     }
 
-    public SlateOptionsBuilder nbtEnabled(boolean nbtEnabled) {
-        this.nbtEnabled = nbtEnabled;
-        return this;
-    }
-
     public SlateOptionsBuilder itemMetaParser(String name, ItemMetaParser parser) {
         this.itemMetaParsers.put(name, parser);
         return this;
@@ -56,7 +50,7 @@ public class SlateOptionsBuilder {
 
     public SlateOptions build() {
         Validate.notNull(mainDirectory, "mainDirectory not defined in SlateOptions");
-        return new SlateOptions(mainDirectory, mergeDirectories, loreWrappingWidth, keyedItemProvider, nbtEnabled, itemMetaParsers);
+        return new SlateOptions(mainDirectory, mergeDirectories, loreWrappingWidth, keyedItemProvider, itemMetaParsers);
     }
 
 }
