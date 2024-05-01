@@ -49,6 +49,11 @@ public class SlateOptionsBuilder {
         return this;
     }
 
+    public SlateOptionsBuilder itemMetaParsers(Map<String, ItemMetaParser> parsers) {
+        this.itemMetaParsers.putAll(parsers);
+        return this;
+    }
+
     public SlateOptions build() {
         Validate.notNull(mainDirectory, "mainDirectory not defined in SlateOptions");
         return new SlateOptions(mainDirectory, mergeDirectories, loreWrappingWidth, keyedItemProvider, nbtEnabled, itemMetaParsers);
