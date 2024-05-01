@@ -21,11 +21,9 @@ These features are natively supported through Slate's YAML-based configuration l
 - Full item meta support
 - MiniMessage formatting
 - PlaceholderAPI support
-- Lore wrapping to automatically insert newlines
 - Click actions to execute commands
 - Customizing the title and size of the menu
 - Full protection of items so they cannot be taken out of menus
-- Resource pack support
 
 ### API Features
 
@@ -37,8 +35,6 @@ The API is designed to be declarative and hierarchical. Code is structured using
 - Templates for defining multiple instances of a similar item
 - Components for reusing pieces of lore across items
 - Custom configuration options with automatic updating for user configs
-- Modify item appearance before being shown
-- Hide and show items dynamically
 
 ## Documentation
 
@@ -51,7 +47,7 @@ Release versions of the API are published to the Maven central repository.
 ### Gradle
 
 **Kotlin DSL:**
-```kotlin
+```Gradle Kotlin DSL
 repositories {
     mavenCentral()
 }
@@ -118,7 +114,7 @@ slate.generateFiles();
 slate.loadMenus();
 ```
 
-Finally, show the menu to a where you need to, like in a command:
+Finally, show the menu to a player where you need to, like in a command:
 
 ```java
 slate.openMenu(player, "my_menu");
