@@ -2,7 +2,7 @@
 
 A configurable and concise inventory GUI framework for Bukkit.
 
-![Maven Central Version](https://img.shields.io/maven-central/v/dev.aurelium/slate?style=flat-square)
+[![Maven Central Version](https://img.shields.io/maven-central/v/dev.aurelium/slate?style=flat-square)](https://central.sonatype.com/artifact/dev.aurelium/slate)
 
 ## Overview
 

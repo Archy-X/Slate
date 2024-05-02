@@ -9,6 +9,7 @@ import dev.aurelium.slate.util.LoreUtil;
 import dev.aurelium.slate.util.TextUtil;
 import dev.aurelium.slate.function.*;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +32,23 @@ public record BuiltMenu(
     public static BuiltMenu createEmpty() {
         return new BuiltMenu(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>(), p -> null, m -> 1,
                 m -> new HashMap<>(), i -> null, m -> {}, m -> {}, new HashMap<>());
+    }
+
+    // Also gets items in name(1) format
+    @NotNull
+    public BuiltItem getBackingItem(String name) {
+        BuiltItem direct = items.get(name);
+        if (direct != null) {
+            return direct;
+        }
+        if (isDuplicateItemName(name)) {
+            String backingName = name.substring(0, name.lastIndexOf("("));
+            BuiltItem backing = items.get(backingName);
+            if (backing != null) {
+                return backing;
+            }
+        }
+        return BuiltItem.createEmpty();
     }
 
     @SuppressWarnings("unchecked")
@@ -75,6 +93,34 @@ public record BuiltMenu(
             }
         }
         return input;
+    }
+
+    private boolean isDuplicateItemName(String str) {
+        if (str == null || str.isEmpty()) {
+            return false;
+        }
+
+        int len = str.length();
+        int i = len - 1;
+
+        // Check for closing parenthesis
+        if (str.charAt(i) != ')') {
+            return false;
+        }
+        i--;
+
+        // Check for at least one digit
+        if (i < 0 || !Character.isDigit(str.charAt(i))) {
+            return false;
+        }
+
+        // Skip all digits
+        while (i >= 0 && Character.isDigit(str.charAt(i))) {
+            i--;
+        }
+
+        // Check for opening parenthesis
+        return i >= 0 && str.charAt(i) == '(';
     }
 
 }

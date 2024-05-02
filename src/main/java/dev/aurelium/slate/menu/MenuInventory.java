@@ -168,7 +168,7 @@ public class MenuInventory implements InventoryProvider {
 
     private void addSingleItem(ActiveSingleItem activeItem, InventoryContents contents, Player player) {
         SingleItem item = activeItem.getItem();
-        BuiltItem builtItem = slate.getBuiltMenu(menu.name()).items().getOrDefault(item.getName(), BuiltItem.createEmpty());
+        BuiltItem builtItem = slate.getBuiltMenu(menu.name()).getBackingItem(item.getName());
 
         ItemStack itemStack = item.getBaseItem().clone();
         builtItem.initListener().handle(new MenuInfo(slate, player, activeMenu));

@@ -61,10 +61,23 @@ public class ActiveMenu {
         return menuInventory.getTotalPages();
     }
 
+    /**
+     * Gets a property from the menu's properties with the given name.
+     *
+     * @param name the name of the property
+     * @return the property value as an Object
+     */
     public Object getProperty(String name) {
         return menuInventory.getProperties().get(name);
     }
 
+    /**
+     * Gets a property from the menu's properties with the given name, or returns the default value if the property does not exist.
+     *
+     * @param name the name of the property
+     * @param def the default value to return if the property does not exist
+     * @return the property value as an Object, or the default value if the property does not exist
+     */
     public Object getProperty(String name, Object def) {
         Object value = menuInventory.getProperties().get(name);
         if (value != null) {
@@ -74,18 +87,38 @@ public class ActiveMenu {
         }
     }
 
+    /**
+     * Gets all properties from the menu's properties.
+     *
+     * @return a Map of all properties
+     */
     public Map<String, Object> getProperties() {
         return menuInventory.getProperties();
     }
 
+    /**
+     * Sets a property in the menu's properties with the given name and value.
+     *
+     * @param name the name of the property
+     * @param value the value of the property
+     */
     public void setProperty(String name, Object value) {
         menuInventory.getProperties().put(name, value);
     }
 
+    /**
+     * Reloads the menu for the player as if it was reopened.
+     */
     public void reload() {
         menuInventory.init(menuInventory.getPlayer(), menuInventory.getContents());
     }
 
+    /**
+     * Sets the cooldown of an item in the current menu. Items on cooldown will not be able to be clicked.
+     *
+     * @param itemName the name of the item to set the cooldown for
+     * @param cooldown the cooldown in ticks
+     */
     public void setCooldown(String itemName, int cooldown) {
         ActiveItem activeItem = menuInventory.getActiveItem(itemName);
         if (activeItem != null) {
@@ -93,11 +126,25 @@ public class ActiveMenu {
         }
     }
 
+    /**
+     * Gets the value of an option from the menu's configurable options.
+     *
+     * @param key the key of the option
+     * @return the value of the option as an Object
+     */
     @Nullable
     public Object getOption(String key) {
         return menuInventory.getMenu().options().get(key);
     }
 
+    /**
+     * Gets the value of an option from the menu's configurable options cast to a type.
+     *
+     * @param clazz the class of the option to cast to
+     * @param key the key of the option
+     * @return the value of the option as the specified type, or null if the option does not exist
+     * @param <T> the type of the option
+     */
     @Nullable
     public <T> T getOption(Class<T> clazz, String key) {
         try {
@@ -107,6 +154,13 @@ public class ActiveMenu {
         }
     }
 
+    /**
+     * Gets the value of an option from the menu's configurable options, or returns the default value if the option does not exist.
+     *
+     * @param key the key of the option
+     * @param def the default value to return if the option does not exist
+     * @return the value of the option as an Object, or the default value if the option does not exist
+     */
     public Object getOption(String key, Object def) {
         Object obj = menuInventory.getMenu().options().get(key);
         if (obj != null) {
@@ -116,6 +170,16 @@ public class ActiveMenu {
         }
     }
 
+    /**
+     * Gets the value of an option from the menu's configurable options cast to a type, or returns the default value if the
+     * option does not exist.
+     *
+     * @param clazz the class of the option to cast to
+     * @param key the key of the option
+     * @param def the default value to return if the option does not exist
+     * @return the value of the option as the specified type, or the default value if the option does not exist
+     * @param <T> the type of the option
+     */
     public <T> T getOption(Class<T> clazz, String key, T def) {
         try {
             T result = clazz.cast(menuInventory.getMenu().options().get(key));

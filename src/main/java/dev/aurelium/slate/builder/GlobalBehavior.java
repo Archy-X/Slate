@@ -21,6 +21,15 @@ public record GlobalBehavior(
         LocaleProvider localeProvider
 ) {
 
+    /**
+     * Creates a new {@link GlobalBehaviorBuilder}.
+     *
+     * @return the builder
+     */
+    public static GlobalBehaviorBuilder builder() {
+        return GlobalBehaviorBuilder.builder();
+    }
+
     public String applyGlobalReplacers(String input, Slate slate, Player player, ActiveMenu activeMenu, PlaceholderType type) {
         String[] placeholders = TextUtil.substringsBetween(input, "{", "}");
         if (placeholders != null) {
