@@ -1,6 +1,7 @@
 package dev.aurelium.slate.action.condition;
 
 import dev.aurelium.slate.Slate;
+import dev.aurelium.slate.action.condition.PlaceholderCondition.Compare;
 import dev.aurelium.slate.util.YamlLoader;
 import org.spongepowered.configurate.ConfigurationNode;
 
@@ -47,7 +48,8 @@ public class ConditionParser {
     private PlaceholderCondition parsePlaceholderCondition(ConfigurationNode config) {
         return new PlaceholderCondition(slate,
                 Objects.requireNonNull(config.node("placeholder").getString()),
-                Objects.requireNonNull(config.node("value").getString()));
+                Objects.requireNonNull(config.node("value").getString()),
+                Compare.valueOf(config.node("compare").getString("equals").toUpperCase(Locale.ROOT)));
     }
 
     @Nullable
