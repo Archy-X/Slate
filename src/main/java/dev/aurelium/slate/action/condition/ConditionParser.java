@@ -26,6 +26,8 @@ public class ConditionParser {
                 String type = Objects.requireNonNull(detectType(condNode));
                 if (type.equals("permission")) {
                     conditions.add(parsePermissionCondition(condNode));
+                } else if (type.equals("placeholder")) {
+                    conditions.add(parsePlaceholderCondition(condNode));
                 }
             } catch (RuntimeException e) {
                 slate.getPlugin().getLogger().warning("Error parsing condition in menu " + menuName + " at path " + YamlLoader.toDotString(config.path()) + ".[" + index + "], see below for error:");
@@ -42,6 +44,12 @@ public class ConditionParser {
                 config.node("value").getBoolean(true));
     }
 
+    private PlaceholderCondition parsePlaceholderCondition(ConfigurationNode config) {
+        return new PlaceholderCondition(slate,
+                Objects.requireNonNull(config.node("placeholder").getString()),
+                Objects.requireNonNull(config.node("value").getString()));
+    }
+
     @Nullable
     private String detectType(ConfigurationNode node) {
         String type = node.node("type").getString();
@@ -51,6 +59,8 @@ public class ConditionParser {
         // Auto detection
         if (!node.node("permission").virtual()) {
             return "permission";
+        } else if (!node.node("placeholder").virtual()) {
+            return "placeholder";
         }
         return null;
     }
