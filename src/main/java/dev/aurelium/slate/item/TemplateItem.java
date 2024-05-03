@@ -2,7 +2,7 @@ package dev.aurelium.slate.item;
 
 import dev.aurelium.slate.Slate;
 import dev.aurelium.slate.action.Action;
-import dev.aurelium.slate.action.click.ClickAction;
+import dev.aurelium.slate.action.trigger.ClickTrigger;
 import dev.aurelium.slate.context.ContextGroup;
 import dev.aurelium.slate.inv.content.SlotPos;
 import dev.aurelium.slate.lore.LoreLine;
@@ -25,7 +25,7 @@ public class TemplateItem<C> extends MenuItem {
     private final SlotPos defaultPosition;
     private final Map<String, ContextGroup> contextGroups;
 
-    public TemplateItem(Slate slate, String name, Class<C> contextClass, Map<C, ItemStack> baseItems, ItemStack defaultBaseItem, String displayName, List<LoreLine> lore, Map<C, String> contextualDisplayNames, Map<C, List<LoreLine>> contextualLore, Map<ClickAction, List<Action>> actions, Map<C, PositionProvider> positions, SlotPos defaultPosition, Map<String, Object> options, Map<String, ContextGroup> contextGroups) {
+    public TemplateItem(Slate slate, String name, Class<C> contextClass, Map<C, ItemStack> baseItems, ItemStack defaultBaseItem, String displayName, List<LoreLine> lore, Map<C, String> contextualDisplayNames, Map<C, List<LoreLine>> contextualLore, Map<ClickTrigger, List<Action>> actions, Map<C, PositionProvider> positions, SlotPos defaultPosition, Map<String, Object> options, Map<String, ContextGroup> contextGroups) {
         super(slate, name, displayName, lore, actions, options);
         this.contextClass = contextClass;
         this.positions = positions;

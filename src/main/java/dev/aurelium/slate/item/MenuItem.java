@@ -2,7 +2,7 @@ package dev.aurelium.slate.item;
 
 import dev.aurelium.slate.Slate;
 import dev.aurelium.slate.action.Action;
-import dev.aurelium.slate.action.click.ClickAction;
+import dev.aurelium.slate.action.trigger.ClickTrigger;
 import dev.aurelium.slate.lore.LoreLine;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,10 +15,10 @@ public abstract class MenuItem {
     private final String name;
     private final String displayName;
     private final List<LoreLine> lore;
-    private final Map<ClickAction, List<Action>> actions;
+    private final Map<ClickTrigger, List<Action>> actions;
     private final Map<String, Object> options;
 
-    public MenuItem(Slate slate, String name, String displayName, List<LoreLine> lore, Map<ClickAction, List<Action>> actions, Map<String, Object> options) {
+    public MenuItem(Slate slate, String name, String displayName, List<LoreLine> lore, Map<ClickTrigger, List<Action>> actions, Map<String, Object> options) {
         this.slate = slate;
         this.name = name;
         this.displayName = displayName;
@@ -41,7 +41,7 @@ public abstract class MenuItem {
         return lore;
     }
 
-    public Map<ClickAction, List<Action>> getActions() {
+    public Map<ClickTrigger, List<Action>> getActions() {
         return actions;
     }
 

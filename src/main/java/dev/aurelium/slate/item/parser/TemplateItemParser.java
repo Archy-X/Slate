@@ -106,7 +106,7 @@ public class TemplateItemParser<C> extends MenuItemParser {
         builder.displayName(itemParser.parseDisplayName(section));
         builder.lore(itemParser.parseLore(section));
 
-        parseActions(builder, section, menuName, name);
+        parseActions(builder, section, menuName);
 
         builder.options(MenuLoader.loadOptions(section));
 

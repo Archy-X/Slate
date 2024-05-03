@@ -2,12 +2,12 @@ package dev.aurelium.slate.menu;
 
 import dev.aurelium.slate.Slate;
 import dev.aurelium.slate.action.Action;
-import dev.aurelium.slate.action.click.ClickAction;
+import dev.aurelium.slate.action.trigger.ClickTrigger;
+import dev.aurelium.slate.action.trigger.MenuTrigger;
 import dev.aurelium.slate.builder.BuiltItem;
 import dev.aurelium.slate.builder.BuiltMenu;
 import dev.aurelium.slate.builder.BuiltTemplate;
 import dev.aurelium.slate.fill.FillData;
-import dev.aurelium.slate.fill.FillItem;
 import dev.aurelium.slate.info.ItemInfo;
 import dev.aurelium.slate.info.MenuInfo;
 import dev.aurelium.slate.info.TemplateInfo;
@@ -34,6 +34,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -79,6 +80,10 @@ public class MenuInventory implements InventoryProvider {
         return menu;
     }
 
+    public BuiltMenu getBuiltMenu() {
+        return builtMenu;
+    }
+
     public ActiveMenu getActiveMenu() {
         return activeMenu;
     }
@@ -94,6 +99,14 @@ public class MenuInventory implements InventoryProvider {
 
     public int getCurrentPage() {
         return currentPage;
+    }
+
+    public LoreInterpreter getLoreInterpreter() {
+        return loreInterpreter;
+    }
+
+    public TextFormatter getTextFormatter() {
+        return tf;
     }
 
     @Override
@@ -116,34 +129,12 @@ public class MenuInventory implements InventoryProvider {
         }
         // Handle onOpen
         builtMenu.openListener().handle(new MenuInfo(slate, player, activeMenu));
+        // Execute open actions
+        menu.executeActions(MenuTrigger.OPEN, player, this);
         // Place fill items
         FillData fillData = menu.fillData();
         if (fillData.enabled()) {
-            FillItem fillItem = fillData.item();
-            ItemStack providedFill = builtMenu.fillItem().modify(new ItemInfo(slate, player, activeMenu, fillItem.getBaseItem()));
-            if (providedFill != null) {
-                fillItem = new FillItem(slate, providedFill);
-            }
-            ItemStack itemStack = fillItem.getBaseItem();
-            ItemMeta meta = itemStack.getItemMeta();
-            if (meta != null) {
-                String displayName = fillItem.getDisplayName();
-                if (displayName != null) {
-                    setDisplayName(meta, tf.toComponent(displayName));
-                }
-                List<LoreLine> loreLines = fillItem.getLore();
-                if (loreLines != null) {
-                    setLore(meta, loreInterpreter.interpretLore(loreLines, player, activeMenu, BuiltItem.createEmpty()));
-                }
-                itemStack.setItemMeta(meta);
-            }
-            if (fillData.slots() == null) { // Use default fill
-                contents.fill(ClickableItem.empty(itemStack));
-            } else { // Use defined slot positions
-                for (SlotPos slot : fillData.slots()) {
-                    contents.set(slot, ClickableItem.empty(itemStack));
-                }
-            }
+            fillData.placeInMenu(slate, player, this);
         }
         // Place items
         for (ActiveItem activeItem : activeItems.values()) {
@@ -164,6 +155,11 @@ public class MenuInventory implements InventoryProvider {
             }
         }
         builtMenu.updateListener().handle(new MenuInfo(slate, player, activeMenu));
+    }
+
+    // Added to SmartInventory listeners by builder
+    public void close(InventoryCloseEvent event) {
+        menu.executeActions(MenuTrigger.CLOSE, player, this);
     }
 
     private void addSingleItem(ActiveSingleItem activeItem, InventoryContents contents, Player player) {
@@ -282,7 +278,7 @@ public class MenuInventory implements InventoryProvider {
         itemStack.setItemMeta(meta);
     }
 
-    private void setDisplayName(ItemMeta meta, Component component) {
+    public void setDisplayName(ItemMeta meta, Component component) {
         String displayName = tf.toString(component);
         if (displayName.contains("!!REMOVE!!")) {
             return;
@@ -290,7 +286,7 @@ public class MenuInventory implements InventoryProvider {
         PaperUtil.setDisplayName(meta, component);
     }
 
-    private void setLore(ItemMeta meta, List<Component> components) {
+    public void setLore(ItemMeta meta, List<Component> components) {
         if (components.isEmpty()) return;
         PaperUtil.setLore(meta, components);
     }
@@ -309,9 +305,9 @@ public class MenuInventory implements InventoryProvider {
                 }
 
                 // Run coded click functionality
-                builtItem.handleClick(getClickActions(event.getClick()), new ItemClick(player, event, c.getItem(), pos, activeMenu));
+                builtItem.handleClick(getClickTriggers(event.getClick()), new ItemClick(player, event, c.getItem(), pos, activeMenu));
 
-                executeActions(singleItem, player, contents, c); // Run custom click actions
+                executeClickActions(singleItem, player, contents, c); // Run custom click actions
             }));
         }
     }
@@ -326,26 +322,26 @@ public class MenuInventory implements InventoryProvider {
             }
 
             // Run coded click functionality
-            builtTemplate.handleClick(getClickActions(event.getClick()), new TemplateClick<>(player, event, c.getItem(), pos, activeMenu, context));
+            builtTemplate.handleClick(getClickTriggers(event.getClick()), new TemplateClick<>(player, event, c.getItem(), pos, activeMenu, context));
 
-            executeActions(templateItem, player, contents, c); // Run custom click actions
+            executeClickActions(templateItem, player, contents, c); // Run custom click actions
         }));
     }
 
     /**
      * Executes the configured click actions of an item
      */
-    private void executeActions(MenuItem menuItem, Player player, InventoryContents contents, ItemClickData clickData) {
+    private void executeClickActions(MenuItem menuItem, Player player, InventoryContents contents, ItemClickData clickData) {
         // Convert click data event to InventoryClickEvent
         if (!(clickData.getEvent() instanceof InventoryClickEvent event)) {
             return;
         }
 
-        Set<ClickAction> clickActions = getClickActions(event.getClick());
-        Map<ClickAction, List<Action>> actions = menuItem.getActions();
-        for (Map.Entry<ClickAction, List<Action>> entry : actions.entrySet()) {
-            ClickAction clickAction = entry.getKey();
-            if (clickActions.contains(clickAction)) { // Make sure click matches
+        Set<ClickTrigger> clickTriggers = getClickTriggers(event.getClick());
+        Map<ClickTrigger, List<Action>> actions = menuItem.getActions();
+        for (Map.Entry<ClickTrigger, List<Action>> entry : actions.entrySet()) {
+            ClickTrigger clickTrigger = entry.getKey();
+            if (clickTriggers.contains(clickTrigger)) { // Make sure click matches
                 for (Action action : entry.getValue()) { // Execute each action
                     action.execute(player, this, contents);
                 }
@@ -353,27 +349,27 @@ public class MenuInventory implements InventoryProvider {
         }
     }
 
-    private Set<ClickAction> getClickActions(ClickType clickType) {
-        Set<ClickAction> clickActions = new HashSet<>();
-        clickActions.add(ClickAction.ANY);
+    private Set<ClickTrigger> getClickTriggers(ClickType clickType) {
+        Set<ClickTrigger> clickTriggers = new HashSet<>();
+        clickTriggers.add(ClickTrigger.ANY);
         switch (clickType) {
             case LEFT:
             case SHIFT_LEFT:
-                clickActions.add(ClickAction.LEFT);
+                clickTriggers.add(ClickTrigger.LEFT);
                 break;
             case RIGHT:
             case SHIFT_RIGHT:
-                clickActions.add(ClickAction.RIGHT);
+                clickTriggers.add(ClickTrigger.RIGHT);
                 break;
             case MIDDLE:
-                clickActions.add(ClickAction.MIDDLE);
+                clickTriggers.add(ClickTrigger.MIDDLE);
                 break;
             case DROP:
             case CONTROL_DROP:
-                clickActions.add(ClickAction.DROP);
+                clickTriggers.add(ClickTrigger.DROP);
                 break;
         }
-        return clickActions;
+        return clickTriggers;
     }
 
     public Map<String, Object> getProperties() {

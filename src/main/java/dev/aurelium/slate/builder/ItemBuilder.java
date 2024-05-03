@@ -1,6 +1,6 @@
 package dev.aurelium.slate.builder;
 
-import dev.aurelium.slate.action.click.ClickAction;
+import dev.aurelium.slate.action.trigger.ClickTrigger;
 import dev.aurelium.slate.function.ItemClicker;
 import dev.aurelium.slate.function.ItemModifier;
 import dev.aurelium.slate.function.ItemReplacer;
@@ -18,7 +18,7 @@ public class ItemBuilder {
 
     private final Map<String, ItemReplacer> replacers = new HashMap<>();
     private ItemReplacer anyReplacer = p -> null; // Default anyReplacer doesn't replace by returning null
-    private final Map<ClickAction, ItemClicker> clickers = new HashMap<>();
+    private final Map<ClickTrigger, ItemClicker> clickers = new HashMap<>();
     private ItemModifier modifier = ItemInfo::item;
     private MenuListener initListener = m -> {};
 
@@ -63,18 +63,18 @@ public class ItemBuilder {
      * @return the item builder
      */
     public ItemBuilder onClick(ItemClicker clicker) {
-        clickers.put(ClickAction.ANY, clicker);
+        clickers.put(ClickTrigger.ANY, clicker);
         return this;
     }
 
     /**
      * Defines a consumer to run when the item is clicked by the player using a specific button.
      *
-     * @param action the specific {@link ClickAction} button to run the consumer for
+     * @param action the specific {@link ClickTrigger} button to run the consumer for
      * @param clicker the {@link ItemClicker} consumer, which takes an {@link ItemInfo} parameter
      * @return the item builder
      */
-    public ItemBuilder onClick(ClickAction action, ItemClicker clicker) {
+    public ItemBuilder onClick(ClickTrigger action, ItemClicker clicker) {
         clickers.put(action, clicker);
         return this;
     }

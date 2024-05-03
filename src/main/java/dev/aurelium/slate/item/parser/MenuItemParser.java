@@ -2,7 +2,7 @@ package dev.aurelium.slate.item.parser;
 
 import dev.aurelium.slate.Slate;
 import dev.aurelium.slate.action.Action;
-import dev.aurelium.slate.action.click.ClickAction;
+import dev.aurelium.slate.action.trigger.ClickTrigger;
 import dev.aurelium.slate.inv.content.SlotPos;
 import dev.aurelium.slate.item.MenuItem;
 import dev.aurelium.slate.item.builder.MenuItemBuilder;
@@ -39,13 +39,13 @@ public abstract class MenuItemParser extends MapParser {
         }
     }
 
-    protected void parseActions(MenuItemBuilder builder, ConfigurationNode config, String menuName, String itemName) {
-        Map<ClickAction, List<Action>> actions = new LinkedHashMap<>();
-        for (ClickAction clickAction : ClickAction.values()) {
-            String id = clickAction.getId();
+    protected void parseActions(MenuItemBuilder builder, ConfigurationNode config, String menuName) {
+        Map<ClickTrigger, List<Action>> actions = new LinkedHashMap<>();
+        for (ClickTrigger clickTrigger : ClickTrigger.values()) {
+            String id = clickTrigger.getId();
             if (!config.node(id).virtual()) {
-                List<Action> clickActions = slate.getActionManager().parseActions(config.node(id), menuName, itemName);
-                actions.put(clickAction, clickActions);
+                List<Action> clickActions = slate.getActionManager().parseActions(config.node(id), menuName);
+                actions.put(clickTrigger, clickActions);
             }
         }
         builder.actions(actions);

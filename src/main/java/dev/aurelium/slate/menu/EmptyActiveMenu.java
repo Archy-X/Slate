@@ -10,7 +10,7 @@ public class EmptyActiveMenu extends ActiveMenu {
 
     EmptyActiveMenu(Slate slate, Player player) {
         super(new MenuInventory(slate,
-                new LoadedMenu("", "", 0, new HashMap<>(), new HashMap<>(), new HashMap<>(), FillData.empty(slate), new HashMap<>()),
+                new LoadedMenu("", "", 0, new HashMap<>(), new HashMap<>(), new HashMap<>(), FillData.empty(slate), new HashMap<>(), new HashMap<>()),
                 player,
                 new HashMap<>(),
                 0));

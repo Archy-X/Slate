@@ -1,7 +1,7 @@
 package dev.aurelium.slate.builder;
 
 import dev.aurelium.slate.Slate;
-import dev.aurelium.slate.action.click.ClickAction;
+import dev.aurelium.slate.action.trigger.ClickTrigger;
 import dev.aurelium.slate.function.ItemClicker;
 import dev.aurelium.slate.function.ItemModifier;
 import dev.aurelium.slate.function.ItemReplacer;
@@ -28,7 +28,7 @@ import java.util.Set;
 public record BuiltItem(
         Map<String, ItemReplacer> replacers,
         ItemReplacer anyReplacer,
-        Map<ClickAction, ItemClicker> clickers,
+        Map<ClickTrigger, ItemClicker> clickers,
         @NotNull ItemModifier modifier,
         MenuListener initListener
 ) {
@@ -70,8 +70,8 @@ public record BuiltItem(
         return input;
     }
 
-    public void handleClick(Set<ClickAction> actions, ItemClick itemClick) {
-        for (Entry<ClickAction, ItemClicker> entry : clickers.entrySet()) {
+    public void handleClick(Set<ClickTrigger> actions, ItemClick itemClick) {
+        for (Entry<ClickTrigger, ItemClicker> entry : clickers.entrySet()) {
             if (actions.contains(entry.getKey())) { // Only click if click action matches a defined clicker
                 entry.getValue().click(itemClick);
             }

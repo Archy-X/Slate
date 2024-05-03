@@ -145,7 +145,7 @@ public class MyPlugin extends JavaPlugin {
 ### Other Examples
 
 Complex examples can be seen in [AuraSkills](https://github.com/Archy-X/AuraSkills), a popular plugin that uses Slate for all menus.
-- [Skills menu](https://github.com/Archy-X/AuraSkills/blob/master/bukkit/src/main/java/dev/aurelium/auraskills/bukkit/menus/SkillsMenu.java)
-- [Stats menu](https://github.com/Archy-X/AuraSkills/blob/master/bukkit/src/main/java/dev/aurelium/auraskills/bukkit/menus/StatsMenu.java)
+- [Skills menu](https://github.com/Archy-X/AuraSkills/blob/master/bukkit/src/main/java/dev/aurelium/auraskills/bukkit/menus/SkillsMenu.java) and its [config file](https://github.com/Archy-X/AuraSkills/blob/master/bukkit/src/main/resources/menus/skills.yml)
+- [Stats menu](https://github.com/Archy-X/AuraSkills/blob/master/bukkit/src/main/java/dev/aurelium/auraskills/bukkit/menus/StatsMenu.java) and its [config file](https://github.com/Archy-X/AuraSkills/blob/master/bukkit/src/main/resources/menus/stats.yml)
 - [Where menus are registered](https://github.com/Archy-X/AuraSkills/blob/master/bukkit/src/main/java/dev/aurelium/auraskills/bukkit/menus/MenuRegistrar.java)
 - [SlateOptions used and custom meta parsers](https://github.com/Archy-X/AuraSkills/blob/master/bukkit/src/main/java/dev/aurelium/auraskills/bukkit/menus/MenuOptions.java)

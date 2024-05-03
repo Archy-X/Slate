@@ -2,10 +2,12 @@ package dev.aurelium.slate.menu;
 
 import dev.aurelium.slate.Slate;
 import dev.aurelium.slate.builder.BuiltMenu;
+import dev.aurelium.slate.inv.InventoryListener;
 import dev.aurelium.slate.inv.SmartInventory;
 import dev.aurelium.slate.text.TextFormatter;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -58,6 +60,7 @@ public class MenuOpener {
                 .size(menu.size(), 9)
                 .manager(slate.getInventoryManager())
                 .provider(menuInventory)
+                .listener(new InventoryListener<>(InventoryCloseEvent.class, menuInventory::close))
                 .build();
         smartInventory.open(player);
     }

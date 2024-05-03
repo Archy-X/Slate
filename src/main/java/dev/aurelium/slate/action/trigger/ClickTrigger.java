@@ -1,6 +1,6 @@
-package dev.aurelium.slate.action.click;
+package dev.aurelium.slate.action.trigger;
 
-public enum ClickAction {
+public enum ClickTrigger {
 
     ANY("on_click"),
     LEFT("on_left_click"),
@@ -10,7 +10,7 @@ public enum ClickAction {
 
     private final String identifier;
 
-    ClickAction(String id) {
+    ClickTrigger(String id) {
         this.identifier = id;
     }
 

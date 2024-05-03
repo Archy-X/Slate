@@ -114,7 +114,7 @@ public class YamlLoader {
         return merged;
     }
 
-    public String toDotString(NodePath nodePath) {
+    public static String toDotString(NodePath nodePath) {
         var sb = new StringBuilder();
         for (Object segment : nodePath.array()) {
             sb.append(segment).append(".");

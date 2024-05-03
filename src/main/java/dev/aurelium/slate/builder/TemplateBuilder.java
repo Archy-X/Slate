@@ -1,6 +1,6 @@
 package dev.aurelium.slate.builder;
 
-import dev.aurelium.slate.action.click.ClickAction;
+import dev.aurelium.slate.action.trigger.ClickTrigger;
 import dev.aurelium.slate.info.TemplateInfo;
 import dev.aurelium.slate.function.*;
 
@@ -13,7 +13,7 @@ public class TemplateBuilder<T> {
     private final Class<T> contextType;
     private final Map<String, TemplateReplacer<T>> replacers = new HashMap<>();
     private TemplateReplacer<T> anyReplacer = p -> null;
-    private final Map<ClickAction, TemplateClicker<T>> clickers = new HashMap<>();
+    private final Map<ClickTrigger, TemplateClicker<T>> clickers = new HashMap<>();
     private TemplateModifier<T> modifier = TemplateInfo::item;
     private DefinedContexts<T> definedContexts = m -> new HashSet<>();
     private TemplateSlot<T> slotProvider = t -> null;
@@ -39,11 +39,11 @@ public class TemplateBuilder<T> {
     }
 
     public TemplateBuilder<T> onClick(TemplateClicker<T> clicker) {
-        clickers.put(ClickAction.ANY, clicker);
+        clickers.put(ClickTrigger.ANY, clicker);
         return this;
     }
 
-    public TemplateBuilder<T> onClick(ClickAction action, TemplateClicker<T> clicker) {
+    public TemplateBuilder<T> onClick(ClickTrigger action, TemplateClicker<T> clicker) {
         clickers.put(action, clicker);
         return this;
     }

@@ -1,7 +1,7 @@
 package dev.aurelium.slate.builder;
 
 import dev.aurelium.slate.Slate;
-import dev.aurelium.slate.action.click.ClickAction;
+import dev.aurelium.slate.action.trigger.ClickTrigger;
 import dev.aurelium.slate.info.ItemInfo;
 import dev.aurelium.slate.item.TemplateClick;
 import dev.aurelium.slate.item.provider.PlaceholderType;
@@ -20,7 +20,7 @@ public record BuiltTemplate<T>(
         Class<T> contextType,
         Map<String, TemplateReplacer<T>> replacers,
         TemplateReplacer<T> anyReplacer,
-        Map<ClickAction, TemplateClicker<T>> clickers,
+        Map<ClickTrigger, TemplateClicker<T>> clickers,
         TemplateModifier<T> modifier,
         DefinedContexts<T> definedContexts,
         TemplateSlot<T> slotProvider,
@@ -38,8 +38,8 @@ public record BuiltTemplate<T>(
         return replacer.applyReplacers(input, player, activeMenu, type, value);
     }
 
-    public void handleClick(Set<ClickAction> actions, TemplateClick<T> templateClick) {
-        for (Entry<ClickAction, TemplateClicker<T>> entry : clickers.entrySet()) {
+    public void handleClick(Set<ClickTrigger> actions, TemplateClick<T> templateClick) {
+        for (Entry<ClickTrigger, TemplateClicker<T>> entry : clickers.entrySet()) {
             if (actions.contains(entry.getKey())) { // Only click if click action matches a defined clicker
                 entry.getValue().click(templateClick);
             }

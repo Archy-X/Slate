@@ -1,6 +1,8 @@
 package dev.aurelium.slate.menu;
 
 import dev.aurelium.slate.Slate;
+import dev.aurelium.slate.action.Action;
+import dev.aurelium.slate.action.trigger.MenuTrigger;
 import dev.aurelium.slate.builder.BuiltTemplate;
 import dev.aurelium.slate.component.ComponentParser;
 import dev.aurelium.slate.component.MenuComponent;
@@ -196,8 +198,22 @@ public class MenuLoader {
 
         generateDefaultOptions(menuName, file, config);
         Map<String, Object> options = MenuLoader.loadOptions(config);
+
+        Map<MenuTrigger, List<Action>> actions = loadActions(config, menuName);
         // Add menu to map
-        return new LoadedMenu(menuName, title, size, items, components, formats, fillData, options);
+        return new LoadedMenu(menuName, title, size, items, components, formats, fillData, options, actions);
+    }
+
+    private Map<MenuTrigger, List<Action>> loadActions(ConfigurationNode config, String menuName) {
+        Map<MenuTrigger, List<Action>> actions = new LinkedHashMap<>();
+        for (MenuTrigger menuTrigger : MenuTrigger.values()) {
+            String id = menuTrigger.getId();
+            if (!config.node(id).virtual()) {
+                List<Action> clickActions = slate.getActionManager().parseActions(config.node(id), menuName);
+                actions.put(menuTrigger, clickActions);
+            }
+        }
+        return actions;
     }
 
     private void generateDefaultOptions(String menuName, File file, ConfigurationNode mainConfig) throws SerializationException {
