@@ -31,7 +31,9 @@ public class CommandAction extends Action {
 
     private String formatCommand(Player player, String command) {
         command = TextUtil.replace(command, "{player}", player.getName());
-        command = PlaceholderAPI.setPlaceholders(player, command);
+        if (slate.isPlaceholderAPIEnabled()) {
+            command = PlaceholderAPI.setPlaceholders(player, command);
+        }
         return command;
     }
 
