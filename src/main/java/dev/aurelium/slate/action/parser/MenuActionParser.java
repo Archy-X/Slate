@@ -3,7 +3,7 @@ package dev.aurelium.slate.action.parser;
 import dev.aurelium.slate.Slate;
 import dev.aurelium.slate.action.Action;
 import dev.aurelium.slate.action.MenuAction;
-import dev.aurelium.slate.action.builder.MenuActionBuilder;
+import dev.aurelium.slate.action.MenuAction.ActionType;
 import dev.aurelium.slate.context.ContextProvider;
 import dev.aurelium.slate.util.TextUtil;
 import org.spongepowered.configurate.ConfigurationNode;
@@ -21,12 +21,10 @@ public class MenuActionParser extends ActionParser {
 
     @Override
     public Action parse(ConfigurationNode config) {
-        MenuActionBuilder builder = new MenuActionBuilder(slate);
-        builder.actionType(MenuAction.ActionType.valueOf(Objects.requireNonNull(config.node("action").getString()).toUpperCase(Locale.ROOT)));
+        ActionType actionType = MenuAction.ActionType.valueOf(Objects.requireNonNull(config.node("action").getString()).toUpperCase(Locale.ROOT));
         String menuName = config.node("menu").getString();
-        builder.menuName(menuName);
-        builder.properties(getProperties(menuName, config));
-        return builder.build();
+
+        return new MenuAction(slate, actionType, menuName, getProperties(menuName, config));
     }
 
     private Map<String, Object> getProperties(String menuName, ConfigurationNode config) {
@@ -36,8 +34,7 @@ public class MenuActionParser extends ActionParser {
             for (Object keyObj : propertiesConfig.childrenMap().keySet()) {
                 String key = String.valueOf(keyObj);
                 Object valueObj = propertiesConfig.node(keyObj).raw();
-                if (valueObj instanceof String) {
-                    String value = (String) valueObj;
+                if (valueObj instanceof String value) {
                     if (value.contains(":")) { // Parse custom object
                         String type = TextUtil.substringBefore(value, ":");
                         value = TextUtil.substringAfter(value, ":");
