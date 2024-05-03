@@ -316,7 +316,7 @@ public class MenuInventory implements InventoryProvider {
                 if (failsClickConditions(singleItem, player, event)) return;
 
                 // Run coded click functionality
-                builtItem.handleClick(getClickTriggers(event.getClick()), new ItemClick(player, event, c.getItem(), pos, activeMenu));
+                builtItem.handleClick(getClickTriggers(event.getClick()), new ItemClick(slate, player, event, c.getItem(), pos, activeMenu));
 
                 executeClickActions(singleItem, player, contents, c); // Run custom click actions
             }));
@@ -332,7 +332,7 @@ public class MenuInventory implements InventoryProvider {
             if (failsContextClickConditions(context, templateItem, player, event)) return;
 
             // Run coded click functionality
-            builtTemplate.handleClick(getClickTriggers(event.getClick()), new TemplateClick<>(player, event, c.getItem(), pos, activeMenu, context));
+            builtTemplate.handleClick(getClickTriggers(event.getClick()), new TemplateClick<>(slate, player, event, c.getItem(), pos, activeMenu, context));
 
             executeClickActions(templateItem, player, contents, c); // Run custom click actions
         }));
