@@ -2,14 +2,19 @@ package dev.aurelium.slate.item;
 
 import dev.aurelium.slate.Slate;
 import dev.aurelium.slate.action.Action;
+import dev.aurelium.slate.action.condition.Condition;
+import dev.aurelium.slate.action.condition.ItemConditions;
 import dev.aurelium.slate.action.trigger.ClickTrigger;
 import dev.aurelium.slate.context.ContextGroup;
 import dev.aurelium.slate.inv.content.SlotPos;
 import dev.aurelium.slate.lore.LoreLine;
+import dev.aurelium.slate.menu.MenuInventory;
 import dev.aurelium.slate.position.PositionProvider;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,21 +22,17 @@ import java.util.Map;
 public class TemplateItem<C> extends MenuItem {
 
     private final Class<C> contextClass;
-    private final Map<C, PositionProvider> positions;
-    private final Map<C, ItemStack> baseItems;
-    private final Map<C, String> contextualDisplayNames;
-    private final Map<C, List<LoreLine>> contextualLore;
+    private final TemplateData<C> data;
     private final ItemStack defaultBaseItem;
     private final SlotPos defaultPosition;
     private final Map<String, ContextGroup> contextGroups;
 
-    public TemplateItem(Slate slate, String name, Class<C> contextClass, Map<C, ItemStack> baseItems, ItemStack defaultBaseItem, String displayName, List<LoreLine> lore, Map<C, String> contextualDisplayNames, Map<C, List<LoreLine>> contextualLore, Map<ClickTrigger, List<Action>> actions, Map<C, PositionProvider> positions, SlotPos defaultPosition, Map<String, Object> options, Map<String, ContextGroup> contextGroups) {
-        super(slate, name, displayName, lore, actions, options);
+    public TemplateItem(Slate slate, String name, Class<C> contextClass, TemplateData<C> data, ItemStack defaultBaseItem,
+                        String displayName, List<LoreLine> lore, Map<ClickTrigger, List<Action>> actions, ItemConditions conditions,
+                        SlotPos defaultPosition, Map<String, Object> options, Map<String, ContextGroup> contextGroups) {
+        super(slate, name, displayName, lore, actions, conditions, options);
         this.contextClass = contextClass;
-        this.positions = positions;
-        this.baseItems = baseItems;
-        this.contextualDisplayNames = contextualDisplayNames;
-        this.contextualLore = contextualLore;
+        this.data = data;
         this.defaultBaseItem = defaultBaseItem;
         this.defaultPosition = defaultPosition;
         this.contextGroups = contextGroups;
@@ -42,16 +43,16 @@ public class TemplateItem<C> extends MenuItem {
     }
 
     public PositionProvider getPosition(C context) {
-        return positions.get(context);
+        return data.positions().get(context);
     }
 
     public Map<C, PositionProvider> getPositionsMap() {
-        return positions;
+        return data.positions();
     }
 
     public Map<C, ItemStack> getBaseItems() {
         Map<C, ItemStack> clonedItems = new HashMap<>();
-        for (Map.Entry<C, ItemStack> entry : baseItems.entrySet()) {
+        for (Map.Entry<C, ItemStack> entry : data.baseItems().entrySet()) {
             clonedItems.put(entry.getKey(), entry.getValue().clone());
         }
         return clonedItems;
@@ -72,7 +73,7 @@ public class TemplateItem<C> extends MenuItem {
 
     @Nullable
     public String getContextualDisplayName(C context) {
-        return contextualDisplayNames.get(context);
+        return data.displayNames().get(context);
     }
 
     /**
@@ -93,7 +94,7 @@ public class TemplateItem<C> extends MenuItem {
 
     @Nullable
     public List<LoreLine> getContextualLore(C context) {
-        return contextualLore.get(context);
+        return data.lore().get(context);
     }
 
     /**
@@ -114,5 +115,14 @@ public class TemplateItem<C> extends MenuItem {
 
     public Map<String, ContextGroup> getContextGroups() {
         return contextGroups;
+    }
+
+    public boolean failsContextViewConditions(C context, Player player, MenuInventory inventory) {
+        return failsConditions(player, inventory, data.conditions().getOrDefault(context, ItemConditions.empty()).viewConditions());
+    }
+
+    public boolean failsContextClickConditions(C context, ClickTrigger trigger, Player player, MenuInventory inventory) {
+        List<Condition> conditions = data.conditions().getOrDefault(context, ItemConditions.empty()).clickConditions().getOrDefault(trigger, new ArrayList<>());
+        return failsConditions(player, inventory, conditions);
     }
 }

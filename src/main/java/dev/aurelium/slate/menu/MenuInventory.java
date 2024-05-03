@@ -164,6 +164,11 @@ public class MenuInventory implements InventoryProvider {
 
     private void addSingleItem(ActiveSingleItem activeItem, InventoryContents contents, Player player) {
         SingleItem item = activeItem.getItem();
+
+        if (item.failsViewConditions(player, this)) {
+            return; // Don't show item
+        }
+
         BuiltItem builtItem = slate.getBuiltMenu(menu.name()).getBackingItem(item.getName());
 
         ItemStack itemStack = item.getBaseItem().clone();
@@ -201,6 +206,10 @@ public class MenuInventory implements InventoryProvider {
         TemplateItem<C> item = activeItem.getItem();
         BuiltTemplate<C> builtTemplate = slate.getBuiltMenu(menu.name()).getTemplate(item.getName(), item.getContextClass());
 
+        if (item.failsViewConditions(player, this)) {
+            return; // Don't show item
+        }
+
         Set<C> contexts;
         builtTemplate.initListener().handle(new MenuInfo(slate, player, activeMenu));
         Set<C> builtDefined = builtTemplate.definedContexts().get(new MenuInfo(slate, player, activeMenu));
@@ -211,6 +220,10 @@ public class MenuInventory implements InventoryProvider {
         }
 
         for (C context : contexts) {
+            if (item.failsContextViewConditions(context, player, this)) {
+                continue;
+            }
+
             addContextItem(contents, player, context, item, builtTemplate, contexts);
         }
     }
@@ -299,10 +312,8 @@ public class MenuInventory implements InventoryProvider {
             contents.set(pos, ClickableItem.from(itemStack, c -> {
                 if (!(c.getEvent() instanceof InventoryClickEvent event)) return;
 
-                ActiveItem activeItem = activeItems.get(singleItem.getName());
-                if (activeItem != null && activeItem.getCooldown() != 0) {
-                    return;
-                }
+                if (isOnCooldown(singleItem)) return;
+                if (failsClickConditions(singleItem, player, event)) return;
 
                 // Run coded click functionality
                 builtItem.handleClick(getClickTriggers(event.getClick()), new ItemClick(player, event, c.getItem(), pos, activeMenu));
@@ -316,16 +327,40 @@ public class MenuInventory implements InventoryProvider {
         contents.set(pos, ClickableItem.from(itemStack, c -> {
             if (!(c.getEvent() instanceof InventoryClickEvent event)) return;
 
-            ActiveItem activeItem = activeItems.get(templateItem.getName());
-            if (activeItem != null && activeItem.getCooldown() != 0) {
-                return;
-            }
+            if (isOnCooldown(templateItem)) return;
+            if (failsClickConditions(templateItem, player, event)) return;
+            if (failsContextClickConditions(context, templateItem, player, event)) return;
 
             // Run coded click functionality
             builtTemplate.handleClick(getClickTriggers(event.getClick()), new TemplateClick<>(player, event, c.getItem(), pos, activeMenu, context));
 
             executeClickActions(templateItem, player, contents, c); // Run custom click actions
         }));
+    }
+
+    private boolean isOnCooldown(MenuItem menuItem) {
+        ActiveItem activeItem = activeItems.get(menuItem.getName());
+        return activeItem != null && activeItem.getCooldown() != 0;
+    }
+
+    private boolean failsClickConditions(MenuItem menuItem, Player player, InventoryClickEvent event) {
+        // Check click conditions
+        for (ClickTrigger trigger : getClickTriggers(event.getClick())) {
+            if (menuItem.failsClickConditions(trigger, player, this)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private <C> boolean failsContextClickConditions(C context, TemplateItem<C> template, Player player, InventoryClickEvent event) {
+        // Check click conditions
+        for (ClickTrigger trigger : getClickTriggers(event.getClick())) {
+            if (template.failsContextClickConditions(context, trigger, player, this)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

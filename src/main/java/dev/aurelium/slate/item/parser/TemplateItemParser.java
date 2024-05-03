@@ -1,6 +1,7 @@
 package dev.aurelium.slate.item.parser;
 
 import dev.aurelium.slate.Slate;
+import dev.aurelium.slate.action.condition.ItemConditions;
 import dev.aurelium.slate.context.ContextGroup;
 import dev.aurelium.slate.context.ContextProvider;
 import dev.aurelium.slate.context.GroupAlign;
@@ -8,7 +9,6 @@ import dev.aurelium.slate.inv.content.SlotPos;
 import dev.aurelium.slate.item.MenuItem;
 import dev.aurelium.slate.item.builder.TemplateItemBuilder;
 import dev.aurelium.slate.lore.LoreLine;
-import dev.aurelium.slate.menu.MenuLoader;
 import dev.aurelium.slate.position.FixedPosition;
 import dev.aurelium.slate.position.GroupPosition;
 import dev.aurelium.slate.position.PositionProvider;
@@ -46,6 +46,7 @@ public class TemplateItemParser<C> extends MenuItemParser {
 
         Map<C, String> contextualDisplayNames = new HashMap<>();
         Map<C, List<LoreLine>> contextualLore = new HashMap<>();
+        Map<C, ItemConditions> contextualConditions = new HashMap<>();
 
         for (ConfigurationNode contextNode : section.node("contexts").childrenMap().values()) {
             String key;
@@ -83,11 +84,14 @@ public class TemplateItemParser<C> extends MenuItemParser {
                 if (!contextualLoreList.isEmpty()) {
                     contextualLore.put(context, contextualLoreList);
                 }
+                // Parse view_conditions, etc. on the specific context
+                contextualConditions.put(context, getConditions(contextNode, menuName));
             }
         }
 
         builder.contextualDisplayNames(contextualDisplayNames);
         builder.contextualLore(contextualLore);
+        builder.contextualConditions(contextualConditions);
 
         String defaultPos = section.node("pos").getString();
         if (positions.isEmpty() && defaultPos != null) {
@@ -103,12 +107,7 @@ public class TemplateItemParser<C> extends MenuItemParser {
             builder.defaultBaseItem(itemParser.parseBaseItem(section));
         }
 
-        builder.displayName(itemParser.parseDisplayName(section));
-        builder.lore(itemParser.parseLore(section));
-
-        parseActions(builder, section, menuName);
-
-        builder.options(MenuLoader.loadOptions(section));
+        parseCommonOptions(builder, section, menuName);
 
         return builder.build();
     }

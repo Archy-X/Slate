@@ -29,6 +29,6 @@ public class SingleItemBuilder extends MenuItemBuilder {
 
     @Override
     public MenuItem build() {
-        return new SingleItem(slate, name, baseItem, displayName, lore, actions, positions, options);
+        return new SingleItem(slate, name, baseItem, displayName, lore, actions, conditions, positions, options);
     }
 }

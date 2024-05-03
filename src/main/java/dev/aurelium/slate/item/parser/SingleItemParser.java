@@ -4,7 +4,6 @@ import dev.aurelium.slate.Slate;
 import dev.aurelium.slate.inv.content.SlotPos;
 import dev.aurelium.slate.item.MenuItem;
 import dev.aurelium.slate.item.builder.SingleItemBuilder;
-import dev.aurelium.slate.menu.MenuLoader;
 import dev.aurelium.slate.util.Validate;
 import org.spongepowered.configurate.ConfigurationNode;
 
@@ -43,13 +42,7 @@ public class SingleItemParser extends MenuItemParser {
             builder.positions(List.of(parsePosition(positionString)));
         }
 
-
-        builder.displayName(itemParser.parseDisplayName(section));
-        builder.lore(itemParser.parseLore(section));
-
-        parseActions(builder, section, menuName);
-
-        builder.options(MenuLoader.loadOptions(section));
+        parseCommonOptions(builder, section, menuName);
 
         return builder.build();
     }

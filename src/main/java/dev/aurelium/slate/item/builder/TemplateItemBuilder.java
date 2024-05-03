@@ -1,9 +1,11 @@
 package dev.aurelium.slate.item.builder;
 
 import dev.aurelium.slate.Slate;
+import dev.aurelium.slate.action.condition.ItemConditions;
 import dev.aurelium.slate.context.ContextGroup;
 import dev.aurelium.slate.inv.content.SlotPos;
 import dev.aurelium.slate.item.MenuItem;
+import dev.aurelium.slate.item.TemplateData;
 import dev.aurelium.slate.item.TemplateItem;
 import dev.aurelium.slate.lore.LoreLine;
 import dev.aurelium.slate.position.PositionProvider;
@@ -20,6 +22,7 @@ public class TemplateItemBuilder<C> extends MenuItemBuilder {
     private Map<C, ItemStack> baseItems;
     private Map<C, String> contextualDisplayNames;
     private Map<C, List<LoreLine>> contextualLore;
+    private Map<C, ItemConditions> contextualConditions;
     private ItemStack defaultBaseItem;
     private SlotPos defaultPosition;
     private Map<String, ContextGroup> contextGroups = new HashMap<>();
@@ -68,8 +71,16 @@ public class TemplateItemBuilder<C> extends MenuItemBuilder {
         return this;
     }
 
+    public TemplateItemBuilder<C> contextualConditions(Map<C, ItemConditions> contextualConditions) {
+        this.contextualConditions = contextualConditions;
+        return this;
+    }
+
     @Override
     public MenuItem build() {
-        return new TemplateItem<>(slate, name, contextClass, baseItems, defaultBaseItem, displayName, lore, contextualDisplayNames, contextualLore, actions, positions, defaultPosition, options, contextGroups);
+        TemplateData<C> templateData = new TemplateData<>(positions, baseItems, contextualDisplayNames, contextualLore, contextualConditions);
+
+        return new TemplateItem<>(slate, name, contextClass, templateData, defaultBaseItem, displayName, lore,
+                 actions, conditions, defaultPosition, options, contextGroups);
     }
 }
