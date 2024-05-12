@@ -54,9 +54,13 @@ public class MenuOpener {
             title = PlaceholderAPI.setPlaceholders(player, title);
         }
 
+        if ((boolean) menu.options().getOrDefault("format_title", true)) {
+            title = tf.toString(tf.toComponent(title));
+        }
+
         // Build inventory and open
         SmartInventory smartInventory = SmartInventory.builder()
-                .title(tf.toString(tf.toComponent(title)))
+                .title(title)
                 .size(menu.size(), 9)
                 .manager(slate.getInventoryManager())
                 .provider(menuInventory)
