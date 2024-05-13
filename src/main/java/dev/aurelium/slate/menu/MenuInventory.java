@@ -213,11 +213,7 @@ public class MenuInventory implements InventoryProvider {
         Set<C> contexts;
         builtTemplate.initListener().handle(new MenuInfo(slate, player, activeMenu));
         Set<C> builtDefined = builtTemplate.definedContexts().get(new MenuInfo(slate, player, activeMenu));
-        if (!builtDefined.isEmpty()) {
-            contexts = builtDefined;
-        } else {
-            contexts = item.getBaseItems().keySet();
-        }
+        contexts = Objects.requireNonNullElseGet(builtDefined, () -> item.getBaseItems().keySet());
 
         for (C context : contexts) {
             if (item.failsContextViewConditions(context, player, this)) {
