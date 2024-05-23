@@ -58,6 +58,8 @@ public class MenuInventory implements InventoryProvider {
     private InventoryContents contents;
     private final TextFormatter tf = new TextFormatter();
     private final BuiltMenu builtMenu;
+    private final ArrayList<ActiveItem> toUpdate;
+    private final MenuInfo menuInfo;
 
     public MenuInventory(Slate slate, LoadedMenu menu, Player player, Map<String, Object> properties, int currentPage) {
         this.slate = slate;
@@ -65,11 +67,13 @@ public class MenuInventory implements InventoryProvider {
         this.menu = menu;
         this.activeItems = new LinkedHashMap<>();
         this.activeMenu = new ActiveMenu(this);
+        this.toUpdate = new ArrayList<>();
         this.properties = new HashMap<>(properties); // Make a copy in case the properties map passed in is immutable
         this.player = player;
         this.builtMenu = slate.getBuiltMenu(menu.name());
         this.totalPages = builtMenu.pageProvider().getPages(new MenuInfo(slate, player, activeMenu));
         this.currentPage = currentPage;
+        this.menuInfo = new MenuInfo(slate, player, activeMenu);
     }
 
     public Slate getSlate() {
@@ -107,6 +111,12 @@ public class MenuInventory implements InventoryProvider {
 
     public TextFormatter getTextFormatter() {
         return tf;
+    }
+
+    public void setToUpdate(ActiveItem activeItem) {
+        if (!toUpdate.contains(activeItem)) {
+            toUpdate.add(activeItem);
+        }
     }
 
     @Override
@@ -149,12 +159,14 @@ public class MenuInventory implements InventoryProvider {
     @Override
     public void update(Player player, InventoryContents contents) {
         // Decrement item cooldowns
-        for (ActiveItem activeItem : activeItems.values()) {
-            if (activeItem.getCooldown() > 0) {
-                activeItem.setCooldown(activeItem.getCooldown() - 1);
+        for (int i = 0; i < toUpdate.size(); i++) {
+            ActiveItem activeItem = toUpdate.get(i);
+            int cooldown = activeItem.getCooldown();
+            if (cooldown > 0) {
+                activeItem.setCooldown(cooldown- 1);
             }
         }
-        builtMenu.updateListener().handle(new MenuInfo(slate, player, activeMenu));
+        builtMenu.updateListener().handle(menuInfo);
     }
 
     // Added to SmartInventory listeners by builder

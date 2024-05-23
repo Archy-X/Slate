@@ -123,6 +123,7 @@ public class ActiveMenu {
         ActiveItem activeItem = menuInventory.getActiveItem(itemName);
         if (activeItem != null) {
             activeItem.setCooldown(cooldown);
+            menuInventory.setToUpdate(activeItem);
         }
     }
 
