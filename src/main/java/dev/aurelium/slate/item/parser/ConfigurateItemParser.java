@@ -8,11 +8,13 @@ import dev.aurelium.slate.lore.LoreLine;
 import dev.aurelium.slate.util.NumberUtil;
 import dev.aurelium.slate.util.SkullCreator;
 import dev.aurelium.slate.util.Validate;
+import dev.aurelium.slate.util.VersionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.*;
@@ -116,6 +118,9 @@ public class ConfigurateItemParser {
             List<String> flags = section.node("flags").getList(String.class, new ArrayList<>());
             for (String flagName : flags) {
                 ItemFlag itemFlag = ItemFlag.valueOf(flagName.toUpperCase(Locale.ROOT));
+                if (itemFlag == ItemFlag.HIDE_ATTRIBUTES && VersionUtil.isAtLeastVersion(20, 5)) {
+                    meta.setAttributeModifiers(Material.IRON_SWORD.getDefaultAttributeModifiers(EquipmentSlot.HAND));
+                }
                 meta.addItemFlags(itemFlag);
             }
             item.setItemMeta(meta);
