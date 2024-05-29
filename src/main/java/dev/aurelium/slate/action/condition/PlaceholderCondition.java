@@ -5,6 +5,8 @@ import dev.aurelium.slate.menu.MenuInventory;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
 
+import java.util.Map;
+
 public class PlaceholderCondition extends Condition {
 
     private final String placeholder;
@@ -20,11 +22,11 @@ public class PlaceholderCondition extends Condition {
 
     @Override
     public boolean isMet(Player player, MenuInventory menuInventory) {
-        String leftText = placeholder;
+        String leftText = replaceProperties(placeholder, menuInventory);
         if (slate.isPlaceholderAPIEnabled()) {
             leftText = PlaceholderAPI.setPlaceholders(player, leftText);
         }
-        String rightText = value;
+        String rightText = replaceProperties(value, menuInventory);
         if (slate.isPlaceholderAPIEnabled()) {
             rightText = PlaceholderAPI.setPlaceholders(player, rightText);
         }
@@ -35,6 +37,15 @@ public class PlaceholderCondition extends Condition {
             e.printStackTrace();
             return false;
         }
+    }
+
+    private String replaceProperties(String text, MenuInventory menu) {
+        for (Map.Entry<String, Object> property : menu.getProperties().entrySet()) {
+            String key = property.getKey();
+            Object value = property.getValue();
+            text = text.replace("{" + key + "}", value.toString());
+        }
+        return text;
     }
 
     public enum Compare {
