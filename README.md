@@ -57,7 +57,7 @@ repositories {
 }
 
 dependencies {
-    implementation("dev.aurelium:slate:1.0.5")
+    implementation("dev.aurelium:slate:1.1.5")
 }
 ```
 
@@ -68,7 +68,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'dev.aurelium:slate:1.0.5'
+    implementation 'dev.aurelium:slate:1.1.5'
 }
 ```
 
@@ -78,7 +78,7 @@ dependencies {
 <dependency>
     <groupId>dev.aurelium</groupId>
     <artifactId>slate</artifactId>
-    <version>1.0.5</version>
+    <version>1.1.5</version>
 </dependency>
 ```
 
