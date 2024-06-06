@@ -169,7 +169,7 @@ public class MenuLoader {
         if (!fillSection.virtual()) {
             boolean fillEnabled = fillSection.node("enabled").getBoolean(false);
             FillItem fillItem = new FillItemParser(slate).parse(fillSection, menuName);
-            fillData = new FillData(fillItem, new SlotParser().parse(fillSection), fillEnabled);
+            fillData = new FillData(fillItem, new SlotParser().parse(fillSection, size), fillEnabled);
         } else {
             fillData = new FillData(FillItem.getDefault(slate), null, false);
         }
