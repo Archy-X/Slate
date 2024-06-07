@@ -62,6 +62,41 @@ public class ActiveMenu {
     }
 
     /**
+     * Gets a property from a name cast to a type.
+     *
+     * @param name the property name
+     * @return the property value, or null if it isn't defined
+     * @param <T> the type of the value
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T property(String name) {
+        try {
+            return (T) menuInventory.getProperties().get(name);
+        } catch (ClassCastException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Gets a property from a name cast to a type or a default value.
+     *
+     * @param name the property name
+     * @param def the default fallback value
+     * @return the property value, or def
+     * @param <T> the type of the value
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T property(String name, T def) {
+        try {
+            return (T) menuInventory.getProperties().getOrDefault(name, def);
+        } catch (ClassCastException e) {
+            e.printStackTrace();
+            return def;
+        }
+    }
+
+    /**
      * Gets a property from the menu's properties with the given name.
      *
      * @param name the name of the property
