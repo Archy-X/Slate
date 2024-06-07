@@ -42,7 +42,7 @@ public record FillData(FillItem item, SlotPos[] slots, boolean enabled) {
             }
             List<LoreLine> loreLines = fillItem.getLore();
             if (loreLines != null) {
-                inv.setLore(meta, inv.getLoreInterpreter().interpretLore(loreLines, player, inv.getActiveMenu(), BuiltItem.createEmpty()));
+                inv.setLore(meta, inv.getLoreInterpreter().interpretLore(loreLines, player, inv.getActiveMenu(), BuiltItem.createEmpty(), fillItem));
             }
             itemStack.setItemMeta(meta);
         }

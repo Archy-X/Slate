@@ -205,7 +205,7 @@ public class MenuInventory implements InventoryProvider {
             }
             List<LoreLine> loreLines = item.getLore();
             if (loreLines != null) {
-                setLore(meta, loreInterpreter.interpretLore(loreLines, player, activeMenu, builtItem));
+                setLore(meta, loreInterpreter.interpretLore(loreLines, player, activeMenu, builtItem, item));
             }
             itemStack.setItemMeta(meta);
         }
@@ -294,7 +294,7 @@ public class MenuInventory implements InventoryProvider {
         }
         List<LoreLine> loreLines = item.getActiveLore(context);
         if (loreLines != null) {
-            setLore(meta, loreInterpreter.interpretLore(loreLines, player, activeMenu, builtTemplate, context));
+            setLore(meta, loreInterpreter.interpretLore(loreLines, player, activeMenu, builtTemplate, item, context));
         }
         itemStack.setItemMeta(meta);
     }

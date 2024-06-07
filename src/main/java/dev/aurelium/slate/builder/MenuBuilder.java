@@ -119,6 +119,21 @@ public class MenuBuilder {
     }
 
     /**
+     * Add a component without a context type to the menu. Components created this way cannot access the
+     * context object of templates, so they should be only used in items.
+     *
+     * @param name the name of the component, as defined in the menu file
+     * @param template a consumer containing a new {@link ComponentBuilder}, best used as a lambda
+     * @return the menu builder
+     */
+    public MenuBuilder component(String name, Consumer<ComponentBuilder<?>> template) {
+        ComponentBuilder<?> builder = ComponentBuilder.builder(null);
+        template.accept(builder);
+        componentBuilders.put(name, builder);
+        return this;
+    }
+
+    /**
      * Add a component to the menu that accepts a {@link ComponentBuilder} instance you must create yourself.
      * It is usually easier to use {@link #component(String, Class, Consumer)}, which provides a builder for you.
      *

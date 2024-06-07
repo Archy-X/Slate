@@ -3,6 +3,7 @@ package dev.aurelium.slate.builder;
 import dev.aurelium.slate.function.ComponentInstances;
 import dev.aurelium.slate.function.ComponentReplacer;
 import dev.aurelium.slate.function.ComponentVisibility;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +20,7 @@ public class ComponentBuilder<T> {
         this.contextType = contextType;
     }
 
-    public static <T> ComponentBuilder<T> builder(Class<T> contextType) {
+    public static <T> ComponentBuilder<T> builder(@Nullable Class<T> contextType) {
         return new ComponentBuilder<>(contextType);
     }
 

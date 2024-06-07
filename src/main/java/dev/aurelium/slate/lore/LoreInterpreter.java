@@ -6,7 +6,9 @@ import dev.aurelium.slate.builder.BuiltItem;
 import dev.aurelium.slate.builder.BuiltTemplate;
 import dev.aurelium.slate.component.ComponentData;
 import dev.aurelium.slate.component.MenuComponent;
-import dev.aurelium.slate.info.TemplateInfo;
+import dev.aurelium.slate.info.ComponentInfo;
+import dev.aurelium.slate.item.MenuItem;
+import dev.aurelium.slate.item.TemplateItem;
 import dev.aurelium.slate.item.provider.PlaceholderType;
 import dev.aurelium.slate.lore.type.ComponentLore;
 import dev.aurelium.slate.lore.type.TextLore;
@@ -37,13 +39,13 @@ public class LoreInterpreter {
     }
 
     @NotNull
-    public List<Component> interpretLore(List<LoreLine> loreLines, Player player, ActiveMenu activeMenu, BuiltItem builtItem) {
+    public List<Component> interpretLore(List<LoreLine> loreLines, Player player, ActiveMenu activeMenu, BuiltItem builtItem, MenuItem menuItem) {
         List<String> lore = new ArrayList<>();
         for (LoreLine line : loreLines) {
             if (line instanceof TextLore textLore) {
                 lore.add(interpretTextLore(textLore, player, activeMenu, builtItem));
             } else if (line instanceof ComponentLore componentLore) {
-                List<String> list = interpretComponent(componentLore, player, activeMenu);
+                List<String> list = interpretComponent(componentLore, player, activeMenu, menuItem);
                 if (list != null) {
                     lore.addAll(list);
                 }
@@ -54,13 +56,13 @@ public class LoreInterpreter {
     }
 
     @NotNull
-    public <T> List<Component> interpretLore(List<LoreLine> loreLines, Player player, ActiveMenu activeMenu, BuiltTemplate<T> builtTemplate, T context) {
+    public <T> List<Component> interpretLore(List<LoreLine> loreLines, Player player, ActiveMenu activeMenu, BuiltTemplate<T> builtTemplate, TemplateItem<T> templateItem, T context) {
         List<String> lore = new ArrayList<>();
         for (LoreLine line : loreLines) {
             if (line instanceof TextLore textLore) {
                 lore.add(interpretTextLore(textLore, player, activeMenu, builtTemplate, context));
             } else if (line instanceof ComponentLore componentLore) {
-                List<String> list = interpretComponent(componentLore, player, activeMenu, context);
+                List<String> list = interpretComponent(componentLore, player, activeMenu, templateItem, context);
                 if (list != null) {
                     lore.addAll(list);
                 }
@@ -117,7 +119,7 @@ public class LoreInterpreter {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> List<String> interpretComponent(ComponentLore lore, Player player, ActiveMenu activeMenu, T context) {
+    private <T> List<String> interpretComponent(ComponentLore lore, Player player, ActiveMenu activeMenu, TemplateItem<T> templateItem, T context) {
         // Choose the component if multiple
         String componentName = lore.getComponent();
         MenuComponent component = activeMenu.getComponents().get(componentName);
@@ -126,7 +128,7 @@ public class LoreInterpreter {
         }
         @NotNull BuiltComponent<T> builtComponent = (BuiltComponent<T>) slate.getBuiltMenu(activeMenu.getName()).components()
                 .getOrDefault(componentName, BuiltComponent.createEmpty(component.contextClass()));
-        TemplateInfo<T> info = new TemplateInfo<>(slate, player, activeMenu, new ItemStack(Material.STONE), context);
+        ComponentInfo<T> info = new ComponentInfo<>(slate, player, activeMenu, new ItemStack(Material.STONE), templateItem.getName(), context);
         if (!builtComponent.visibility().shouldShow(info)) {
             return null;
         }
@@ -148,7 +150,7 @@ public class LoreInterpreter {
     }
 
     @SuppressWarnings("unchecked")
-    private List<String> interpretComponent(ComponentLore lore, Player player, ActiveMenu activeMenu) {
+    private List<String> interpretComponent(ComponentLore lore, Player player, ActiveMenu activeMenu, MenuItem menuItem) {
         // Choose the component if multiple
         String componentName = lore.getComponent();
         MenuComponent component = activeMenu.getComponents().get(componentName);
@@ -157,7 +159,7 @@ public class LoreInterpreter {
         }
         @NotNull BuiltComponent<Object> builtComponent = (BuiltComponent<Object>) slate.getBuiltMenu(activeMenu.getName()).components()
                 .getOrDefault(componentName, BuiltComponent.createEmpty(component.contextClass()));
-        TemplateInfo<Object> info = new TemplateInfo<>(slate, player, activeMenu, new ItemStack(Material.STONE), null);
+        ComponentInfo<Object> info = new ComponentInfo<>(slate, player, activeMenu, new ItemStack(Material.STONE), menuItem.getName(), null);
         if (!builtComponent.visibility().shouldShow(info)) {
             return null;
         }
