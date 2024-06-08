@@ -142,6 +142,18 @@ public class ActiveMenu {
     }
 
     /**
+     * Sets a property only if a property with the given name has not been set.
+     *
+     * @param name the name of the property
+     * @param value the value of the property
+     */
+    public void defaultProperty(String name, Object value) {
+        if (!menuInventory.getProperties().containsKey(name)) {
+            menuInventory.getProperties().put(name, value);
+        }
+    }
+
+    /**
      * Reloads the menu for the player as if it was reopened.
      */
     public void reload() {
