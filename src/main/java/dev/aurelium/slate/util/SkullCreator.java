@@ -335,6 +335,7 @@ public class SkullCreator {
                 try {
                     if (PaperUtil.IS_PAPER) {
                         var profile = Bukkit.createProfile(UUID.randomUUID());
+                        profile.getTextures().setSkin(new URL(url));
                         meta.setPlayerProfile(profile);
                     } else {
                         var profile = Bukkit.createPlayerProfile(UUID.randomUUID());
