@@ -12,6 +12,7 @@ import org.bukkit.block.Skull;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -35,9 +36,13 @@ public class SkullCreator {
     private static boolean warningPosted = false;
 
     // some reflection stuff to be used when setting a skull's profile
+    private static final String CRAFTBUKKIT_PACKAGE = Bukkit.getServer().getClass().getPackage().getName();
     private static Field blockProfileField;
     private static Method metaSetProfileMethod;
     private static Field metaProfileField;
+    private static Class<?> craftPlayerProfileClass;
+    private static Constructor<?> craftPlayerProfileConstructor;
+    private static Method buildResolvableProfileMethod;
 
     /**
      * Creates a player skull, should work in both legacy and new Bukkit APIs.
@@ -109,8 +114,10 @@ public class SkullCreator {
         notNull(name, "name");
 
         SkullMeta meta = (SkullMeta) item.getItemMeta();
-        meta.setOwner(name);
-        item.setItemMeta(meta);
+        if (meta != null) {
+            meta.setOwner(name);
+            item.setItemMeta(meta);
+        }
 
         return item;
     }
@@ -127,8 +134,10 @@ public class SkullCreator {
         notNull(id, "id");
 
         SkullMeta meta = (SkullMeta) item.getItemMeta();
-        meta.setOwningPlayer(Bukkit.getOfflinePlayer(id));
-        item.setItemMeta(meta);
+        if (meta != null) {
+            meta.setOwningPlayer(Bukkit.getOfflinePlayer(id));
+            item.setItemMeta(meta);
+        }
 
         return item;
     }
@@ -303,6 +312,20 @@ public class SkullCreator {
 
             } catch (NoSuchFieldException | IllegalAccessException ex2) {
                 ex2.printStackTrace();
+            } catch (IllegalArgumentException ex3) {
+                // Spigot 1.21+ uses ResolvableProfile
+                try {
+                    if (craftPlayerProfileClass == null || craftPlayerProfileConstructor == null || buildResolvableProfileMethod == null) {
+                        craftPlayerProfileClass = Class.forName(CRAFTBUKKIT_PACKAGE + ".profile.CraftPlayerProfile");
+                        craftPlayerProfileConstructor = craftPlayerProfileClass.getDeclaredConstructor(GameProfile.class);
+                        buildResolvableProfileMethod = craftPlayerProfileClass.getDeclaredMethod("buildResolvableProfile");
+                    }
+                    Object playerProfileInst = craftPlayerProfileConstructor.newInstance(makeProfile(b64));
+                    Object resolvableProfileInst = buildResolvableProfileMethod.invoke(playerProfileInst);
+                    metaProfileField.set(meta, resolvableProfileInst);
+                } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException ex4) {
+                    ex4.printStackTrace();
+                }
             }
         }
     }
