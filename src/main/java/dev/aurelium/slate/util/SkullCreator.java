@@ -2,6 +2,9 @@ package dev.aurelium.slate.util;
 
 // Copyright (c) 2017 deanveloper (see LICENSE.md for more info)
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import org.bukkit.Bukkit;
@@ -11,14 +14,19 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Skull;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -43,6 +51,8 @@ public class SkullCreator {
     private static Class<?> craftPlayerProfileClass;
     private static Constructor<?> craftPlayerProfileConstructor;
     private static Method buildResolvableProfileMethod;
+
+    private static final Map<String, String> urlDecodeCache = new HashMap<>();
 
     /**
      * Creates a player skull, should work in both legacy and new Bukkit APIs.
@@ -293,38 +303,82 @@ public class SkullCreator {
         }
     }
 
-    private static void mutateItemMeta(SkullMeta meta, String b64) {
-        try {
-            if (metaSetProfileMethod == null) {
-                metaSetProfileMethod = meta.getClass().getDeclaredMethod("setProfile", GameProfile.class);
-                metaSetProfileMethod.setAccessible(true);
-            }
-            metaSetProfileMethod.invoke(meta, makeProfile(b64));
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
-            // if in an older API where there is no setProfile method,
-            // we set the profile field directly.
-            try {
-                if (metaProfileField == null) {
-                    metaProfileField = meta.getClass().getDeclaredField("profile");
-                    metaProfileField.setAccessible(true);
-                }
-                metaProfileField.set(meta, makeProfile(b64));
+    @Nullable
+    public static String decodeSkinUrl(String base64Texture) {
+        String cached = urlDecodeCache.get(base64Texture);
+        if (cached != null) { // Check cache to skip parsing if already done
+            return cached;
+        }
 
-            } catch (NoSuchFieldException | IllegalAccessException ex2) {
-                ex2.printStackTrace();
-            } catch (IllegalArgumentException ex3) {
-                // Spigot 1.21+ uses ResolvableProfile
+        String decoded = new String(Base64.getDecoder().decode(base64Texture));
+        JsonObject object = JsonParser.parseString(decoded).getAsJsonObject();
+        JsonElement textures = object.get("textures");
+        if (textures == null)
+            return null;
+        JsonElement skin = textures.getAsJsonObject().get("SKIN");
+        if (skin == null)
+            return null;
+        JsonElement url = skin.getAsJsonObject().get("url");
+        if (url != null) {
+            urlDecodeCache.put(base64Texture, url.getAsString());
+            return url.getAsString();
+        } else {
+            return null;
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private static void mutateItemMeta(SkullMeta meta, String b64) {
+        if (VersionUtil.isAtLeastVersion(18, 1)) {
+            String url = decodeSkinUrl(b64);
+            if (url != null) {
                 try {
-                    if (craftPlayerProfileClass == null || craftPlayerProfileConstructor == null || buildResolvableProfileMethod == null) {
-                        craftPlayerProfileClass = Class.forName(CRAFTBUKKIT_PACKAGE + ".profile.CraftPlayerProfile");
-                        craftPlayerProfileConstructor = craftPlayerProfileClass.getDeclaredConstructor(GameProfile.class);
-                        buildResolvableProfileMethod = craftPlayerProfileClass.getDeclaredMethod("buildResolvableProfile");
+                    if (PaperUtil.IS_PAPER) {
+                        var profile = Bukkit.createProfile(UUID.randomUUID());
+                        meta.setPlayerProfile(profile);
+                    } else {
+                        var profile = Bukkit.createPlayerProfile(UUID.randomUUID());
+                        profile.getTextures().setSkin(new URL(url));
+                        meta.setOwnerProfile(profile);
                     }
-                    Object playerProfileInst = craftPlayerProfileConstructor.newInstance(makeProfile(b64));
-                    Object resolvableProfileInst = buildResolvableProfileMethod.invoke(playerProfileInst);
-                    metaProfileField.set(meta, resolvableProfileInst);
-                } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | InvocationTargetException | IllegalAccessException ex4) {
-                    ex4.printStackTrace();
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else {
+            try {
+                if (metaSetProfileMethod == null) {
+                    metaSetProfileMethod = meta.getClass().getDeclaredMethod("setProfile", GameProfile.class);
+                    metaSetProfileMethod.setAccessible(true);
+                }
+                metaSetProfileMethod.invoke(meta, makeProfile(b64));
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+                // if in an older API where there is no setProfile method,
+                // we set the profile field directly.
+                try {
+                    if (metaProfileField == null) {
+                        metaProfileField = meta.getClass().getDeclaredField("profile");
+                        metaProfileField.setAccessible(true);
+                    }
+                    metaProfileField.set(meta, makeProfile(b64));
+
+                } catch (NoSuchFieldException | IllegalAccessException ex2) {
+                    ex2.printStackTrace();
+                } catch (IllegalArgumentException ex3) {
+                    // Spigot 1.21+ uses ResolvableProfile
+                    try {
+                        if (craftPlayerProfileClass == null || craftPlayerProfileConstructor == null || buildResolvableProfileMethod == null) {
+                            craftPlayerProfileClass = Class.forName(CRAFTBUKKIT_PACKAGE + ".profile.CraftPlayerProfile");
+                            craftPlayerProfileConstructor = craftPlayerProfileClass.getDeclaredConstructor(GameProfile.class);
+                            buildResolvableProfileMethod = craftPlayerProfileClass.getDeclaredMethod("buildResolvableProfile");
+                        }
+                        Object playerProfileInst = craftPlayerProfileConstructor.newInstance(makeProfile(b64));
+                        Object resolvableProfileInst = buildResolvableProfileMethod.invoke(playerProfileInst);
+                        metaProfileField.set(meta, resolvableProfileInst);
+                    } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException |
+                             InvocationTargetException | IllegalAccessException ex4) {
+                        ex4.printStackTrace();
+                    }
                 }
             }
         }
