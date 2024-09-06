@@ -14,6 +14,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Skull;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.profile.PlayerTextures;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Constructor;
@@ -335,7 +336,9 @@ public class SkullCreator {
                 try {
                     if (PaperUtil.IS_PAPER) {
                         var profile = Bukkit.createProfile(UUID.randomUUID());
-                        profile.getTextures().setSkin(new URL(url));
+                        PlayerTextures textures = profile.getTextures();
+                        textures.setSkin(new URL(url));
+                        profile.setTextures(textures);
                         meta.setPlayerProfile(profile);
                     } else {
                         var profile = Bukkit.createPlayerProfile(UUID.randomUUID());
