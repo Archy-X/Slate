@@ -19,6 +19,7 @@ public record BuiltMenu(
         Map<String, BuiltItem> items,
         Map<String, BuiltTemplate<?>> templates,
         Map<String, BuiltComponent<?>> components,
+        Map<String, ItemReplacer> pageReplacers,
         Map<String, ItemReplacer> titleReplacers,
         ItemReplacer titleAnyReplacer,
         PageProvider pageProvider,
@@ -30,7 +31,7 @@ public record BuiltMenu(
 ) {
 
     public static BuiltMenu createEmpty() {
-        return new BuiltMenu(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>(), p -> null, m -> 1,
+        return new BuiltMenu(new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>(), new HashMap<>(), p -> null, m -> 1,
                 m -> new HashMap<>(), i -> null, m -> {}, m -> {}, new HashMap<>());
     }
 

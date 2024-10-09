@@ -18,6 +18,7 @@ public class MenuBuilder {
     private final Map<String, ItemBuilder> itemBuilders = new HashMap<>();
     private final Map<String, TemplateBuilder<?>> templateBuilders = new HashMap<>();
     private final Map<String, ComponentBuilder<?>> componentBuilders = new HashMap<>();
+    private final Map<String, ItemReplacer> pageReplacers = new HashMap<>();
     private final Map<String, ItemReplacer> titleReplacers = new HashMap<>();
     private ItemReplacer titleAnyReplacer = p -> null;
     private PageProvider pageProvider = m -> 1;
@@ -149,6 +150,19 @@ public class MenuBuilder {
     }
 
     /**
+     * Replaces any placeholder on the page that matches the "from" string. This can be in the title,
+     * items, templates, and components.
+     *
+     * @param from the text of the placeholder without curly braces
+     * @param replacer the replacer function, best used as a lambda
+     * @return the menu builder
+     */
+    public MenuBuilder replace(String from, ItemReplacer replacer) {
+        pageReplacers.put(from, replacer);
+        return this;
+    }
+
+    /**
      * Replaces a placeholder in the menu title with a value.
      *
      * @param from the text of the placeholder without curly braces
@@ -260,7 +274,7 @@ public class MenuBuilder {
         for (Entry<String, ComponentBuilder<?>> entry : componentBuilders.entrySet()) {
             components.put(entry.getKey(), entry.getValue().build());
         }
-        return new BuiltMenu(items, templates, components, titleReplacers, titleAnyReplacer, pageProvider, propertyProvider,
+        return new BuiltMenu(items, templates, components, pageReplacers, titleReplacers, titleAnyReplacer, pageProvider, propertyProvider,
                 fillItem, openListener, updateListener, defaultOptions);
     }
 
