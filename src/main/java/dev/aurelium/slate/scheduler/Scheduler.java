@@ -10,12 +10,12 @@ public abstract class Scheduler {
         this.plugin = plugin;
     }
 
-    public abstract void run(Player player, Runnable runnable);
-    public abstract void runGlobal(Runnable runnable);
+    public abstract WrappedTask run(Player player, Runnable runnable);
+    public abstract WrappedTask runGlobal(Runnable runnable);
 
-    public abstract void runLater(Player player, Runnable runnable, long delay);
+    public abstract WrappedTask runLater(Player player, Runnable runnable, long delay);
 
-    public abstract void runTimer(Player player, Runnable runnable, long delay, long period);
+    public abstract WrappedTask runTimer(Player player, Runnable runnable, long delay, long period);
 
     public static Scheduler createScheduler(JavaPlugin plugin) {
         try {

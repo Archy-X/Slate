@@ -2,6 +2,7 @@ package dev.aurelium.slate.scheduler;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 
 public class BukkitScheduler extends Scheduler {
     public BukkitScheduler(JavaPlugin plugin) {
@@ -9,22 +10,26 @@ public class BukkitScheduler extends Scheduler {
     }
 
     @Override
-    public void run(Player player, Runnable runnable) {
-        plugin.getServer().getScheduler().runTask(plugin, runnable);
+    public WrappedTask run(Player player, Runnable runnable) {
+        BukkitTask task = plugin.getServer().getScheduler().runTask(plugin, runnable);
+        return new WrappedTask(task);
     }
 
     @Override
-    public void runGlobal(Runnable runnable) {
-        run(null, runnable);
+    public WrappedTask runGlobal(Runnable runnable) {
+        BukkitTask task = plugin.getServer().getScheduler().runTask(plugin, runnable);
+        return new WrappedTask(task);
     }
 
     @Override
-    public void runLater(Player player, Runnable runnable, long delay) {
-        plugin.getServer().getScheduler().runTaskLater(plugin, runnable, delay);
+    public WrappedTask runLater(Player player, Runnable runnable, long delay) {
+        BukkitTask task = plugin.getServer().getScheduler().runTaskLater(plugin, runnable, delay);
+        return new WrappedTask(task);
     }
 
     @Override
-    public void runTimer(Player player, Runnable runnable, long delay, long period) {
-        plugin.getServer().getScheduler().runTaskTimer(plugin, runnable, delay, period);
+    public WrappedTask runTimer(Player player, Runnable runnable, long delay, long period) {
+        BukkitTask task =  plugin.getServer().getScheduler().runTaskTimer(plugin, runnable, delay, period);
+        return new WrappedTask(task);
     }
 }

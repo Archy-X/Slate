@@ -23,6 +23,7 @@ import dev.aurelium.slate.inv.opener.ChestInventoryOpener;
 import dev.aurelium.slate.inv.opener.InventoryOpener;
 import dev.aurelium.slate.inv.opener.SpecialInventoryOpener;
 import dev.aurelium.slate.scheduler.Scheduler;
+import dev.aurelium.slate.scheduler.WrappedTask;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -34,7 +35,6 @@ import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -47,7 +47,7 @@ public class InventoryManager {
 
     private final Map<UUID, SmartInventory> inventories;
     private final Map<UUID, InventoryContents> contents;
-    private final Map<UUID, BukkitRunnable> updateTasks;
+    private final Map<UUID, WrappedTask> updateTasks;
 
     private final List<InventoryOpener> defaultOpeners;
     private final List<InventoryOpener> openers;
@@ -137,16 +137,19 @@ public class InventoryManager {
     }
 
     protected void scheduleUpdateTask(Player p, SmartInventory inv) {
-        scheduler.runTimer(p, () ->
-                inv.getProvider().update(p, contents.get(p.getUniqueId())), 1, 1);
+        final InventoryContents inventoryContents = contents.get(p.getUniqueId());
+
+        WrappedTask task = scheduler.runTimer(p, () ->
+                inv.getProvider().update(p, inventoryContents), 1, 1);
+
+        this.updateTasks.put(p.getUniqueId(), task);
     }
 
     protected void cancelUpdateTask(Player p) {
-    	if(updateTasks.containsKey(p.getUniqueId())) {
-          int bukkitTaskId = this.updateTasks.get(p.getUniqueId()).getTaskId();
-          Bukkit.getScheduler().cancelTask(bukkitTaskId);
-          this.updateTasks.remove(p.getUniqueId());
-    	}
+        if (updateTasks.containsKey(p.getUniqueId())) {
+            this.updateTasks.get(p.getUniqueId()).cancel();
+            this.updateTasks.remove(p.getUniqueId());
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -157,7 +160,7 @@ public class InventoryManager {
             Player p = (Player) e.getWhoClicked();
             SmartInventory inv = inventories.get(p.getUniqueId());
 
-            if(inv == null)
+            if (inv == null)
                 return;
 
             // Restrict putting items from the bottom inventory into the top inventory
@@ -180,13 +183,13 @@ public class InventoryManager {
                 int row = e.getSlot() / 9;
                 int column = e.getSlot() % 9;
 
-                if(!inv.checkBounds(row, column))
+                if (!inv.checkBounds(row, column))
                     return;
 
                 InventoryContents invContents = contents.get(p.getUniqueId());
                 SlotPos slot = SlotPos.of(row, column);
 
-                if(!invContents.isEditable(slot))
+                if (!invContents.isEditable(slot))
                     e.setCancelled(true);
 
                 inv.getListeners().stream()
@@ -196,7 +199,7 @@ public class InventoryManager {
                 invContents.get(slot).ifPresent(item -> item.run(new ItemClickData(e, p, e.getCurrentItem(), slot)));
 
                 // Don't update if the clicked slot is editable - prevent item glitching
-                if(!invContents.isEditable(slot)) {
+                if (!invContents.isEditable(slot)) {
                     p.updateInventory();
                 }
             }
@@ -213,7 +216,7 @@ public class InventoryManager {
             InventoryContents content = contents.get(p.getUniqueId());
 
             for (int slot : e.getRawSlots()) {
-                SlotPos pos = SlotPos.of(slot/9, slot%9);
+                SlotPos pos = SlotPos.of(slot / 9, slot % 9);
                 if (slot >= p.getOpenInventory().getTopInventory().getSize() || content.isEditable(pos))
                     continue;
 
@@ -249,7 +252,7 @@ public class InventoryManager {
 
             SmartInventory inv = inventories.get(p.getUniqueId());
 
-            try{
+            try {
                 inv.getListeners().stream()
                         .filter(listener -> listener.getType() == InventoryCloseEvent.class)
                         .forEach(listener -> ((InventoryListener<InventoryCloseEvent>) listener).accept(e));
@@ -260,8 +263,7 @@ public class InventoryManager {
 
                     inventories.remove(p.getUniqueId());
                     contents.remove(p.getUniqueId());
-                }
-                else
+                } else
                     scheduler.run(p, () -> p.openInventory(e.getInventory()));
             }
         }
@@ -275,7 +277,7 @@ public class InventoryManager {
 
             SmartInventory inv = inventories.get(p.getUniqueId());
 
-            try{
+            try {
                 inv.getListeners().stream()
                         .filter(listener -> listener.getType() == PlayerQuitEvent.class)
                         .forEach(listener -> ((InventoryListener<PlayerQuitEvent>) listener).accept(e));
@@ -289,7 +291,7 @@ public class InventoryManager {
         @EventHandler(priority = EventPriority.LOW)
         public void onPluginDisable(PluginDisableEvent e) {
             new HashMap<>(inventories).forEach((player, inv) -> {
-                try{
+                try {
                     inv.getListeners().stream()
                             .filter(listener -> listener.getType() == PluginDisableEvent.class)
                             .forEach(listener -> ((InventoryListener<PluginDisableEvent>) listener).accept(e));

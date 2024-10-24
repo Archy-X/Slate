@@ -1,5 +1,6 @@
 package dev.aurelium.slate.scheduler;
 
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -10,22 +11,26 @@ public class PaperScheduler extends Scheduler {
     }
 
     @Override
-    public void run(Player player, Runnable runnable) {
-        player.getScheduler().run(plugin, (t) -> runnable.run(), null);
+    public WrappedTask run(Player player, Runnable runnable) {
+        ScheduledTask task = player.getScheduler().run(plugin, (t) -> runnable.run(), null);
+        return new WrappedTask(task);
     }
 
     @Override
-    public void runGlobal(Runnable runnable) {
-        Bukkit.getGlobalRegionScheduler().run(plugin, (t) -> runnable.run());
+    public WrappedTask runGlobal(Runnable runnable) {
+        ScheduledTask task = Bukkit.getGlobalRegionScheduler().run(plugin, (t) -> runnable.run());
+        return new WrappedTask(task);
     }
 
     @Override
-    public void runLater(Player player, Runnable runnable, long delay) {
-        player.getScheduler().runDelayed(plugin, (t) -> runnable.run(), null, delay);
+    public WrappedTask runLater(Player player, Runnable runnable, long delay) {
+        ScheduledTask task = player.getScheduler().runDelayed(plugin, (t) -> runnable.run(), null, delay);
+        return new WrappedTask(task);
     }
 
     @Override
-    public void runTimer(Player player, Runnable runnable, long delay, long period) {
-        player.getScheduler().runAtFixedRate(plugin, (t) -> runnable.run(), null, delay, period);
+    public WrappedTask runTimer(Player player, Runnable runnable, long delay, long period) {
+        ScheduledTask task = player.getScheduler().runAtFixedRate(plugin, (t) -> runnable.run(), null, delay, period);
+        return new WrappedTask(task);
     }
 }
