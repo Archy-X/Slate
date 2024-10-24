@@ -30,13 +30,15 @@ public class MenuOpener {
      * @param page The page number to open, 0 is the first page
      */
     public void openMenu(Player player, String name, Map<String, Object> properties, int page) {
-        try {
-            openMenuUnchecked(player, name, properties, page);
-        } catch (Exception e) {
-            player.closeInventory();
-            slate.getPlugin().getLogger().warning("Error opening Slate menu " + name);
-            e.printStackTrace();
-        }
+        slate.getScheduler().run(player, () -> {
+            try {
+                openMenuUnchecked(player, name, properties, page);
+            } catch (Exception e) {
+                player.closeInventory();
+                slate.getPlugin().getLogger().warning("Error opening Slate menu " + name);
+                e.printStackTrace();
+            }
+        });
     }
 
     public void openMenuUnchecked(Player player, String name, Map<String, Object> properties, int page) {

@@ -92,6 +92,7 @@ public class SmartInventory {
             Inventory handle = opener.open(this, player);
 
             this.manager.setInventory(player, this);
+            this.manager.cancelUpdateTask(player);
             this.manager.scheduleUpdateTask(player, this);
 
             return handle;

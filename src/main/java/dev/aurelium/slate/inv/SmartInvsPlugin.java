@@ -16,6 +16,7 @@
 
 package dev.aurelium.slate.inv;
 
+import dev.aurelium.slate.scheduler.Scheduler;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class SmartInvsPlugin extends JavaPlugin {
@@ -38,7 +39,7 @@ public class SmartInvsPlugin extends JavaPlugin {
 
     public static void setPlugin(JavaPlugin javaPlugin) {
         instance = javaPlugin;
-        invManager = new InventoryManager(javaPlugin);
+        invManager = new InventoryManager(javaPlugin, Scheduler.createScheduler(javaPlugin));
         invManager.init();
     }
 
