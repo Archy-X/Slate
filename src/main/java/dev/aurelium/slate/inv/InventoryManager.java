@@ -22,6 +22,7 @@ import dev.aurelium.slate.inv.content.SlotPos;
 import dev.aurelium.slate.inv.opener.ChestInventoryOpener;
 import dev.aurelium.slate.inv.opener.InventoryOpener;
 import dev.aurelium.slate.inv.opener.SpecialInventoryOpener;
+import dev.aurelium.slate.scheduler.Scheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -41,6 +42,7 @@ import java.util.logging.Level;
 public class InventoryManager {
 
     private final JavaPlugin plugin;
+    private final Scheduler scheduler;
     private final PluginManager pluginManager;
 
     private final Map<UUID, SmartInventory> inventories;
@@ -50,8 +52,9 @@ public class InventoryManager {
     private final List<InventoryOpener> defaultOpeners;
     private final List<InventoryOpener> openers;
 
-    public InventoryManager(JavaPlugin plugin) {
+    public InventoryManager(JavaPlugin plugin, Scheduler scheduler) {
         this.plugin = plugin;
+        this.scheduler = scheduler;
         this.pluginManager = Bukkit.getPluginManager();
 
         this.inventories = new HashMap<>();
@@ -68,8 +71,6 @@ public class InventoryManager {
 
     public void init() {
         pluginManager.registerEvents(new InvListener(), plugin);
-
-//        new InvTask().runTaskTimer(plugin, 1, 1);
     }
 
     public Optional<InventoryOpener> findOpener(InventoryType type) {
@@ -136,9 +137,8 @@ public class InventoryManager {
     }
 
     protected void scheduleUpdateTask(Player p, SmartInventory inv) {
-    	PlayerInvTask task = new PlayerInvTask(p, inv.getProvider(), contents.get(p.getUniqueId()));
-    	task.runTaskTimer(plugin, 1, inv.getUpdateFrequency());
-    	this.updateTasks.put(p.getUniqueId(), task);
+        scheduler.runTimer(p, () ->
+                inv.getProvider().update(p, contents.get(p.getUniqueId())), 1, 1);
     }
 
     protected void cancelUpdateTask(Player p) {
@@ -262,7 +262,7 @@ public class InventoryManager {
                     contents.remove(p.getUniqueId());
                 }
                 else
-                    Bukkit.getScheduler().runTask(plugin, () -> p.openInventory(e.getInventory()));
+                    scheduler.run(p, () -> p.openInventory(e.getInventory()));
             }
         }
 
@@ -303,41 +303,4 @@ public class InventoryManager {
         }
 
     }
-
-    class InvTask extends BukkitRunnable {
-
-        @Override
-        public void run() {
-            new HashMap<>(inventories).forEach((uuid, inv) -> {
-                Player player = Bukkit.getPlayer(uuid);
-
-                try {
-                    inv.getProvider().update(player, contents.get(uuid));
-                } catch (Exception e) {
-                    handleInventoryUpdateError(inv, player, e);
-                }
-            });
-        }
-
-    }
-
-    class PlayerInvTask extends BukkitRunnable {
-
-        private Player player;
-        private InventoryProvider provider;
-        private InventoryContents contents;
-
-        public PlayerInvTask(Player player, InventoryProvider provider, InventoryContents contents) {
-          this.player = Objects.requireNonNull(player);
-          this.provider = Objects.requireNonNull(provider);
-          this.contents = Objects.requireNonNull(contents);
-        }
-
-        @Override
-        public void run() {
-            provider.update(this.player, this.contents);
-        }
-
-    }
-
 }

@@ -12,6 +12,7 @@ import dev.aurelium.slate.menu.MenuFileGenerator;
 import dev.aurelium.slate.menu.MenuLoader;
 import dev.aurelium.slate.menu.MenuOpener;
 import dev.aurelium.slate.option.SlateOptions;
+import dev.aurelium.slate.scheduler.Scheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -27,6 +28,7 @@ import java.util.function.Consumer;
 public class Slate {
 
     private final JavaPlugin plugin;
+    private final Scheduler scheduler;
     private final ContextManager contextManager;
     private final InventoryManager inventoryManager;
     private final ActionManager actionManager;
@@ -40,8 +42,9 @@ public class Slate {
 
     public Slate(JavaPlugin plugin, SlateOptions options) {
         this.plugin = plugin;
+        this.scheduler = Scheduler.createScheduler(plugin);
         this.contextManager = new ContextManager();
-        this.inventoryManager = new InventoryManager(plugin);
+        this.inventoryManager = new InventoryManager(plugin, scheduler);
         inventoryManager.init();
         this.actionManager = new ActionManager(this);
         this.placeholderAPIEnabled = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
@@ -156,6 +159,10 @@ public class Slate {
 
     public SlateOptions getOptions() {
         return options;
+    }
+
+    public Scheduler getScheduler() {
+        return scheduler;
     }
 
     /**

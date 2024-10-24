@@ -23,9 +23,9 @@ public class CommandAction extends Action {
     public void execute(Player player, MenuInventory menuInventory, InventoryContents contents) {
         String formattedCommand = formatCommand(player, command);
         if (executor == Executor.CONSOLE) {
-            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), formattedCommand);
+            slate.getScheduler().runGlobal(() -> Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), formattedCommand));
         } else if (executor == Executor.PLAYER) {
-            player.performCommand(formattedCommand);
+            slate.getScheduler().run(player, () -> player.performCommand(formattedCommand));
         }
     }
 
