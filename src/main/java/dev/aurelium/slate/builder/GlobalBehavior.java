@@ -43,19 +43,30 @@ public record GlobalBehavior(
                 PlaceholderData data = new PlaceholderData(type, style, pair.second());
                 PlaceholderInfo info = new PlaceholderInfo(slate, player, pair.first(), activeMenu, data);
 
-                // Apply page replacers
-                for (Entry<String, ItemReplacer> entry : pageReplacers.entrySet()) {
-                    if (!entry.getKey().equals(pair.first())) continue;
-                    // Replacer target string matches current placeholder name
-                    String replaced = entry.getValue().replace(info);
+                // Apply global replacers
+                for (ItemReplacer replacer : globalReplacers) {
+                    String replaced = replacer.replace(info);
                     if (replaced != null) {
                         input = TextUtil.replace(input, "{" + placeholder + "}", replaced);
                     }
                 }
+            }
+        }
 
-                // Apply global replacers
-                for (ItemReplacer replacer : globalReplacers) {
-                    String replaced = replacer.replace(info);
+        // Apply page replacers
+        String[] afterGlobalPlaceholders = TextUtil.substringsBetween(input, "{", "}");
+        if (afterGlobalPlaceholders != null) {
+            String style = LoreUtil.getStyle(input);
+            for (String placeholder : afterGlobalPlaceholders) {
+                Pair<String, ListData> pair = LoreInterpreter.detectListPlaceholder(placeholder);
+                PlaceholderData data = new PlaceholderData(type, style, pair.second());
+                PlaceholderInfo info = new PlaceholderInfo(slate, player, pair.first(), activeMenu, data);
+
+                for (Entry<String, ItemReplacer> entry : pageReplacers.entrySet()) {
+                    if (!entry.getKey().equals(pair.first())) continue;
+                    // Replacer target string matches current placeholder name
+                    String replaced = entry.getValue().replace(info);
+                    slate.getPlugin().getLogger().info("Replaced placeholder " + entry.getKey() + " with " + replaced);
                     if (replaced != null) {
                         input = TextUtil.replace(input, "{" + placeholder + "}", replaced);
                     }
