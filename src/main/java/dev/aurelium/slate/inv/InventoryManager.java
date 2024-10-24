@@ -37,6 +37,7 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 public class InventoryManager {
@@ -57,9 +58,9 @@ public class InventoryManager {
         this.scheduler = scheduler;
         this.pluginManager = Bukkit.getPluginManager();
 
-        this.inventories = new HashMap<>();
-        this.contents = new HashMap<>();
-        this.updateTasks = new HashMap<>();
+        this.inventories = new ConcurrentHashMap<>();
+        this.contents = new ConcurrentHashMap<>();
+        this.updateTasks = new ConcurrentHashMap<>();
 
         this.defaultOpeners = Arrays.asList(
                 new ChestInventoryOpener(),
