@@ -66,7 +66,6 @@ public record GlobalBehavior(
                     if (!entry.getKey().equals(pair.first())) continue;
                     // Replacer target string matches current placeholder name
                     String replaced = entry.getValue().replace(info);
-                    slate.getPlugin().getLogger().info("Replaced placeholder " + entry.getKey() + " with " + replaced);
                     if (replaced != null) {
                         input = TextUtil.replace(input, "{" + placeholder + "}", replaced);
                     }
