@@ -140,9 +140,7 @@ public class InventoryManager {
     protected void scheduleUpdateTask(Player p, SmartInventory inv) {
         final InventoryContents inventoryContents = contents.get(p.getUniqueId());
 
-        WrappedTask task = scheduler.runTimer(p, () ->
-                inv.getProvider().update(p, inventoryContents), 1, 1);
-
+        WrappedTask task = scheduler.runTimer(p, () -> inv.getProvider().update(p, inventoryContents), 1, 1);
         this.updateTasks.put(p.getUniqueId(), task);
     }
 
