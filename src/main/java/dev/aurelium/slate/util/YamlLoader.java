@@ -40,6 +40,7 @@ public class YamlLoader {
             URI uri = url.toURI();
             try (FileSystem ignored = FileSystems.newFileSystem(uri, Map.of("create", "true"))) {
                 var loader = YamlConfigurationLoader.builder()
+                        .defaultOptions(opts -> opts.shouldCopyDefaults(false))
                         .path(Path.of(uri))
                         .build();
                 return loader.load();
@@ -53,6 +54,7 @@ public class YamlLoader {
     public ConfigurationNode loadUserFile(File file) throws ConfigurateException {
         var loader = YamlConfigurationLoader.builder()
                 .path(file.toPath())
+                .defaultOptions(opts -> opts.shouldCopyDefaults(false))
                 .nodeStyle(NodeStyle.BLOCK)
                 .indent(2)
                 .build();
@@ -61,6 +63,7 @@ public class YamlLoader {
 
     public void saveFile(File file, ConfigurationNode config) throws ConfigurateException {
         var loader = YamlConfigurationLoader.builder()
+                .defaultOptions(opts -> opts.shouldCopyDefaults(false))
                 .file(file)
                 .nodeStyle(NodeStyle.BLOCK)
                 .indent(2)
