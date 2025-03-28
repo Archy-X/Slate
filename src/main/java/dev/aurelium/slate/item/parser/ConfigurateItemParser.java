@@ -76,6 +76,7 @@ public class ConfigurateItemParser {
         if (!config.node("durability").virtual()) {
             parseDurability(config, item);
         }
+        parseItemModel(config, item);
         // Parses custom_model_data and old format CustomModelData nbt map
         parseCustomModelData(config, item);
 
@@ -131,7 +132,7 @@ public class ConfigurateItemParser {
 
     private void parseGlow(ItemStack item) {
         ItemMeta meta = getMeta(item);
-        meta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 1, true);
+        meta.addEnchant(Enchantment.MENDING, 1, true);
         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
         item.setItemMeta(meta);
     }
@@ -263,6 +264,15 @@ public class ConfigurateItemParser {
             int data = config.node("nbt").node("CustomModelData").getInt();
             ItemMeta meta = getMeta(item);
             meta.setCustomModelData(data);
+            item.setItemMeta(meta);
+        }
+    }
+
+    private void parseItemModel(ConfigurationNode config, ItemStack item) {
+        if (!config.node("item_model").empty() && VersionUtil.isAtLeastVersion(21, 2)) {
+            String model = config.node("item_model").getString("");
+            ItemMeta meta = getMeta(item);
+            meta.setItemModel(NamespacedKey.fromString(model));
             item.setItemMeta(meta);
         }
     }
