@@ -3,7 +3,7 @@ import java.net.URI
 
 plugins {
     `java-library`
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("com.gradleup.shadow") version "8.3.5"
     idea
     `maven-publish`
     signing
@@ -11,6 +11,14 @@ plugins {
 
 group = "dev.aurelium"
 version = project.property("projectVersion") as String
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
 
 repositories {
     mavenCentral()
@@ -29,7 +37,7 @@ dependencies {
     }
     api("net.kyori:adventure-text-minimessage:4.16.0")
     api("net.kyori:adventure-platform-bukkit:4.3.2")
-    compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("com.mojang:authlib:1.5.25")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
@@ -40,17 +48,13 @@ configurations.all {
     exclude("org.yaml", "snakeyaml")
 }
 
-tasks.withType<ShadowJar> {
-    val projectVersion: String by project
-
-    exclude("plugin.yml")
-}
-
-tasks.withType<JavaCompile> {
-    options.encoding = "UTF-8"
-}
-
 tasks {
+    withType<ShadowJar> {
+        val projectVersion: String by project
+
+        exclude("plugin.yml")
+    }
+
     javadoc {
         title = "Slate API (${project.version})"
         source = sourceSets.main.get().allSource
@@ -62,9 +66,14 @@ tasks {
             charset("UTF-8")
         }
     }
+
     build {
         dependsOn(shadowJar)
         dependsOn(javadoc)
+    }
+
+    withType<JavaCompile> {
+        options.encoding = "UTF-8"
     }
 }
 
@@ -75,11 +84,6 @@ idea {
     }
 }
 
-java {
-    withJavadocJar()
-    withSourcesJar()
-    sourceCompatibility = JavaVersion.VERSION_17
-}
 
 if (project.hasProperty("sonatypeUsername") && project.hasProperty("sonatypePassword")) {
     publishing {
@@ -131,7 +135,6 @@ if (project.hasProperty("sonatypeUsername") && project.hasProperty("sonatypePass
     }
 
     signing {
-        useGpgCmd()
         sign(publishing.publications.getByName("mavenJava"))
         isRequired = true
     }
