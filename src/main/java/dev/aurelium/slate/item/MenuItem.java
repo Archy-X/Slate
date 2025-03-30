@@ -1,7 +1,7 @@
 package dev.aurelium.slate.item;
 
 import dev.aurelium.slate.Slate;
-import dev.aurelium.slate.action.Action;
+import dev.aurelium.slate.action.ItemActions;
 import dev.aurelium.slate.action.condition.Condition;
 import dev.aurelium.slate.action.condition.ItemConditions;
 import dev.aurelium.slate.action.trigger.ClickTrigger;
@@ -20,11 +20,11 @@ public abstract class MenuItem {
     private final String name;
     private final String displayName;
     private final List<LoreLine> lore;
-    private final Map<ClickTrigger, List<Action>> actions;
+    private final ItemActions actions;
     private final ItemConditions conditions;
     private final Map<String, Object> options;
 
-    public MenuItem(Slate slate, String name, String displayName, List<LoreLine> lore, Map<ClickTrigger, List<Action>> actions,
+    public MenuItem(Slate slate, String name, String displayName, List<LoreLine> lore, ItemActions actions,
                     ItemConditions conditions, Map<String, Object> options) {
         this.slate = slate;
         this.name = name;
@@ -49,7 +49,7 @@ public abstract class MenuItem {
         return lore;
     }
 
-    public Map<ClickTrigger, List<Action>> getActions() {
+    public ItemActions getActions() {
         return actions;
     }
 

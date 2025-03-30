@@ -2,6 +2,7 @@ package dev.aurelium.slate.menu;
 
 import dev.aurelium.slate.Slate;
 import dev.aurelium.slate.action.Action;
+import dev.aurelium.slate.action.ItemActions;
 import dev.aurelium.slate.action.trigger.ClickTrigger;
 import dev.aurelium.slate.action.trigger.MenuTrigger;
 import dev.aurelium.slate.builder.BuiltItem;
@@ -342,7 +343,7 @@ public class MenuInventory implements InventoryProvider {
             // Run coded click functionality
             builtTemplate.handleClick(getClickTriggers(event.getClick()), new TemplateClick<>(slate, player, event, c.getItem(), pos, activeMenu, context));
 
-            executeClickActions(templateItem, player, contents, c); // Run custom click actions
+            executeClickActions(templateItem, player, contents, c, context); // Run custom click actions
         }));
     }
 
@@ -380,8 +381,28 @@ public class MenuInventory implements InventoryProvider {
             return;
         }
 
-        Set<ClickTrigger> clickTriggers = getClickTriggers(event.getClick());
-        Map<ClickTrigger, List<Action>> actions = menuItem.getActions();
+        executeActionsForClick(menuItem.getActions(), event.getClick(), player, contents);
+    }
+
+    private <C> void executeClickActions(TemplateItem<C> menuItem, Player player, InventoryContents contents, ItemClickData clickData, C context) {
+        if (!(clickData.getEvent() instanceof InventoryClickEvent event)) {
+            return;
+        }
+
+        // Execute template-level actions
+        executeActionsForClick(menuItem.getActions(), event.getClick(), player, contents);
+
+        // Execute context-level actions
+        ItemActions contextActions = menuItem.getContextActions(context);
+        if (contextActions != null) {
+            executeActionsForClick(contextActions, event.getClick(), player, contents);
+        }
+    }
+
+    private void executeActionsForClick(ItemActions itemActions, ClickType type, Player player, InventoryContents contents) {
+        Set<ClickTrigger> clickTriggers = getClickTriggers(type);
+        Map<ClickTrigger, List<Action>> actions = itemActions.actions();
+
         for (Map.Entry<ClickTrigger, List<Action>> entry : actions.entrySet()) {
             ClickTrigger clickTrigger = entry.getKey();
             if (clickTriggers.contains(clickTrigger)) { // Make sure click matches

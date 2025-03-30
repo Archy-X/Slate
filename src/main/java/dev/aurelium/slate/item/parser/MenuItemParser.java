@@ -2,6 +2,7 @@ package dev.aurelium.slate.item.parser;
 
 import dev.aurelium.slate.Slate;
 import dev.aurelium.slate.action.Action;
+import dev.aurelium.slate.action.ItemActions;
 import dev.aurelium.slate.action.condition.Condition;
 import dev.aurelium.slate.action.condition.ConditionParser;
 import dev.aurelium.slate.action.condition.ItemConditions;
@@ -48,13 +49,13 @@ public abstract class MenuItemParser extends MapParser {
         builder.displayName(itemParser.parseDisplayName(config));
         builder.lore(itemParser.parseLore(config));
 
-        parseActions(builder, config, menuName);
+        builder.actions(parseActions(config, menuName));
         builder.conditions(getConditions(config, menuName));
 
         builder.options(MenuLoader.loadOptions(config));
     }
 
-    protected void parseActions(MenuItemBuilder builder, ConfigurationNode config, String menuName) {
+    protected ItemActions parseActions(ConfigurationNode config, String menuName) {
         Map<ClickTrigger, List<Action>> actions = new LinkedHashMap<>();
         for (ClickTrigger clickTrigger : ClickTrigger.values()) {
             String id = clickTrigger.getId();
@@ -63,7 +64,7 @@ public abstract class MenuItemParser extends MapParser {
                 actions.put(clickTrigger, clickActions);
             }
         }
-        builder.actions(actions);
+        return new ItemActions(actions);
     }
 
     protected ItemConditions getConditions(ConfigurationNode config, String menuName) {

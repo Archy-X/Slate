@@ -1,6 +1,7 @@
 package dev.aurelium.slate.item.parser;
 
 import dev.aurelium.slate.Slate;
+import dev.aurelium.slate.action.ItemActions;
 import dev.aurelium.slate.action.condition.ItemConditions;
 import dev.aurelium.slate.context.ContextGroup;
 import dev.aurelium.slate.context.ContextProvider;
@@ -47,6 +48,7 @@ public class TemplateItemParser<C> extends MenuItemParser {
         Map<C, String> contextualDisplayNames = new HashMap<>();
         Map<C, List<LoreLine>> contextualLore = new HashMap<>();
         Map<C, ItemConditions> contextualConditions = new HashMap<>();
+        Map<C, ItemActions> contextualActions = new HashMap<>();
 
         for (ConfigurationNode contextNode : section.node("contexts").childrenMap().values()) {
             String key;
@@ -86,12 +88,15 @@ public class TemplateItemParser<C> extends MenuItemParser {
                 }
                 // Parse view_conditions, etc. on the specific context
                 contextualConditions.put(context, getConditions(contextNode, menuName));
+
+                contextualActions.put(context, parseActions(contextNode, menuName));
             }
         }
 
         builder.contextualDisplayNames(contextualDisplayNames);
         builder.contextualLore(contextualLore);
         builder.contextualConditions(contextualConditions);
+        builder.contextualActions(contextualActions);
 
         String defaultPos = section.node("pos").getString();
         if (positions.isEmpty() && defaultPos != null) {

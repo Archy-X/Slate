@@ -1,7 +1,7 @@
 package dev.aurelium.slate.item;
 
 import dev.aurelium.slate.Slate;
-import dev.aurelium.slate.action.Action;
+import dev.aurelium.slate.action.ItemActions;
 import dev.aurelium.slate.action.condition.Condition;
 import dev.aurelium.slate.action.condition.ItemConditions;
 import dev.aurelium.slate.action.trigger.ClickTrigger;
@@ -28,7 +28,7 @@ public class TemplateItem<C> extends MenuItem {
     private final Map<String, ContextGroup> contextGroups;
 
     public TemplateItem(Slate slate, String name, Class<C> contextClass, TemplateData<C> data, ItemStack defaultBaseItem,
-                        String displayName, List<LoreLine> lore, Map<ClickTrigger, List<Action>> actions, ItemConditions conditions,
+                        String displayName, List<LoreLine> lore, ItemActions actions, ItemConditions conditions,
                         SlotPos defaultPosition, Map<String, Object> options, Map<String, ContextGroup> contextGroups) {
         super(slate, name, displayName, lore, actions, conditions, options);
         this.contextClass = contextClass;
@@ -56,6 +56,11 @@ public class TemplateItem<C> extends MenuItem {
             clonedItems.put(entry.getKey(), entry.getValue().clone());
         }
         return clonedItems;
+    }
+
+    @Nullable
+    public ItemActions getContextActions(C context) {
+        return data.actions().get(context);
     }
 
     @Nullable

@@ -1,13 +1,11 @@
 package dev.aurelium.slate.item.builder;
 
 import dev.aurelium.slate.Slate;
-import dev.aurelium.slate.action.Action;
+import dev.aurelium.slate.action.ItemActions;
 import dev.aurelium.slate.action.condition.ItemConditions;
-import dev.aurelium.slate.action.trigger.ClickTrigger;
 import dev.aurelium.slate.item.MenuItem;
 import dev.aurelium.slate.lore.LoreLine;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,13 +15,12 @@ public abstract class MenuItemBuilder {
     protected String name;
     protected String displayName;
     protected List<LoreLine> lore;
-    protected Map<ClickTrigger, List<Action>> actions;
+    protected ItemActions actions;
     protected ItemConditions conditions;
     protected Map<String, Object> options;
 
     public MenuItemBuilder(Slate slate) {
         this.slate = slate;
-        this.actions = new LinkedHashMap<>();
     }
 
     public abstract MenuItem build();
@@ -43,7 +40,7 @@ public abstract class MenuItemBuilder {
         return this;
     }
 
-    public MenuItemBuilder actions(Map<ClickTrigger, List<Action>> actions) {
+    public MenuItemBuilder actions(ItemActions actions) {
         this.actions = actions;
         return this;
     }
