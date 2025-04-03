@@ -17,13 +17,13 @@
 package dev.aurelium.slate.inv;
 
 import dev.aurelium.slate.inv.content.InventoryContents;
-import dev.aurelium.slate.inv.content.InventoryProvider;
 import dev.aurelium.slate.inv.content.SlotPos;
 import dev.aurelium.slate.inv.opener.ChestInventoryOpener;
 import dev.aurelium.slate.inv.opener.InventoryOpener;
 import dev.aurelium.slate.inv.opener.SpecialInventoryOpener;
 import dev.aurelium.slate.scheduler.Scheduler;
 import dev.aurelium.slate.scheduler.WrappedTask;
+import dev.aurelium.slate.util.InventoryUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -164,7 +164,7 @@ public class InventoryManager {
 
             // Restrict putting items from the bottom inventory into the top inventory
             Inventory clickedInventory = e.getClickedInventory();
-            if (clickedInventory == p.getOpenInventory().getBottomInventory()) {
+            if (clickedInventory == InventoryUtil.getBottomInventory(p)) {
                 if (e.getAction() == InventoryAction.COLLECT_TO_CURSOR || e.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
                     e.setCancelled(true);
                     return;
@@ -176,7 +176,7 @@ public class InventoryManager {
                 }
             }
 
-            if (clickedInventory == p.getOpenInventory().getTopInventory()) {
+            if (clickedInventory == InventoryUtil.getTopInventory(p)) {
                 e.setCancelled(true);
 
                 int row = e.getSlot() / 9;
@@ -214,9 +214,12 @@ public class InventoryManager {
             SmartInventory inv = inventories.get(p.getUniqueId());
             InventoryContents content = contents.get(p.getUniqueId());
 
+            Inventory topInv = InventoryUtil.getTopInventory(p);
+            if (topInv == null) return;
+
             for (int slot : e.getRawSlots()) {
                 SlotPos pos = SlotPos.of(slot / 9, slot % 9);
-                if (slot >= p.getOpenInventory().getTopInventory().getSize() || content.isEditable(pos))
+                if (slot >= topInv.getSize() || content.isEditable(pos))
                     continue;
 
                 e.setCancelled(true);

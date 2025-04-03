@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 import dev.aurelium.slate.inv.ClickableItem;
 import dev.aurelium.slate.inv.SmartInventory;
 import dev.aurelium.slate.inv.util.Pattern;
+import dev.aurelium.slate.util.InventoryUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -976,11 +977,14 @@ public interface InventoryContents {
 
         private void update(int row, int column, ItemStack item) {
             Player currentPlayer = Bukkit.getPlayer(player);
+            if (currentPlayer == null) return;
             if(!inv.getManager().getOpenedPlayers(inv).contains(currentPlayer))
                 return;
 
-            Inventory topInventory = currentPlayer.getOpenInventory().getTopInventory();
-            topInventory.setItem(inv.getColumns() * row + column, item);
+            Inventory topInventory = InventoryUtil.getTopInventory(currentPlayer);
+            if (topInventory != null) {
+                topInventory.setItem(inv.getColumns() * row + column, item);
+            }
         }
 
         @Override
