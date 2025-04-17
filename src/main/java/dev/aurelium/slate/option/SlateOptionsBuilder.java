@@ -20,6 +20,7 @@ public class SlateOptionsBuilder {
     private int loreWrappingWidth = 40;
     private KeyedItemProvider keyedItemProvider = k -> null;
     private final Map<String, ItemMetaParser> itemMetaParsers = new HashMap<>();
+    private boolean removalProtection = false;
 
     /**
      * Sets the main directory where menu files are located. This is a required option.
@@ -94,6 +95,11 @@ public class SlateOptionsBuilder {
         return this;
     }
 
+    public SlateOptionsBuilder removalProtection(boolean removalProtection) {
+        this.removalProtection = removalProtection;
+        return this;
+    }
+
     /**
      * Builds the {@link SlateOptions} object.
      *
@@ -101,7 +107,7 @@ public class SlateOptionsBuilder {
      */
     public SlateOptions build() {
         Validate.notNull(mainDirectory, "mainDirectory not defined in SlateOptions");
-        return new SlateOptions(mainDirectory, mergeDirectories, loreWrappingWidth, keyedItemProvider, itemMetaParsers);
+        return new SlateOptions(mainDirectory, mergeDirectories, loreWrappingWidth, keyedItemProvider, itemMetaParsers, removalProtection);
     }
 
 }

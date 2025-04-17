@@ -12,7 +12,8 @@ public record SlateOptions(
         List<File> mergeDirectories,
         int loreWrappingWidth,
         KeyedItemProvider keyedItemProvider,
-        Map<String, ItemMetaParser> itemMetaParsers
+        Map<String, ItemMetaParser> itemMetaParsers,
+        boolean removalProtection
 ) {
 
     public static SlateOptionsBuilder builder() {

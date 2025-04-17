@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 import dev.aurelium.slate.inv.ClickableItem;
 import dev.aurelium.slate.inv.SmartInventory;
 import dev.aurelium.slate.inv.util.Pattern;
+import dev.aurelium.slate.item.ItemProtection;
 import dev.aurelium.slate.util.InventoryUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -983,7 +984,8 @@ public interface InventoryContents {
 
             Inventory topInventory = InventoryUtil.getTopInventory(currentPlayer);
             if (topInventory != null) {
-                topInventory.setItem(inv.getColumns() * row + column, item);
+                ItemStack protectedItem = ItemProtection.addProtection(item.clone());
+                topInventory.setItem(inv.getColumns() * row + column, protectedItem);
             }
         }
 

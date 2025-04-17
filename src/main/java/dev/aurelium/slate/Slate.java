@@ -7,6 +7,7 @@ import dev.aurelium.slate.builder.GlobalBehaviorBuilder;
 import dev.aurelium.slate.builder.MenuBuilder;
 import dev.aurelium.slate.context.ContextManager;
 import dev.aurelium.slate.inv.InventoryManager;
+import dev.aurelium.slate.item.ItemProtection;
 import dev.aurelium.slate.menu.LoadedMenu;
 import dev.aurelium.slate.menu.MenuFileGenerator;
 import dev.aurelium.slate.menu.MenuLoader;
@@ -37,6 +38,7 @@ public class Slate {
     private final Map<String, BuiltMenu> builtMenus = new HashMap<>();
     private final Map<String, LoadedMenu> loadedMenus = new LinkedHashMap<>();
     private final MenuOpener menuOpener = new MenuOpener(this);
+    private final ItemProtection itemProtection = new ItemProtection();
 
     private GlobalBehavior globalBehavior = GlobalBehaviorBuilder.builder().build();
 
@@ -49,6 +51,9 @@ public class Slate {
         this.actionManager = new ActionManager(this);
         this.placeholderAPIEnabled = Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI");
         this.options = options;
+        if (options.removalProtection()) {
+            plugin.getServer().getPluginManager().registerEvents(itemProtection, plugin);
+        }
     }
 
     /**
@@ -163,6 +168,10 @@ public class Slate {
 
     public Scheduler getScheduler() {
         return scheduler;
+    }
+
+    public ItemProtection getItemProtection() {
+        return itemProtection;
     }
 
     /**
